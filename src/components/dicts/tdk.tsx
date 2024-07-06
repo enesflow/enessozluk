@@ -37,9 +37,13 @@ export const TDKView = component$<{
 											TDK_LINK_DET
 										) ? (
 											<Link
-												href={`/search/${meaning.anlam.slice(
-													TDK_LINK_DET.length
-												)}`}
+												href={`/search/${
+													meaning.anlam
+														.slice(
+															TDK_LINK_DET.length
+														)
+														.split(" (")[0]
+												}`}
 											>
 												{meaning.anlam}
 											</Link>
