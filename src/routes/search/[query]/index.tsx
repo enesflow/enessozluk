@@ -1,15 +1,11 @@
 import { component$ } from "@builder.io/qwik";
-import {
-	routeLoader$,
-	useLocation,
-	type DocumentHead,
-} from "@builder.io/qwik-city";
+import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
+import { LuggatView, useLuggatLoader } from "~/components/dicts/luggat";
 import { useNisanyanLoader } from "~/components/dicts/nisanyan";
 import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
-import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { SearchBar } from "~/components/search";
-import { LuggatView, useLuggatLoader } from "~/components/dicts/luggat";
-export { useTDKLoader, useNisanyanLoader, useLuggatLoader };
+import { NisanyanView } from "../../../components/dicts/nisanyan";
+export { useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 export default component$(() => {
 	const loc = useLocation();
