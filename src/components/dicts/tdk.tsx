@@ -6,12 +6,14 @@ import { convertToRoman } from "#helpers/roman";
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 // eslint-disable-next-line qwik/loader-location
-export const useTDKLoader = routeLoader$(async ({ params }) => {
-	const url = `${TDK_URL}${params.query}`;
-	const response = await fetch(url);
-	const data = (await response.json()) as TDKResponse | TDKResponseError;
-	return data;
-});
+export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
+	async ({ params }) => {
+		const url = `${TDK_URL}${params.query}`;
+		const response = await fetch(url);
+		const data = (await response.json()) as TDKResponse | TDKResponseError;
+		return data;
+	}
+);
 
 export const TDKView = component$<{
 	data: TDKResponse | TDKResponseError;
@@ -31,7 +33,6 @@ export const TDKView = component$<{
 							<ul>
 								{result.anlamlarListe.map((meaning) => (
 									<li key={meaning.anlam_id}>
-										{/* <h3>{meaning.anlam}</h3> */}
 										{meaning.anlam.startsWith(
 											TDK_LINK_DET
 										) ? (

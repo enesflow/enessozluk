@@ -89,7 +89,9 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
 }
 
 // eslint-disable-next-line qwik/loader-location
-export const useNisanyanLoader = routeLoader$(async ({ params }) => {
+export const useNisanyanLoader = routeLoader$<
+	NisanyanResponse | NisanyanResponseError
+>(async ({ params }) => {
 	const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
 	const response = await fetch(url);
 	const data = (await response.json()) as
