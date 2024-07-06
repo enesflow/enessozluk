@@ -203,11 +203,12 @@ export const NisanyanView = component$<{
                           , {convertDate(history.date)}]
                         </span>
                       </p>
-                      <TextWithLinks
-                        class="result-quote"
-                        regex={NISANYAN_LINK_REGEX}
-                        text={formatSpecialChars(history.quote)}
-                      />
+                      <span class="result-quote">
+                        <TextWithLinks
+                          regex={NISANYAN_LINK_REGEX}
+                          text={formatSpecialChars(history.quote)}
+                        />
+                      </span>
                     </div>
                   ))}
                 </section>

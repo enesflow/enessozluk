@@ -29,7 +29,7 @@
 }
 
 .results-list {
-  @apply list-inside list-disc;
+  @apply list-none;
 }
 
 .result-item {

@@ -32,7 +32,10 @@ export const TDKView = component$<{
               </h2>
               <ul class="results-list">
                 {result.anlamlarListe.map((meaning) => (
-                  <li key={meaning.anlam_id} class="result-subitem">
+                  <li
+                    key={meaning.anlam_id}
+                    class="result-subitem result-description"
+                  >
                     {meaning.anlam.startsWith(TDK_LINK_DET) ? (
                       <Link
                         href={`/search/${
@@ -45,7 +48,7 @@ export const TDKView = component$<{
                         {meaning.anlam.slice(TDK_LINK_DET.length)}
                       </Link>
                     ) : (
-                      <p class="result-description">{meaning.anlam}</p>
+                      meaning.anlam
                     )}
                     <ul>
                       {meaning.orneklerListe?.map((example) => (

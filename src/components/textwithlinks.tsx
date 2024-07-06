@@ -8,12 +8,11 @@ function isALetter(char: string | undefined): boolean {
 export const TextWithLinks = component$<{
   text: string;
   regex: RegExp;
-  class?: string;
-}>(({ text, regex, class: className }) => {
+}>(({ text, regex }) => {
   const parts = text.split(regex);
 
   return (
-    <p class={className}>
+    <>
       {parts.map((part, index) => {
         // If the part contains a space, it is likely a link; otherwise, it's text
         const [word, ...rest] = part.split(" ");
@@ -45,6 +44,6 @@ export const TextWithLinks = component$<{
           </span>
         );
       })}
-    </p>
+    </>
   );
 });
