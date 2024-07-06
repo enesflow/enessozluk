@@ -16,6 +16,8 @@ const NISANYAN_ABBREVIATIONS = {
   ETü: "Eski Türkçe",
   Gürc: "Gürcüce",
   Süry: "Süryanice",
+  Erm: "Ermenice",
+  Aram: "Aramice",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
