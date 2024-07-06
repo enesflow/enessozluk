@@ -29,7 +29,6 @@ export const onRequest: RequestHandler = async ({
 			toAdd = "mak";
 		}
 		const to = `${url.origin}/search/${encodeURIComponent(noHyphen + toAdd)}/`;
-		console.log(to);
 		throw redirect(301, to);
 	}
 	/* if (query !== lower) {
