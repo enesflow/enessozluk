@@ -3,7 +3,12 @@
     "allowJs": true,
     "target": "ES2017",
     "module": "ES2022",
-    "lib": ["es2022", "DOM", "WebWorker", "DOM.Iterable"],
+    "lib": [
+      "es2022",
+      "DOM",
+      "WebWorker",
+      "DOM.Iterable"
+    ],
     "jsx": "react-jsx",
     "jsxImportSource": "@builder.io/qwik",
     "strict": true,
@@ -17,9 +22,25 @@
     "outDir": "tmp",
     "noEmit": true,
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": [
+        "./src/*"
+      ],
+      "#/*": [
+        "./types/*"
+      ],
+      "#helpers/*": [
+        "./helpers/*"
+      ]
     }
   },
-  "files": ["./.eslintrc.cjs"],
-  "include": ["src", "./*.d.ts", "./*.config.ts"]
+  "files": [
+    "./.eslintrc.cjs"
+  ],
+  "include": [
+    "src",
+    "./*.d.ts",
+    "./*.config.ts",
+    "./types",
+    "./helpers",
+  ],
 }
