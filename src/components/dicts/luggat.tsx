@@ -24,6 +24,53 @@ export const LuggatDefiniton = component$<{ text: string }>(({ text }) => {
 	return <p>{text}</p>;
 });
 
+function consolidateNames(names: string): string {
+	// example:
+	// input: kudsi / kudsi / kudsî / قُدْس۪ي
+	// output: kudsi / kudsî / قُدْس۪ي
+	const namesSet = new Set<string>();
+	const namesArray = names.split("/");
+	for (const name of namesArray) {
+		if (name.trim() === "") {
+			continue;
+		}
+		namesSet.add(name.trim());
+	}
+	return Array.from(namesSet).join(" / ");
+}
+
+function consolidateDefinitions(definitions: string[]): string[] {
+	const definitionsSet = new Set<string>();
+	for (const definition of definitions) {
+		definitionsSet.add(definition.trim());
+	}
+	return Array.from(definitionsSet);
+}
+
+function consolidateEntries(
+	words: LuggatResponse["words"]
+): LuggatResponse["words"] {
+	const resultRecord = new Map<string, string[]>();
+	for (const word of words) {
+		if (resultRecord.has(word.name)) {
+			resultRecord.set(word.name, [
+				...resultRecord.get(word.name)!,
+				...word.definitions,
+			]);
+		} else {
+			resultRecord.set(word.name, word.definitions);
+		}
+	}
+	const result: LuggatResponse["words"] = [];
+	for (const [name, definitions] of resultRecord) {
+		result.push({
+			name: consolidateNames(name),
+			definitions: consolidateDefinitions(definitions),
+		});
+	}
+	return result;
+}
+
 // eslint-disable-next-line qwik/loader-location
 export const useLuggatLoader = routeLoader$<
 	LuggatResponse | LuggatResponseError
@@ -71,7 +118,10 @@ export const useLuggatLoader = routeLoader$<
 			return { isUnsuccessful: true };
 		}
 
-		return { isUnsuccessful: false, words };
+		return {
+			isUnsuccessful: false,
+			words: consolidateEntries(words),
+		};
 	} catch (error) {
 		return { isUnsuccessful: true };
 	}
