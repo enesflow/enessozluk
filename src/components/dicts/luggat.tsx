@@ -5,6 +5,25 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
 
 const LUGGAT_URL = "https://www.luggat.com/" as const;
+
+export const LuggatDefiniton = component$<{ text: string }>(({ text }) => {
+	const match = text.match(/\(Bak: (.+?)\)/);
+	if (match) {
+		const [fullMatch, linkText] = match;
+		const beforeLink = text.split(fullMatch)[0];
+		const afterLink = text.split(fullMatch)[1];
+
+		return (
+			<p>
+				{beforeLink}
+				<a href={`/search/${linkText}`}>{linkText}</a>
+				{afterLink}
+			</p>
+		);
+	}
+	return <p>{text}</p>;
+});
+
 // eslint-disable-next-line qwik/loader-location
 export const useLuggatLoader = routeLoader$<
 	LuggatResponse | LuggatResponseError
@@ -17,13 +36,11 @@ export const useLuggatLoader = routeLoader$<
 		const words: LuggatResponse["words"] = [];
 
 		$(".arama-sonucu-div").each((index, element) => {
-			console.log(`Processing element ${index}`);
 			const name = $(element)
 				.find("h2.heading-5")
 				.text()
 				.trim()
 				.replace(/\s+/g, " ");
-			console.log(`Found name: ${name}`);
 			const definitions: string[] = [];
 
 			// Process definitions inside <ol> lists
@@ -31,25 +48,17 @@ export const useLuggatLoader = routeLoader$<
 				.find("ol li")
 				.each((_, li) => {
 					const definition = $(li).text().trim();
-					console.log(`Found definition: ${definition}`);
 					definitions.push(definition);
 				});
 
 			// If no <ol> list definitions found, check for other possible definitions
 			if (definitions.length === 0) {
-				console.log("Could not find any definitions in <ol> list");
 				const potentialDefinition = $(element)
 					.contents()
 					.filter((_, node) => node.type === "text")
 					.text()
 					.trim();
-				console.log(
-					`Found alternative definition: ${potentialDefinition}`
-				);
 				if (potentialDefinition) {
-					console.log(
-						`Found alternative definition: ${potentialDefinition}`
-					);
 					definitions.push(potentialDefinition);
 				}
 			}
@@ -64,7 +73,6 @@ export const useLuggatLoader = routeLoader$<
 
 		return { isUnsuccessful: false, words };
 	} catch (error) {
-		console.error("Error parsing HTML:", error);
 		return { isUnsuccessful: true };
 	}
 });
@@ -85,7 +93,9 @@ export const LuggatView = component$<{
 							</h2>
 							<ul>
 								{word.definitions.map((meaning) => (
-									<li key={meaning}>{meaning}</li>
+									<li key={meaning}>
+										<LuggatDefiniton text={meaning} />
+									</li>
 								))}
 							</ul>
 						</li>
