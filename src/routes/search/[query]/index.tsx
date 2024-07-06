@@ -1,5 +1,9 @@
 import { component$ } from "@builder.io/qwik";
-import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
+import {
+	routeLoader$,
+	useLocation,
+	type DocumentHead,
+} from "@builder.io/qwik-city";
 import { useNisanyanLoader } from "~/components/dicts/nisanyan";
 import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
@@ -26,12 +30,14 @@ export default component$(() => {
 	);
 });
 
-export const head: DocumentHead = {
-	title: "Welcome to Qwik",
-	meta: [
-		{
-			name: "description",
-			content: "Qwik site description",
-		},
-	],
+export const head: DocumentHead = ({ params }) => {
+	return {
+		title: `${params.query} - Enes Sözlük 📕`,
+		meta: [
+			{
+				name: "description",
+				content: `Enes Sözlük'te ${params.query} araması için sonuçlar.`,
+			},
+		],
+	};
 };

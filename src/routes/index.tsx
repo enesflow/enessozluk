@@ -5,18 +5,19 @@ import { SearchBar } from "~/components/search";
 export default component$(() => {
 	return (
 		<>
-			<h1>Welcome to EnesSozluk 📕</h1>
+			<h1>Enes Sözlük'e Hoş Geldiniz 📕</h1>
 			<SearchBar />
 		</>
 	);
 });
 
 export const head: DocumentHead = {
-	title: "Welcome to EnesSozluk",
+	title: "Enes Sözlük 📕",
 	meta: [
 		{
 			name: "description",
-			content: "EnesSozluk site description",
+			content:
+				"Enes Sözlük'e hoş geldiniz. Türkçe sözlüklerde arama yapın.",
 		},
 	],
 };
