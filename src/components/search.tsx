@@ -12,13 +12,13 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
       >
         <input
           type="text"
-          placeholder="Search"
+          placeholder="Enes Sözlük'te ara..."
           bind:value={query}
           value={value}
           class="search-input"
         />
         <button type="submit" class="search-button">
-          Search
+          Ara
         </button>
       </form>
     </>
