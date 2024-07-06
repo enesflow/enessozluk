@@ -135,7 +135,15 @@ export const NisanyanView = component$<{
                     <li class="result-subitem">
                       <strong>{etymology.languages[0].name}</strong>
                       <span> {etymology.romanizedText}</span>
-                      <span> «{etymology.definition}»</span>
+                      <span>
+                        {" "}
+                        {etymology.definition.includes("a.a.")
+                          ? etymology.definition.replace(
+                              "a.a.",
+                              "(aynı anlama sahip)",
+                            )
+                          : `"${etymology.definition}"`}
+                      </span>
                       <span> {etymology.relation.text}</span>
                     </li>
                   </ul>
