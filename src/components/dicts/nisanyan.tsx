@@ -2,6 +2,7 @@ import type { NisanyanResponse, NisanyanResponseError } from "#/nisanyan";
 import { generateUUID, convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { TextWithLinks } from "../textwithlinks";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -17,6 +18,7 @@ const NISANYAN_ABBREVIATIONS = {
   Süry: "Süryanice",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
+const NISANYAN_LINK_REGEX = /%l/g;
 
 function convertDate(date: string): string {
   if (date.startsWith("<")) {
@@ -149,9 +151,9 @@ export const NisanyanView = component$<{
               {word.note && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Ek açıklama</h2>
-                  <p
-                    class="result-description"
-                    dangerouslySetInnerHTML={replaceAbbrevations(
+                  <TextWithLinks
+                    regex={NISANYAN_LINK_REGEX}
+                    text={replaceAbbrevations(
                       formatSpecialChars(word.note),
                       data,
                     )}
@@ -193,10 +195,10 @@ export const NisanyanView = component$<{
                           , {convertDate(history.date)}]
                         </span>
                       </p>
-                      <p
-                        dangerouslySetInnerHTML={
-                          "&emsp;" + formatSpecialChars(history.quote)
-                        }
+                      <TextWithLinks
+                        class="result-quote"
+                        regex={NISANYAN_LINK_REGEX}
+                        text={formatSpecialChars(history.quote)}
                       />
                     </div>
                   ))}

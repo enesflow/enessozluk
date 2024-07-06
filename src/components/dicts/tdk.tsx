@@ -47,9 +47,9 @@ export const TDKView = component$<{
                     ) : (
                       <p class="result-description">{meaning.anlam}</p>
                     )}
-                    <ul class="result-quote">
+                    <ul>
                       {meaning.orneklerListe?.map((example) => (
-                        <li key={example.ornek_id}>
+                        <li key={example.ornek_id} class="result-quote">
                           <p>
                             "{example.ornek}"{" "}
                             <em>

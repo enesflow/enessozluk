@@ -3,27 +3,11 @@ import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
+import { TextWithLinks } from "../textwithlinks";
 
 const LUGGAT_URL = "https://www.luggat.com/" as const;
 const LUGGAT_NO_RESULT = "Sonuç bulunamadı" as const;
-
-export const LuggatDefiniton = component$<{ text: string }>(({ text }) => {
-  const match = text.match(/\(Bak: (.+?)\)/);
-  if (match) {
-    const [fullMatch, linkText] = match;
-    const beforeLink = text.split(fullMatch)[0];
-    const afterLink = text.split(fullMatch)[1];
-
-    return (
-      <>
-        {beforeLink}
-        <a href={`/search/${linkText}`}>{linkText}</a>
-        {afterLink}
-      </>
-    );
-  }
-  return <p>{text}</p>;
-});
+const LUGGAT_LINK_REGEX = /\(Bak[:.] (.+?)\)/g;
 
 function consolidateNames(names: string): string {
   // example:
@@ -145,7 +129,7 @@ export const LuggatView = component$<{
               <ul class="results-list">
                 {word.definitions.map((meaning) => (
                   <li key={meaning} class="result-subitem">
-                    <LuggatDefiniton text={meaning} />
+                    <TextWithLinks regex={LUGGAT_LINK_REGEX} text={meaning} />
                   </li>
                 ))}
               </ul>

@@ -53,7 +53,7 @@
 }
 
 .result-quote {
-  @apply italic text-gray-700;
+  @apply ml-4 list-none italic text-gray-700;
 }
 
 .result-section {
@@ -73,7 +73,7 @@ a {
 }
 
 li {
-  @apply list-none;
+  @apply list-disc;
 }
 
 body {
