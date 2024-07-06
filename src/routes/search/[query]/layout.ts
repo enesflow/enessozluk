@@ -1,6 +1,11 @@
 import type { RequestHandler } from "@builder.io/qwik-city";
 
-export const onRequest: RequestHandler = async ({ params, redirect, next }) => {
+export const onRequest: RequestHandler = async ({
+	url,
+	params,
+	redirect,
+	next,
+}) => {
 	const query = params.query;
 	const lower = query.toLocaleLowerCase("tr");
 	if (!query.endsWith("-")) {
@@ -17,11 +22,15 @@ export const onRequest: RequestHandler = async ({ params, redirect, next }) => {
 	if (lastVowel) {
 		const [vowel] = lastVowel;
 		const noHyphen = lower.slice(0, -1);
+		let toAdd = "";
 		if ("eiüö".includes(vowel.toLowerCase())) {
-			throw redirect(301, `/search/${noHyphen}mek`);
+			toAdd = "mek";
 		} else if ("aıou".includes(vowel.toLowerCase())) {
-			throw redirect(301, `/search/${noHyphen}mak`);
+			toAdd = "mak";
 		}
+		const to = `${url.origin}/search/${encodeURIComponent(noHyphen + toAdd)}/`;
+		console.log(to);
+		throw redirect(301, to);
 	}
 	/* if (query !== lower) {
 		throw redirect(301, `/search/${lower}`);
