@@ -6,4 +6,76 @@
 @tailwind components;
 @tailwind utilities;
 
+/* global.css */
 
+.header {
+  @apply mb-4 text-center text-4xl font-bold;
+}
+
+.search-form {
+  @apply my-4 flex items-center justify-center gap-4;
+}
+
+.search-input {
+  @apply w-1/2 rounded-md border-2 border-gray-300 p-2;
+}
+
+.search-button {
+  @apply rounded-md bg-red-500 p-2 text-white hover:bg-red-600;
+}
+
+.results-heading {
+  @apply mb-2 mt-4 text-3xl font-semibold;
+}
+
+.results-list {
+  @apply list-inside list-disc;
+}
+
+.result-item {
+  @apply mb-4;
+}
+
+.result-subitem {
+  @apply ml-4 list-inside;
+}
+
+.result-title {
+  @apply text-xl font-medium;
+}
+
+.result-subtitle {
+  @apply text-lg font-semibold;
+}
+
+.result-description {
+  @apply text-base;
+}
+
+.result-quote {
+  @apply italic text-gray-700;
+}
+
+.result-section {
+  @apply pb-4 pl-4 pr-4;
+}
+
+.results-container {
+  @apply mx-8 max-w-7xl sm:mx-16 md:mx-32 lg:mx-64 xl:mx-96;
+}
+
+.error-message {
+  @apply relative my-4 max-w-xs rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700;
+}
+
+a {
+  @apply text-red-600 hover:underline;
+}
+
+li {
+  @apply list-none;
+}
+
+body {
+  @apply p-4;
+}
