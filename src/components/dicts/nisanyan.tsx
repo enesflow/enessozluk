@@ -211,8 +211,8 @@ export const NisanyanView = component$<{
 												<span>
 													{" "}
 													[
-													{history.source?.book ??
-														history.source?.name ??
+													{history.source?.book ||
+														history.source?.name ||
 														"Bilinmiyor"}
 													,{" "}
 													{convertDate(history.date)}]
