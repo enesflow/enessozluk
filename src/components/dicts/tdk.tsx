@@ -2,15 +2,24 @@ import type { TDKResponse, TDKResponseError } from "#/tdk";
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$, Link } from "@builder.io/qwik-city";
 import { convertToRoman } from "#helpers/roman";
+import { Recommendations } from "../recommendations";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
+const TDK_RECOMMENDATIONS_URL = "https://sozluk.gov.tr/oneri?soz=" as const;
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
   async ({ params }) => {
     const url = `${TDK_URL}${params.query}`;
     const response = await fetch(url);
     const data = (await response.json()) as TDKResponse | TDKResponseError;
+    if ("error" in data) {
+      // then we need to get the recommendations
+      const recUrl = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
+      const recResponse = await fetch(recUrl);
+      const recData = await recResponse.json();
+      data.recommendations = recData;
+    }
     return data;
   },
 );
@@ -21,7 +30,19 @@ export const TDKView = component$<{
   return (
     <>
       {"error" in data ? (
-        <p class="error-message">{data.error}</p>
+        <>
+          <p class="error-message">{data.error}</p>
+          {data.recommendations.length > 0 && (
+            <>
+              <div class="result-item result-subitem">
+                Öneriler:{" "}
+                <Recommendations
+                  words={data.recommendations.map((rec) => rec.madde)}
+                />
+              </div>
+            </>
+          )}
+        </>
       ) : (
         <ul class="results-list">
           {data.map((result, index) => (

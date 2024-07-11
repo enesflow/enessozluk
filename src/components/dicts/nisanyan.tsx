@@ -3,6 +3,7 @@ import { generateUUID, convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { TextWithLinks } from "../textwithlinks";
+import { Recommendations } from "~/components/recommendations";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -68,7 +69,7 @@ function formatSpecialChars(str: string): string {
 
 function replaceAbbrevations(str: string, data: NisanyanResponse): string {
   const languages: Record<string, string> = NISANYAN_ABBREVIATIONS;
-  for (const word of data.words) {
+  for (const word of data.words ?? []) {
     for (const etymology of word.etymologies) {
       for (const language of etymology.languages) {
         languages[language.abbreviation] = language.name;
@@ -98,6 +99,9 @@ export const useNisanyanLoader = routeLoader$<
   const data = (await response.json()) as
     | NisanyanResponse
     | NisanyanResponseError;
+  if ("error" in (data as any)) {
+    data.isUnsuccessful = true;
+  }
   return data;
 });
 
@@ -122,10 +126,26 @@ export const NisanyanView = component$<{
   return (
     <>
       {data.isUnsuccessful ? (
-        <p class="error-message">{NISANYAN_NO_RESULT}</p>
+        <>
+          <p class="error-message">{NISANYAN_NO_RESULT}</p>
+          {data.words && (
+            <>
+              <div class="result-item result-subitem">
+                Öneriler:{" "}
+                <Recommendations
+                  words={[
+                    ...data.words.map((word) => word.name),
+                    ...data.fiveAfter.map((word) => word.name),
+                    ...data.fiveBefore.map((word) => word.name),
+                  ]}
+                />
+              </div>
+            </>
+          )}
+        </>
       ) : (
         <ul class="results-list">
-          {data.words.map((word, index) => (
+          {data.words?.map((word, index) => (
             <li key={word._id} class="result-item">
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {removeNumbersAtEnd(word.name)}
