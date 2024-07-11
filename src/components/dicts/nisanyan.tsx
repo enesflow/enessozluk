@@ -1,17 +1,22 @@
 import type {
+  NisanyanAffixResponse,
+  NisanyanAffixResponseError,
   NisanyanEtymology,
   NisanyanResponse,
   NisanyanResponseError,
+  NisanyanWord,
 } from "#/nisanyan";
 import { API_FAILED_TEXT } from "#helpers/constants";
 import { convertToRoman, generateUUID } from "#helpers/roman";
 import { removeNumbersAtEnd } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { TextWithLinks } from "../textwithlinks";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
+const NISANYAN_AFFIX_URL =
+  "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
   Fa: "Farsça",
   Ger: "Germence",
@@ -26,9 +31,18 @@ const NISANYAN_ABBREVIATIONS = {
   Erm: "Ermenice",
   Aram: "Aramice",
   TTü: "Türkiye Türkçesi",
+  Lat: "Latince",
+  Fr: "Fransızca",
+  İt: "İtalyanca",
+  İsp: "İspanyolca",
+  Alm: "Almanca",
+  Yun: "Yunanca",
+  Rus: "Rusça",
+  Çin: "Çince",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
+const NISANYAN_NEWLINE_DET = "● " as const;
 
 function convertDate(date: string): string {
   if (date.startsWith("<")) {
@@ -149,11 +163,92 @@ export function fixForJoinedWords(
   return data;
 }
 
+function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
+  //get all the keys
+  const keys = Object.keys(data);
+  let result = [] as any;
+  for (const key of keys) {
+    if (key.toLocaleLowerCase().endsWith("words")) {
+      result = result.concat(data[key]);
+    }
+  }
+  return result;
+}
+
+export const getNisanyanAffixAsNisanyanResponse = server$(
+  async (query: string): Promise<NisanyanResponse | NisanyanResponseError> => {
+    const url = `${NISANYAN_AFFIX_URL}${encodeURIComponent(query)}?session=${generateUUID()}`;
+    const response = await fetch(url);
+    const data = (await response.json()) as
+      | NisanyanAffixResponse
+      | NisanyanAffixResponseError;
+    if ("error" in data) {
+      return {
+        isUnsuccessful: true,
+        words: [
+          {
+            _id: "1",
+            name: "Tekrar",
+          },
+          {
+            _id: "2",
+            name: "dene-",
+          },
+          {
+            _id: "3",
+            name: query,
+          },
+        ],
+      };
+    } else {
+      // return in a way so that we don't have to write a new ui for affixes
+      // return it as it's a word
+      data.affix.language;
+      const words = joinAllItemsEndingInWords(data);
+      const res = {
+        isUnsuccessful: false,
+        words: [
+          {
+            _id: data.affix._id,
+            actualTimeUpdated: data.affix.timeUpdated,
+            etymologies: [],
+            id_depr: data.affix.id_depr,
+            name: `${data.affix.name} (${words.length} kelime)`,
+            note: data.affix.description,
+            queries: [],
+            references: [],
+            referenceOf: words.map((word) => ({
+              ...word,
+              similarWords: [],
+              histories: [],
+              referenceOf: [],
+              misspellings: [],
+            })),
+            timeCreated: data.affix.timeCreated,
+            timeUpdated: data.affix.timeUpdated,
+          },
+        ] satisfies NisanyanWord[],
+        fiveAfter: [],
+        fiveBefore: [],
+        randomWord: {
+          _id: "1",
+          name: "Rastgele",
+        },
+      };
+      console.log(res.words[0].references);
+      return res;
+    }
+  },
+);
+
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
 >(async ({ params }) => {
   try {
+    if (params.query.startsWith("+") || params.query.endsWith("+")) {
+      return getNisanyanAffixAsNisanyanResponse(params.query);
+    }
     const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
     const response = await fetch(url);
     const data = (await response.json()) as
@@ -240,43 +335,55 @@ export const NisanyanView = component$<{
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {removeNumbersAtEnd(word.name)}
               </h2>
-              <section class="result-section">
-                <h2 class="result-subtitle">Köken</h2>
-                {word.etymologies.map((etymology, index) => (
-                  <ul key={index} class="result-list">
-                    <li
-                      class={`${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "pl-4" : ""}`}
-                    >
-                      {etymology.relation.abbreviation == "+" && (
-                        <span>ve </span>
-                      )}
-                      <strong>{etymology.languages[0].name}</strong>
-                      {<span> {formatDefinition(etymology)}</span>}
-                      <TextWithLinks
-                        regex={NISANYAN_LINK_REGEX}
-                        text={formatRelation(etymology)}
-                      />
-                    </li>
-                  </ul>
-                ))}
-                {word.references.length > 0 && (
-                  <p class="result-description">
-                    Daha fazla bilgi için{" "}
-                    <WordLinks words={word.references.map((ref) => ref.name)} />{" "}
-                    maddelerine bakınız.
-                  </p>
-                )}
-              </section>
+              {word.etymologies.length > 0 && (
+                <section class="result-section">
+                  <h2 class="result-subtitle">Köken</h2>
+                  {word.etymologies.map((etymology, index) => (
+                    <ul key={index} class="result-list">
+                      <li
+                        class={`${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "pl-4" : ""}`}
+                      >
+                        {etymology.relation.abbreviation == "+" && (
+                          <span>ve </span>
+                        )}
+                        <strong>{etymology.languages[0].name}</strong>
+                        {<span> {formatDefinition(etymology)}</span>}
+                        <TextWithLinks
+                          regex={NISANYAN_LINK_REGEX}
+                          text={formatRelation(etymology)}
+                        />
+                      </li>
+                    </ul>
+                  ))}
+                  {word.references.length > 0 && (
+                    <p class="result-description">
+                      Daha fazla bilgi için{" "}
+                      <WordLinks
+                        words={word.references.map((ref) => ref.name)}
+                      />{" "}
+                      maddelerine bakınız.
+                    </p>
+                  )}
+                </section>
+              )}
               {word.note && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Ek açıklama</h2>
-                  <TextWithLinks
-                    regex={NISANYAN_LINK_REGEX}
-                    text={replaceAbbrevations(
-                      formatSpecialChars(word.note),
-                      data,
-                    )}
-                  />
+                  <ul class="result-list">
+                    {word.note
+                      .split(NISANYAN_NEWLINE_DET)
+                      .map((note, index) => (
+                        <li key={index} class="result-subitem">
+                          <TextWithLinks
+                            regex={NISANYAN_LINK_REGEX}
+                            text={replaceAbbrevations(
+                              formatSpecialChars(note),
+                              data,
+                            )}
+                          />
+                        </li>
+                      ))}
+                  </ul>
                 </section>
               )}
               {word.similarWords && (

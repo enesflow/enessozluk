@@ -33,10 +33,10 @@ export const onRequest: RequestHandler = async ({
       }
     }
   }
-  if (lower !== params.query) {
-    if (lower !== "") {
+  if (query !== params.query) {
+    if (query !== "") {
       // for example, if the query is "Enes2", redirect to "enes"
-      throw redirect(301, `/search/${lower}`);
+      throw redirect(301, `/search/${query}`);
     }
   }
 

@@ -190,5 +190,39 @@ export type NisanyanResponseError = {
 };
 
 // export Relation as NisanyanRelation;
-export type { Relation as NisanyanRelation };
+export type { Word as NisanyanWord };
 export type { Etymology as NisanyanEtymology };
+
+type Language = {
+  _id: string;
+  name: string;
+  description: string;
+  description2: string;
+  timeCreated: string;
+  timeUpdated: string;
+  abbreviation: string;
+  id_depr: number;
+};
+
+type Affix = {
+  _id: string;
+  name: string;
+  language: Language;
+  description: string;
+  timeCreated: string;
+  timeUpdated: string;
+};
+
+type Word = {
+  _id: string;
+  name: string;
+};
+
+export type NisanyanAffixResponse = {
+  affix: Affix;
+  words: Word[];
+};
+
+export type NisanyanAffixResponseError = {
+  error: {};
+};

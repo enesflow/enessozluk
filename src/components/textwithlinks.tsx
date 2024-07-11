@@ -2,10 +2,19 @@ import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 
 function isALetter(char: string | undefined): boolean {
-  if (!char) return false;
-  const additionalChars = ["+", "-", " "];
-  return (
-    char.toLowerCase() !== char.toUpperCase() || additionalChars.includes(char)
+  return !(
+    // a comma
+    (
+      char === "," ||
+      // a dot
+      char === "." ||
+      // a colon
+      char === ":" ||
+      // a semicolon
+      char === ";" ||
+      // a question mark
+      char === "?"
+    )
   );
 }
 
