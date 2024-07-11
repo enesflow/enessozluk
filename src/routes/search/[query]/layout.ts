@@ -13,7 +13,7 @@ export const onRequest: RequestHandler = async ({
   // if the query ends with a hyphen, do this
   // this is for turkish words
   // get the last vowel, check if it's a back vowel or a front vowel (a, ı, o, u or e, i, ö, ü)
-  if (query.endsWith("-")) {
+  if (query.endsWith("-") && !(query.startsWith("+") || query.endsWith("+"))) {
     const lastVowel = lower.match(/[aeıioöuü]/gi)?.slice(-1);
     // if it's a back vowel, add "mak" to the end
     // if it's a front vowel, add "mek" to the end
