@@ -1,12 +1,12 @@
-import { component$, useSignal, useTask$ } from "@builder.io/qwik";
+import { removeNumbersInWord } from "#helpers/string";
+import { component$, useComputed$ } from "@builder.io/qwik";
 import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import { LuggatView, useLuggatLoader } from "~/components/dicts/luggat";
 import { useNisanyanLoader } from "~/components/dicts/nisanyan";
 import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
+import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
-import { ExternalLink } from "~/components/externalLink";
-import { removeNumbersInWord } from "#helpers/string";
 export { useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type Links = {
@@ -29,27 +29,23 @@ export default component$(() => {
   const tdk = useTDKLoader();
   const nisanyan = useNisanyanLoader();
   const luggat = useLuggatLoader();
-  /* const links = getLinks(loc.params.query); */
-  const links = useSignal<Links>();
-  useTask$(({ track }) => {
-    track(() => (links.value = getLinks(loc.params.query)));
-  });
+  const links = useComputed$(() => getLinks(loc.params.query));
   return (
     <>
       <h1 class="header">{loc.params.query}</h1>
       <div class="results-container">
         <SearchBar value={loc.params.query} />
         <h1 style="results-heading">
-          TDK Sonuçları: <ExternalLink href={links.value?.tdk} />
+          TDK Sonuçları: <ExternalLink href={links.value.tdk} />
         </h1>
         <TDKView data={tdk.value} />
         <h1 style="results-heading">
           Nişanyan Sözlük Sonuçları:{" "}
-          <ExternalLink href={links.value?.nisanayan} />
+          <ExternalLink href={links.value.nisanayan} />
         </h1>
         <NisanyanView data={nisanyan.value} />
         <h1 style="results-heading">
-          Luggat Sonuçları: <ExternalLink href={links.value?.luggat} />
+          Luggat Sonuçları: <ExternalLink href={links.value.luggat} />
         </h1>
         <LuggatView data={luggat.value} />
       </div>
