@@ -133,11 +133,19 @@ export const NisanyanView = component$<{
               <div class="result-item result-subitem">
                 Öneriler:{" "}
                 <Recommendations
-                  words={[
-                    ...data.words.map((word) => word.name),
-                    ...data.fiveAfter.map((word) => word.name),
-                    ...data.fiveBefore.map((word) => word.name),
-                  ]}
+                  words={Array.from(
+                    new Set([
+                      ...data.words.map((word) =>
+                        removeNumbersAtEnd(word.name),
+                      ),
+                      ...data.fiveAfter.map((word) =>
+                        removeNumbersAtEnd(word.name),
+                      ),
+                      ...data.fiveBefore.map((word) =>
+                        removeNumbersAtEnd(word.name),
+                      ),
+                    ]),
+                  )}
                 />
               </div>
             </>
