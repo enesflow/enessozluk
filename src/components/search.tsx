@@ -1,10 +1,30 @@
-import { component$, useSignal } from "@builder.io/qwik";
-import { useNavigate } from "@builder.io/qwik-city";
+import {
+  $,
+  component$,
+  useOnWindow,
+  useSignal,
+  useTask$,
+} from "@builder.io/qwik";
+import { useLocation, useNavigate } from "@builder.io/qwik-city";
+import { isBrowser } from "@builder.io/qwik/build";
 import Spinner from "./spinner";
 export const SearchBar = component$<{ value?: string }>(({ value }) => {
   const nav = useNavigate();
   const query = useSignal(value ?? "");
   const isLoading = useSignal(false);
+  const input = useSignal<HTMLInputElement>();
+  const loc = useLocation();
+  const focusOnInput = $(() => {
+    if (loc.isNavigating || !isBrowser) return;
+
+    input.value?.focus();
+    input.value?.setSelectionRange(0, input.value.value.length);
+  });
+  useOnWindow("load", focusOnInput);
+  useTask$(({ track }) => {
+    track(() => loc.isNavigating);
+    focusOnInput();
+  });
   return (
     <>
       <form
@@ -25,6 +45,7 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
           bind:value={query}
           value={value}
           class="search-input"
+          ref={input}
         />
         <button
           type="submit"

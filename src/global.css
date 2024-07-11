@@ -1,14 +1,3 @@
-.spinner_P7sC {
-  @apply fill-current;
-  transform-origin: center;
-  animation: spinner_svv2 0.75s infinite linear;
-}
-@keyframes spinner_svv2 {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 /**
  * Tailwind CSS imports
  * View the full documentation at https://tailwindcss.com
@@ -18,6 +7,10 @@
 @tailwind utilities;
 
 /* global.css */
+
+body {
+  @apply selection:rounded-md selection:bg-red-500;
+}
 
 .header {
   @apply mb-4 text-center text-4xl font-bold;
@@ -101,4 +94,15 @@ li {
 
 body {
   @apply p-4;
+}
+
+.spinner_P7sC {
+  @apply fill-current;
+  transform-origin: center;
+  animation: spinner_svv2 0.75s infinite linear;
+}
+@keyframes spinner_svv2 {
+  100% {
+    transform: rotate(360deg);
+  }
 }
