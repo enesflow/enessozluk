@@ -44,6 +44,8 @@ const NISANYAN_ABBREVIATIONS = {
   Akad: "Akatça",
   İbr: "İbranice",
   HAvr: "Hintavrupa Anadili",
+  Moğ: "Moğolca",
+  Çağ: "Çağatayca",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
@@ -113,11 +115,19 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
       //const pattern = new RegExp(`(?<=^|\\s|>)${abbreviation}(?=\\s|$|<)`, "g");
       // the above regex is the old one without support for the fourth condition
       // this is the new one with the fourth and fifth conditions
-      const pattern = new RegExp(
+      /*  const pattern = new RegExp(
         `(?<=^|\\s|>|,|\\.|:|;|\\?|\\()${abbreviation}(?=\\s|$|<|,|\\.|:|;|\\?|\\))`,
         "g",
+      ); */
+      // entirely new rules:
+      // the word is at the beginning of the string OR
+      // the word has a space, , . : ; ? ( ) / at the beginning OR
+      // the word has a space, , . : ; ? ( ) / at the end OR
+      // the word is at the end of the string
+      const pattern = new RegExp(
+        `(?<=^|\\s|,|\\.|:|;|\\?|\\(|\\)|\\/|>)${abbreviation}(?=\\s|$|,|\\.|:|;|\\?|\\(|\\)|\\/|<)`,
+        "g",
       );
-
       result = result.replace(pattern, language);
     }
   }
