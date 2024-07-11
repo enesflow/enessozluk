@@ -117,7 +117,9 @@ export function formatDefinition(etymology: NisanyanEtymology): string {
   } else {
     return (
       formatOrigin(etymology) +
-      (etymology.definition ? ` "${etymology.definition}"` : "")
+      (etymology.definition
+        ? ` "${etymology.definition.replace("mec.", "mecazi")}"`
+        : "")
     );
   }
 }
