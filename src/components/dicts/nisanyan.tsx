@@ -41,6 +41,8 @@ const NISANYAN_ABBREVIATIONS = {
   Rus: "Rusça",
   Çin: "Çince",
   YTü: "Yeni Türkçe",
+  Akad: "Akatça",
+  İbr: "İbranice",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
