@@ -43,6 +43,7 @@ const NISANYAN_ABBREVIATIONS = {
   YTü: "Yeni Türkçe",
   Akad: "Akatça",
   İbr: "İbranice",
+  HAvr: "Hintavrupa Anadili",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
