@@ -35,6 +35,19 @@ export function isOutLink(word: string): {
   };
 }
 
+export function preprocessTDK(data: TDKResponse | TDKResponseError) {
+  if ("error" in data) {
+    return data;
+  }
+  // 1. remove the paranthesises from the beginning and the end of lisan if they exist
+  // and only from the beginning ( and the end ) of lisan
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].lisan) {
+      data[i].lisan = data[i].lisan.replace(/^\(/, "").replace(/\)$/, "");
+    }
+  }
+  return data;
+}
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
   async ({ params }) => {
@@ -49,7 +62,7 @@ export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
         const recData = await recResponse.json();
         (data as TDKResponseError).recommendations = recData;
       }
-      return data;
+      return preprocessTDK(data);
     } catch (error) {
       return {
         error: API_FAILED_TEXT,
@@ -89,6 +102,7 @@ export const TDKView = component$<{
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {result.madde}{" "}
                 {result.taki ? `-${result.taki}` : ""}
+                {result.lisan && <> ({result.lisan})</>}
               </h2>
               <ul class="results-list">
                 {result.anlamlarListe?.map((meaning) => (
