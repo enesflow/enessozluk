@@ -32,8 +32,8 @@ export default component$(() => {
   const links = useComputed$(() => getLinks(loc.params.query));
   return (
     <>
-      <h1 class="header">{loc.params.query}</h1>
       <div class="results-container">
+        <h1 class="header">{loc.params.query}</h1>
         <SearchBar value={loc.params.query} />
         <h1 style="results-heading">
           TDK Sonuçları: <ExternalLink href={links.value.tdk} />
