@@ -63,6 +63,10 @@
   @apply text-xl font-medium;
 }
 
+.result-title-description {
+  @apply italic text-gray-700;
+}
+
 .result-subtitle {
   @apply text-lg font-semibold;
 }

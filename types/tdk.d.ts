@@ -16,7 +16,7 @@ type Author = {
   ekno: string;
 };
 
-type Feature = {
+type Attribute = {
   ozellik_id: string;
   tur: string;
   tam_adi: string;
@@ -25,6 +25,7 @@ type Feature = {
 };
 
 type Meaning = {
+  serverDefinedPreText?: string;
   anlam_id: string;
   madde_id: string;
   anlam_sira: string;
@@ -36,7 +37,7 @@ type Meaning = {
   gos_kelime: string;
   gos_kultur: string;
   orneklerListe?: Example[];
-  ozelliklerListe?: Feature[];
+  ozelliklerListe?: Attribute[];
 };
 
 type Proverb = {

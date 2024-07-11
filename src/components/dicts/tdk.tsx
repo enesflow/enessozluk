@@ -46,6 +46,29 @@ export function preprocessTDK(data: TDKResponse | TDKResponseError) {
       data[i].lisan = data[i].lisan.replace(/^\(/, "").replace(/\)$/, "");
     }
   }
+  // 2. add serverDefinedPreText to every meaning
+  const firstAttributes = data[0].anlamlarListe?.[0].ozelliklerListe;
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].anlamlarListe) {
+      for (let j = 0; j < (data[i].anlamlarListe ?? []).length; j++) {
+        const meaning = data[i].anlamlarListe![j];
+        // if there is not a attribute with the same type as the first attribute
+        // then add firstAttributes to the start of meaning.ozelliklerListe
+        if (
+          !meaning.ozelliklerListe?.some(
+            (ozellik) => ozellik.tur === firstAttributes?.[0].tur,
+          )
+        ) {
+          meaning.ozelliklerListe = firstAttributes?.concat(
+            meaning.ozelliklerListe ?? [],
+          );
+        }
+        data[i].anlamlarListe![j].serverDefinedPreText = meaning.ozelliklerListe
+          ?.map((ozellik) => ozellik.tam_adi)
+          .join(", ");
+      }
+    }
+  }
   return data;
 }
 // eslint-disable-next-line qwik/loader-location
@@ -102,7 +125,12 @@ export const TDKView = component$<{
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {result.madde}{" "}
                 {result.taki ? `-${result.taki}` : ""}
-                {result.lisan && <> ({result.lisan})</>}
+                {/* {result.telaffuz && <i> ({result.telaffuz})</i>}
+                {result.lisan && <i> ({result.lisan})</i>} */}
+                <i class="result-title-description">
+                  {result.telaffuz && <> {result.telaffuz}</>}
+                  {result.lisan && <> ({result.lisan})</>}
+                </i>
               </h2>
               <ul class="results-list">
                 {result.anlamlarListe?.map((meaning) => (
@@ -110,6 +138,7 @@ export const TDKView = component$<{
                     key={meaning.anlam_id}
                     class="result-subitem result-description"
                   >
+                    <strong>{meaning.serverDefinedPreText} </strong>
                     {isOutLink(meaning.anlam).outLink ? (
                       <Link
                         href={`/search/${
