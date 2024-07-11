@@ -39,16 +39,16 @@ export default component$(() => {
       <div class="results-container">
         <SearchBar value={loc.params.query} />
         <h1 style="results-heading">
-          TDK Sonuçları: <ExternalLink href={links.value.tdk} />
+          TDK Sonuçları: <ExternalLink href={links.value?.tdk} />
         </h1>
         <TDKView data={tdk.value} />
         <h1 style="results-heading">
           Nişanyan Sözlük Sonuçları:{" "}
-          <ExternalLink href={links.value.nisanayan} />
+          <ExternalLink href={links.value?.nisanayan} />
         </h1>
         <NisanyanView data={nisanyan.value} />
         <h1 style="results-heading">
-          Luggat Sonuçları: <ExternalLink href={links.value.luggat} />
+          Luggat Sonuçları: <ExternalLink href={links.value?.luggat} />
         </h1>
         <LuggatView data={luggat.value} />
       </div>
