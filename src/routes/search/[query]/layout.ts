@@ -7,13 +7,20 @@ export const onRequest: RequestHandler = async ({
   redirect,
   next,
 }) => {
-  const query = removeNumbersInWord(params.query);
-  const lower = query.toLocaleLowerCase("tr");
+  const queryWithoutNumbers = removeNumbersInWord(params.query);
+  const lower = queryWithoutNumbers.toLocaleLowerCase("tr");
 
   // if the query ends with a hyphen, do this
   // this is for turkish words
   // get the last vowel, check if it's a back vowel or a front vowel (a, ı, o, u or e, i, ö, ü)
-  if (query.endsWith("-") && !(query.startsWith("+") || query.endsWith("+"))) {
+  if (
+    queryWithoutNumbers.startsWith("+") ||
+    queryWithoutNumbers.endsWith("+")
+  ) {
+    await next();
+    return;
+  }
+  if (queryWithoutNumbers.endsWith("-")) {
     const lastVowel = lower.match(/[aeıioöuü]/gi)?.slice(-1);
     // if it's a back vowel, add "mak" to the end
     // if it's a front vowel, add "mek" to the end
@@ -33,10 +40,10 @@ export const onRequest: RequestHandler = async ({
       }
     }
   }
-  if (query !== params.query) {
-    if (query !== "") {
+  if (queryWithoutNumbers !== params.query) {
+    if (queryWithoutNumbers !== "") {
       // for example, if the query is "Enes2", redirect to "enes"
-      throw redirect(301, `/search/${query}`);
+      throw redirect(301, `/search/${queryWithoutNumbers}`);
     }
   }
 

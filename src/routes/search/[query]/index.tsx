@@ -6,6 +6,7 @@ import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
 import { SearchBar } from "~/components/search";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { ExternalLink } from "~/components/externalLink";
+import { removeNumbersInWord } from "#helpers/string";
 export { useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type Links = {
@@ -16,7 +17,7 @@ type Links = {
 export function getLinks(query: string): Links {
   const tdk = `https://www.sozluk.gov.tr/?aranan=${encodeURIComponent(query)}`;
   const nisanayan =
-    query.startsWith("+") || query.endsWith("+")
+    query.startsWith("+") || removeNumbersInWord(query).endsWith("+")
       ? `https://www.nisanyansozluk.com/ek/${encodeURIComponent(query)}`
       : `https://www.nisanyansozluk.com/kelime/${encodeURIComponent(query)}`;
   const luggat = `https://www.luggat.com/${encodeURIComponent(query)}`;

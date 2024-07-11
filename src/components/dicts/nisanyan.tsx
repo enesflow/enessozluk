@@ -8,7 +8,7 @@ import type {
 } from "#/nisanyan";
 import { API_FAILED_TEXT } from "#helpers/constants";
 import { convertToRoman, generateUUID } from "#helpers/roman";
-import { removeNumbersAtEnd } from "#helpers/string";
+import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
@@ -40,6 +40,7 @@ const NISANYAN_ABBREVIATIONS = {
   Yun: "Yunanca",
   Rus: "Rusça",
   Çin: "Çince",
+  YTü: "Yeni Türkçe",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
@@ -263,7 +264,10 @@ export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
 >(async ({ params }) => {
   try {
-    if (params.query.startsWith("+") || params.query.endsWith("+")) {
+    if (
+      params.query.startsWith("+") ||
+      removeNumbersInWord(params.query).endsWith("+")
+    ) {
       const response = await getNisanyanAffixAsNisanyanResponse(params.query);
       if (!response.isUnsuccessful) return response;
     }
