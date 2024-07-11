@@ -30,6 +30,7 @@ const NISANYAN_ABBREVIATIONS = {
   Süry: "Süryanice",
   Erm: "Ermenice",
   Aram: "Aramice",
+  Tü: "Türkçe",
   TTü: "Türkiye Türkçesi",
   Lat: "Latince",
   Fr: "Fransızca",
