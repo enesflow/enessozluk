@@ -154,9 +154,10 @@ export const TDKView = component$<{
                       <strong>{meaning.serverDefinedPreText} </strong>
                       {isOutLink(meaning.anlam).outLink ? (
                         <Link
-                          href={`/search/${
-                            isOutLink(meaning.anlam).cleanWord.split(") ")[1]
-                          }`}
+                          href={`/search/${isOutLink(meaning.anlam)
+                            .cleanWord.split(" ")
+                            .filter((word) => !word.startsWith("("))
+                            .join(" ")}`}
                           class="result-description"
                         >
                           {isOutLink(meaning.anlam).cleanWord}
