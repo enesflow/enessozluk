@@ -96,7 +96,6 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
     }
   }
 
-  console.log(languages);
   let result = str;
   for (const [abbreviation, language] of Object.entries(languages)) {
     // to replace the words make sure one of these two conditions are met:
@@ -270,7 +269,7 @@ export const getNisanyanAffixAsNisanyanResponse = server$(
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
->(async ({ params }) => {
+>(async ({ params, redirect }) => {
   try {
     if (
       params.query.startsWith("+") ||
@@ -278,6 +277,13 @@ export const useNisanyanLoader = routeLoader$<
     ) {
       const response = await getNisanyanAffixAsNisanyanResponse(params.query);
       if (!response.isUnsuccessful) return response;
+      // Well, this is a bad fix for this. It will make our app slower. Try the query "+loji" for the problem.
+      else {
+        throw redirect(
+          301,
+          `/search/${encodeURIComponent(params.query.replaceAll("+", ""))}`,
+        );
+      }
     }
     const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
     const response = await fetch(url);
