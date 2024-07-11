@@ -2,7 +2,11 @@ import { component$ } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
 
 function isALetter(char: string | undefined): boolean {
-  return char?.toLowerCase() !== char?.toUpperCase();
+  if (!char) return false;
+  const additionalChars = ["+", "-", " "];
+  return (
+    char.toLowerCase() !== char.toUpperCase() || additionalChars.includes(char)
+  );
 }
 
 export const TextWithLinks = component$<{
@@ -32,12 +36,11 @@ export const TextWithLinks = component$<{
                   !isALetter(word[word.length - 1]) ? word.slice(0, -1) : word
                 }
               />
-
               {!isALetter(word[word.length - 1]) ? (
-                <>{word[word.length - 1]} </>
+                <>{word[word.length - 1]}</>
               ) : (
                 <></>
-              )}
+              )}{" "}
             </>
 
             {remainingText && <span dangerouslySetInnerHTML={remainingText} />}

@@ -59,6 +59,7 @@ type Affix = {
 };
 
 type Affixes = {
+  prefix?: Affix;
   suffix?: Affix;
 };
 

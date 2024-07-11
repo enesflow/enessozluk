@@ -1,16 +1,15 @@
 import type {
   NisanyanEtymology,
-  NisanyanRelation,
   NisanyanResponse,
   NisanyanResponseError,
 } from "#/nisanyan";
-import { generateUUID, convertToRoman } from "#helpers/roman";
+import { API_FAILED_TEXT } from "#helpers/constants";
+import { convertToRoman, generateUUID } from "#helpers/roman";
+import { removeNumbersAtEnd } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
-import { TextWithLinks } from "../textwithlinks";
 import { Recommendations } from "~/components/recommendations";
-import { removeNumbersAtEnd } from "#helpers/string";
-import { API_FAILED_TEXT } from "#helpers/constants";
+import { TextWithLinks } from "../textwithlinks";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -105,17 +104,24 @@ export function formatDefinition(etymology: NisanyanEtymology): string {
   }
 }
 
-export function formatOrigin(etymology: NisanyanEtymology): string {
-  if (etymology.romanizedText.startsWith("*")) {
-    etymology.romanizedText = `yazılı örneği bulunmayan ${etymology.romanizedText}`;
+export function formatOrigin(etm: NisanyanEtymology): string {
+  if (etm.romanizedText.startsWith("*")) {
+    etm.romanizedText = `yazılı örneği bulunmayan ${etm.romanizedText}`;
   }
-  return `${removeNumbersAtEnd(etymology.romanizedText)} ${etymology.originalText ? `(${etymology.originalText})` : ""}`;
+  return `${removeNumbersAtEnd(etm.romanizedText)} ${etm.originalText ? `(${etm.originalText})` : ""}`;
 }
 
-export function formatRelation(relation: NisanyanRelation): string {
-  if (relation.abbreviation == "+") return `sözcüklerinin bileşiğidir.`;
-  else if (relation.abbreviation == "§") return "";
-  else return `sözcüğün${relation.text}`;
+export function formatRelation(etm: NisanyanEtymology): string {
+  if (etm.relation.abbreviation == "+") return `sözcüklerinin bileşiğidir.`;
+  else if (etm.relation.abbreviation == "§") return "";
+  else
+    return ` ${
+      {
+        ö: "özel ismin",
+        f: "fiilin",
+        s: "sözcüğün",
+      }[etm.wordClass.abbreviation] ?? etm.wordClass.name
+    }${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ")[1]}`;
 }
 
 export function fixForJoinedWords(
@@ -246,7 +252,10 @@ export const NisanyanView = component$<{
                       )}
                       <strong>{etymology.languages[0].name}</strong>
                       {<span> {formatDefinition(etymology)}</span>}
-                      <span> {formatRelation(etymology.relation)}</span>
+                      <TextWithLinks
+                        regex={NISANYAN_LINK_REGEX}
+                        text={formatRelation(etymology)}
+                      />
                     </li>
                   </ul>
                 ))}
