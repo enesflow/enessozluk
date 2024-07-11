@@ -122,7 +122,15 @@ export function formatOrigin(etm: NisanyanEtymology): string {
   if (etm.romanizedText.startsWith("*")) {
     etm.romanizedText = `yazılı örneği bulunmayan ${etm.romanizedText}`;
   }
-  return `${removeNumbersAtEnd(etm.romanizedText)} ${etm.originalText ? `(${etm.originalText})` : ""}`;
+  const romanized = etm.romanizedText
+    .split("/")
+    .map((text) => removeNumbersAtEnd(text));
+  const original = etm.originalText.split("/");
+  const con: string[] = [];
+  for (let i = 0; i < romanized.length; i++) {
+    con.push(`${romanized[i]}${original[i] ? ` (${original[i]})` : ""}`);
+  }
+  return con.join(" veya ");
 }
 
 export function formatRelation(etm: NisanyanEtymology): string {
@@ -134,6 +142,7 @@ export function formatRelation(etm: NisanyanEtymology): string {
         ö: "özel ismin",
         f: "fiilin",
         s: "sözcüğün",
+        b: "biçimin",
       }[etm.wordClass.abbreviation] ?? etm.wordClass.name
     }${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ")[1]}`;
 }
