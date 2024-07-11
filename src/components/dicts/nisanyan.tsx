@@ -134,7 +134,7 @@ export function formatOrigin(etm: NisanyanEtymology): string {
 }
 
 export function formatRelation(etm: NisanyanEtymology): string {
-  if (etm.relation.abbreviation == "+") return `sözcüklerinin bileşiğidir.`;
+  if (etm.relation.abbreviation == "+") return ` sözcüklerinin bileşiğidir.`;
   else if (etm.relation.abbreviation == "§") return "";
   else
     return ` ${
@@ -256,7 +256,8 @@ export const useNisanyanLoader = routeLoader$<
 >(async ({ params }) => {
   try {
     if (params.query.startsWith("+") || params.query.endsWith("+")) {
-      return getNisanyanAffixAsNisanyanResponse(params.query);
+      const response = await getNisanyanAffixAsNisanyanResponse(params.query);
+      if (!response.isUnsuccessful) return response;
     }
     const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
     const response = await fetch(url);
@@ -350,10 +351,12 @@ export const NisanyanView = component$<{
                   {word.etymologies.map((etymology, index) => (
                     <ul key={index} class="result-list">
                       <li
-                        class={`${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "pl-4" : ""}`}
+                        class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
                       >
-                        {etymology.relation.abbreviation == "+" && (
+                        {etymology.relation.abbreviation === "+" ? (
                           <span>ve </span>
+                        ) : (
+                          index !== 0 && <span>Bu sözcük </span>
                         )}
                         <strong>{etymology.languages[0].name}</strong>
                         {<span> {formatDefinition(etymology)}</span>}
