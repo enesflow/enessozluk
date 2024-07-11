@@ -4,6 +4,7 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
 import { TextWithLinks } from "../textwithlinks";
+import { API_FAILED_TEXT } from "#helpers/constants";
 
 const LUGGAT_URL = "https://www.luggat.com/" as const;
 const LUGGAT_NO_RESULT = "Sonuç bulunamadı" as const;
@@ -108,7 +109,10 @@ export const useLuggatLoader = routeLoader$<
       words: consolidateEntries(words),
     };
   } catch (error) {
-    return { isUnsuccessful: true };
+    return {
+      isUnsuccessful: true,
+      serverDefinedErrorText: API_FAILED_TEXT,
+    };
   }
 });
 
@@ -118,7 +122,9 @@ export const LuggatView = component$<{
   return (
     <>
       {data.isUnsuccessful ? (
-        <p class="error-message">{LUGGAT_NO_RESULT}</p>
+        <p class="error-message">
+          {data.serverDefinedErrorText ?? LUGGAT_NO_RESULT}
+        </p>
       ) : (
         <ul class="results-list">
           {data.words.map((word, index) => (

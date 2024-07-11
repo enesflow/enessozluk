@@ -5,6 +5,7 @@ import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { TextWithLinks } from "../textwithlinks";
 import { Recommendations } from "~/components/recommendations";
 import { removeNumbersAtEnd } from "#helpers/string";
+import { API_FAILED_TEXT } from "#helpers/constants";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -91,15 +92,36 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
 export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
 >(async ({ params }) => {
-  const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
-  const response = await fetch(url);
-  const data = (await response.json()) as
-    | NisanyanResponse
-    | NisanyanResponseError;
-  if ("error" in (data as any)) {
-    data.isUnsuccessful = true;
+  try {
+    const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
+    const response = await fetch(url);
+    const data = (await response.json()) as
+      | NisanyanResponse
+      | NisanyanResponseError;
+    if ("error" in (data as any)) {
+      data.isUnsuccessful = true;
+    }
+    return data;
+  } catch (error) {
+    return {
+      serverDefinedErrorText: API_FAILED_TEXT,
+      isUnsuccessful: true,
+      words: [
+        {
+          _id: "1",
+          name: "Tekrar",
+        },
+        {
+          _id: "2",
+          name: "dene-",
+        },
+        {
+          _id: "3",
+          name: params.query,
+        },
+      ],
+    };
   }
-  return data;
 });
 
 export const WordLinks = component$<{ words: string[] }>(({ words }) => {
@@ -124,7 +146,9 @@ export const NisanyanView = component$<{
     <>
       {data.isUnsuccessful ? (
         <>
-          <p class="error-message">{NISANYAN_NO_RESULT}</p>
+          <p class="error-message">
+            {data.serverDefinedErrorText ?? NISANYAN_NO_RESULT}
+          </p>
           {data.words && (
             <>
               <div class="result-item result-subitem">
@@ -135,12 +159,12 @@ export const NisanyanView = component$<{
                       ...data.words.map((word) =>
                         removeNumbersAtEnd(word.name),
                       ),
-                      ...data.fiveAfter.map((word) =>
+                      ...(data.fiveAfter?.map((word) =>
                         removeNumbersAtEnd(word.name),
-                      ),
-                      ...data.fiveBefore.map((word) =>
+                      ) || []),
+                      ...(data.fiveBefore?.map((word) =>
                         removeNumbersAtEnd(word.name),
-                      ),
+                      ) || []),
                     ]),
                   )}
                 />

@@ -70,7 +70,7 @@ type Result = {
   font?: string | null;
   madde_duz: string;
   gosterim_tarihi?: string | null;
-  anlamlarListe: Meaning[];
+  anlamlarListe?: Meaning[];
   atasozu?: Proverb[];
 };
 

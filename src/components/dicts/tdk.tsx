@@ -3,6 +3,7 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$, Link } from "@builder.io/qwik-city";
 import { convertToRoman } from "#helpers/roman";
 import { Recommendations } from "../recommendations";
+import { API_FAILED_TEXT } from "#helpers/constants";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
@@ -12,15 +13,27 @@ export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
   async ({ params }) => {
     const url = `${TDK_URL}${params.query}`;
     const response = await fetch(url);
-    const data = (await response.json()) as TDKResponse | TDKResponseError;
-    if ("error" in data) {
-      // then we need to get the recommendations
-      const recUrl = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
-      const recResponse = await fetch(recUrl);
-      const recData = await recResponse.json();
-      data.recommendations = recData;
+    try {
+      const data = (await response.json()) as TDKResponse | TDKResponseError;
+      if ("error" in data || !("anlamlarListe" in data[0])) {
+        // then we need to get the recommendations
+        const recUrl = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
+        const recResponse = await fetch(recUrl);
+        const recData = await recResponse.json();
+        (data as TDKResponseError).recommendations = recData;
+      }
+      console.log(data);
+      return data;
+    } catch (error) {
+      return {
+        error: API_FAILED_TEXT,
+        recommendations: [
+          { madde: "Tekrar" },
+          { madde: "dene-" },
+          { madde: params.query },
+        ],
+      };
     }
-    return data;
   },
 );
 
@@ -52,7 +65,7 @@ export const TDKView = component$<{
                 {result.taki ? `-${result.taki}` : ""}
               </h2>
               <ul class="results-list">
-                {result.anlamlarListe.map((meaning) => (
+                {result.anlamlarListe?.map((meaning) => (
                   <li
                     key={meaning.anlam_id}
                     class="result-subitem result-description"

@@ -177,11 +177,12 @@ export type NisanyanResponse = NisanyanGeneralResponse & {
   words?: Word[];
 };
 
-export type NisanyanResponseError = NisanyanGeneralResponse & {
+export type NisanyanResponseError = {
   isUnsuccessful: true;
   error?: {};
   words?: RelatedWord[];
   fiveBefore?: RelatedWord[];
   fiveAfter?: RelatedWord[];
   randomWord?: RandomWord;
+  serverDefinedErrorText?: string;
 };
