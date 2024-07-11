@@ -125,8 +125,6 @@ export const TDKView = component$<{
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {result.madde}{" "}
                 {result.taki ? `-${result.taki}` : ""}
-                {/* {result.telaffuz && <i> ({result.telaffuz})</i>}
-                {result.lisan && <i> ({result.lisan})</i>} */}
                 <i class="result-title-description">
                   {result.telaffuz && <> {result.telaffuz}</>}
                   {result.lisan && <> ({result.lisan})</>}

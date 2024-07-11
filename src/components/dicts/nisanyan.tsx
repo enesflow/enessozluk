@@ -222,11 +222,12 @@ export const getNisanyanAffixAsNisanyanResponse = server$(
         isUnsuccessful: false,
         words: [
           {
+            serverDefinedTitleDescription: `${words.length} kelime`,
             _id: data.affix._id,
             actualTimeUpdated: data.affix.timeUpdated,
             etymologies: [],
             id_depr: data.affix.id_depr,
-            name: `${data.affix.name} (${words.length} kelime)`,
+            name: data.affix.name,
             note: data.affix.description,
             queries: [],
             references: [],
@@ -348,6 +349,11 @@ export const NisanyanView = component$<{
             <li key={word._id} class="result-item">
               <h2 class="result-title">
                 ({convertToRoman(index + 1)}) {removeNumbersAtEnd(word.name)}
+                <i class="result-title-description">
+                  {word.serverDefinedTitleDescription && (
+                    <> ({word.serverDefinedTitleDescription ?? ""})</>
+                  )}
+                </i>
               </h2>
               {word.etymologies.length > 0 && (
                 <section class="result-section">
