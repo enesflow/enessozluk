@@ -67,7 +67,7 @@ type Result = {
   telaffuz_html?: string | null;
   lisan_html: string;
   telaffuz: string;
-  birlesikler: string;
+  birlesikler: string | null;
   font?: string | null;
   madde_duz: string;
   gosterim_tarihi?: string | null;

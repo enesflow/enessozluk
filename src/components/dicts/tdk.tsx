@@ -4,6 +4,7 @@ import { routeLoader$, Link } from "@builder.io/qwik-city";
 import { convertToRoman } from "#helpers/roman";
 import { Recommendations } from "../recommendations";
 import { API_FAILED_TEXT } from "#helpers/constants";
+import { WordLinks } from "./nisanyan";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
@@ -117,56 +118,81 @@ export const TDKView = component$<{
           )}
         </>
       ) : (
-        <ul class="results-list">
-          {data.map((result, index) => (
-            <li key={result.madde_id} class="result-item">
-              <h2 class="result-title">
-                ({convertToRoman(index + 1)}) {result.madde}{" "}
-                {result.taki ? `-${result.taki}` : ""}
-                <i class="result-title-description">
-                  {result.telaffuz && <> {result.telaffuz}</>}
-                  {result.lisan && <> ({result.lisan})</>}
-                </i>
-              </h2>
-              <ul class="results-list">
-                {result.anlamlarListe?.map((meaning) => (
-                  <li
-                    key={meaning.anlam_id}
-                    class="result-subitem result-description"
-                  >
-                    <strong>{meaning.serverDefinedPreText} </strong>
-                    {isOutLink(meaning.anlam).outLink ? (
-                      <Link
-                        href={`/search/${
-                          isOutLink(meaning.anlam).cleanWord.split(" (")[0]
-                        }`}
-                        class="result-description"
-                      >
-                        {isOutLink(meaning.anlam).cleanWord}
-                      </Link>
-                    ) : (
-                      meaning.anlam
-                    )}
-                    <ul>
-                      {meaning.orneklerListe?.map((example) => (
-                        <li key={example.ornek_id} class="result-quote">
-                          <p>
-                            "{example.ornek}"{" "}
-                            <em>
-                              {example.yazar
-                                ?.map((yazar) => yazar.tam_adi)
-                                .join(", ")}
-                            </em>
-                          </p>
-                        </li>
-                      ))}
-                    </ul>
-                  </li>
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <>
+          {" "}
+          <ul class="results-list">
+            {data.map((result, index) => (
+              <li key={result.madde_id} class="result-item">
+                <h2 class="result-title">
+                  ({convertToRoman(index + 1)}) {result.madde}{" "}
+                  {result.taki ? `-${result.taki}` : ""}
+                  <i class="result-title-description">
+                    {result.telaffuz && <> {result.telaffuz}</>}
+                    {result.lisan && <> ({result.lisan})</>}
+                  </i>
+                </h2>
+                <ul class="results-list">
+                  {result.anlamlarListe?.map((meaning) => (
+                    <li
+                      key={meaning.anlam_id}
+                      class="result-subitem result-description"
+                    >
+                      <strong>{meaning.serverDefinedPreText} </strong>
+                      {isOutLink(meaning.anlam).outLink ? (
+                        <Link
+                          href={`/search/${
+                            isOutLink(meaning.anlam).cleanWord.split(" (")[0]
+                          }`}
+                          class="result-description"
+                        >
+                          {isOutLink(meaning.anlam).cleanWord}
+                        </Link>
+                      ) : (
+                        meaning.anlam
+                      )}
+                      <ul>
+                        {meaning.orneklerListe?.map((example) => (
+                          <li key={example.ornek_id} class="result-quote">
+                            <p>
+                              "{example.ornek}"{" "}
+                              <em>
+                                {example.yazar
+                                  ?.map((yazar) => yazar.tam_adi)
+                                  .join(", ")}
+                              </em>
+                            </p>
+                          </li>
+                        ))}
+                      </ul>
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
+          {data
+            .map((result) =>
+              result.birlesikler?.split(", ").map((word) => word.trim()),
+            )
+            .flat()
+            .filter(Boolean).length > 0 && (
+            <section class="result-section">
+              <h2 class="result-subtitle">Birleşik sözcükler</h2>
+              <WordLinks
+                words={
+                  data
+                    .map((result) =>
+                      result.birlesikler
+                        ?.split(", ")
+                        .map((word) => word.trim()),
+                    )
+                    .flat()
+                    .filter(Boolean) as string[]
+                }
+              />
+            </section>
+          )}
+        </>
       )}
     </>
   );
