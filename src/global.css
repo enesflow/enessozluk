@@ -9,7 +9,7 @@
 /* global.css */
 
 body {
-  @apply selection:rounded-md selection:bg-red-500;
+  @apply selection:bg-red-500 selection:text-white;
 }
 
 .header {
