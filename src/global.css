@@ -1,3 +1,14 @@
+.spinner_P7sC {
+  @apply fill-current;
+  transform-origin: center;
+  animation: spinner_svv2 0.75s infinite linear;
+}
+@keyframes spinner_svv2 {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 /**
  * Tailwind CSS imports
  * View the full documentation at https://tailwindcss.com
@@ -17,11 +28,15 @@
 }
 
 .search-input {
-  @apply w-1/2 rounded-md border-2 border-gray-300 p-2;
+  @apply w-full max-w-md rounded-md border-2 border-gray-300 p-2 sm:w-11/12 md:w-5/6 lg:w-3/4 xl:w-2/3;
 }
 
 .search-button {
-  @apply rounded-md bg-red-500 p-2 text-white hover:bg-red-600;
+  @apply flex w-24 items-center justify-center rounded-md bg-red-500 py-2 text-center font-semibold text-white hover:bg-red-600;
+}
+
+.search-button-loading {
+  @apply cursor-not-allowed bg-red-600;
 }
 
 .results-heading {
