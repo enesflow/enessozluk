@@ -5,8 +5,8 @@ import { SearchBar } from "~/components/search";
 export default component$(() => {
   return (
     <>
-      <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
       <div class="results-container">
+        <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
         <SearchBar />
       </div>
     </>
