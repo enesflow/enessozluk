@@ -21,6 +21,7 @@ const NISANYAN_ABBREVIATIONS = {
   Süry: "Süryanice",
   Erm: "Ermenice",
   Aram: "Aramice",
+  TTü: "Türkiye Türkçesi", 
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
@@ -185,7 +186,7 @@ export const NisanyanView = component$<{
                   <ul key={index} class="result-list">
                     <li class="result-subitem">
                       <strong>{etymology.languages[0].name}</strong>
-                      <span> {etymology.romanizedText}</span>
+                      <span> {removeNumbersAtEnd(etymology.romanizedText)}</span>
                       {etymology.originalText && (
                         <span> ({etymology.originalText})</span>
                       )}
