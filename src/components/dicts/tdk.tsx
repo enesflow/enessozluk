@@ -19,16 +19,14 @@ export function isOutLink(word: string): {
       cleanWord: word.slice(TDK_LINK_DET.length),
     };
   }
-  // for some words (like "server") the result starts with a number (like "343 sunucu")
-  // i don't know if the number is always 343, but let's check for all numbers
-  // let's see if it starts with a number then a space:
-  const match = word.match(/^\d+ /);
-  if (match) {
+  // To make sense of this check, check queries "server" and "z kuşağı" on TDK
+  if (word.startsWith("343 ")) {
     return {
       outLink: true,
-      cleanWord: word.slice(match[0].length),
+      cleanWord: word.slice(4),
     };
   }
+
   return {
     outLink: false,
     cleanWord: word,
