@@ -1,4 +1,9 @@
-import type { NisanyanResponse, NisanyanResponseError } from "#/nisanyan";
+import type {
+  NisanyanEtymology,
+  NisanyanRelation,
+  NisanyanResponse,
+  NisanyanResponseError,
+} from "#/nisanyan";
 import { generateUUID, convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
@@ -21,7 +26,7 @@ const NISANYAN_ABBREVIATIONS = {
   Süry: "Süryanice",
   Erm: "Ermenice",
   Aram: "Aramice",
-  TTü: "Türkiye Türkçesi", 
+  TTü: "Türkiye Türkçesi",
 } as const; // TODO: Complete the list
 const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
@@ -89,6 +94,55 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
   return result;
 }
 
+export function formatDefinition(etymology: NisanyanEtymology): string {
+  if (etymology.definition.includes("a.a.")) {
+    return `aynı anlama gelen ${formatOrigin(etymology)}`;
+  } else {
+    return (
+      formatOrigin(etymology) +
+      (etymology.definition ? ` "${etymology.definition}"` : "")
+    );
+  }
+}
+
+export function formatOrigin(etymology: NisanyanEtymology): string {
+  if (etymology.romanizedText.startsWith("*")) {
+    etymology.romanizedText = `yazılı örneği bulunmayan ${etymology.romanizedText}`;
+  }
+  return `${removeNumbersAtEnd(etymology.romanizedText)} ${etymology.originalText ? `(${etymology.originalText})` : ""}`;
+}
+
+export function formatRelation(relation: NisanyanRelation): string {
+  if (relation.abbreviation == "+") return `sözcüklerinin bileşiğidir.`;
+  else if (relation.abbreviation == "§") return "";
+  else return `sözcüğün${relation.text}`;
+}
+
+export function fixForJoinedWords(
+  data: NisanyanResponse | NisanyanResponseError,
+): NisanyanResponse | NisanyanResponseError {
+  if (data.isUnsuccessful) return data;
+  if (!data.words) return data;
+  for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
+    const word = data.words[wordIndex];
+    let detected = false;
+    for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
+      const etm = word.etymologies[etmIndex];
+      if (
+        etm.relation.abbreviation == "+" ||
+        etm.relation.abbreviation == "§"
+      ) {
+        detected = true;
+      } else if (detected) {
+        data.words[wordIndex].etymologies[
+          etmIndex
+        ].serverDefinedMoreIndentation = true;
+      }
+    }
+  }
+  return data;
+}
+
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
@@ -102,7 +156,7 @@ export const useNisanyanLoader = routeLoader$<
     if ("error" in (data as any)) {
       data.isUnsuccessful = true;
     }
-    return data;
+    return fixForJoinedWords(data);
   } catch (error) {
     return {
       serverDefinedErrorText: API_FAILED_TEXT,
@@ -184,22 +238,15 @@ export const NisanyanView = component$<{
                 <h2 class="result-subtitle">Köken</h2>
                 {word.etymologies.map((etymology, index) => (
                   <ul key={index} class="result-list">
-                    <li class="result-subitem">
-                      <strong>{etymology.languages[0].name}</strong>
-                      <span> {removeNumbersAtEnd(etymology.romanizedText)}</span>
-                      {etymology.originalText && (
-                        <span> ({etymology.originalText})</span>
+                    <li
+                      class={`${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "pl-4" : ""}`}
+                    >
+                      {etymology.relation.abbreviation == "+" && (
+                        <span>ve </span>
                       )}
-                      <span>
-                        {" "}
-                        {etymology.definition.includes("a.a.")
-                          ? etymology.definition.replace(
-                              "a.a.",
-                              "(aynı anlama sahip)",
-                            )
-                          : `"${etymology.definition}"`}
-                      </span>
-                      <span> {etymology.relation.text}</span>
+                      <strong>{etymology.languages[0].name}</strong>
+                      {<span> {formatDefinition(etymology)}</span>}
+                      <span> {formatRelation(etymology.relation)}</span>
                     </li>
                   </ul>
                 ))}

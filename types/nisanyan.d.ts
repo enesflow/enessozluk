@@ -63,6 +63,7 @@ type Affixes = {
 };
 
 type Etymology = {
+  serverDefinedMoreIndentation?: boolean;
   _id: string;
   id_depr: number;
   paranthesis: string;
@@ -186,3 +187,7 @@ export type NisanyanResponseError = {
   randomWord?: RandomWord;
   serverDefinedErrorText?: string;
 };
+
+// export Relation as NisanyanRelation;
+export type { Relation as NisanyanRelation };
+export type { Etymology as NisanyanEtymology };
