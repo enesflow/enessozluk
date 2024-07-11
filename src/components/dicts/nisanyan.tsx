@@ -96,16 +96,26 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
     }
   }
 
+  console.log(languages);
   let result = str;
   for (const [abbreviation, language] of Object.entries(languages)) {
     // to replace the words make sure one of these two conditions are met:
     // 1. the word is surrounded by two spaces
     // 2. the word is at the beginning of the string and followed by a space
     // 3. the word is surrounded by > and < (for HTML tags) (example: <i>tr</i>)
+    // 4. the word has a comma, dot, colon, semicolon, question mark or a parenthesis at the end
+    // 5. the word is at the end of the string
     if (abbreviation !== "?") {
       // if we don't do this if check, the regex will be broken
       // because of the question mark (see the word "kuşku")
-      const pattern = new RegExp(`(?<=^|\\s|>)${abbreviation}(?=\\s|$|<)`, "g");
+      //const pattern = new RegExp(`(?<=^|\\s|>)${abbreviation}(?=\\s|$|<)`, "g");
+      // the above regex is the old one without support for the fourth condition
+      // this is the new one with the fourth and fifth conditions
+      const pattern = new RegExp(
+        `(?<=^|\\s|>|,|\\.|:|;|\\?|\\()${abbreviation}(?=\\s|$|<|,|\\.|:|;|\\?|\\))`,
+        "g",
+      );
+
       result = result.replace(pattern, language);
     }
   }
@@ -222,7 +232,7 @@ export const getNisanyanAffixAsNisanyanResponse = server$(
       // return it as it's a word
       data.affix.language;
       const words = joinAllItemsEndingInWords(data);
-      const res = {
+      return {
         isUnsuccessful: false,
         words: [
           {
@@ -253,8 +263,6 @@ export const getNisanyanAffixAsNisanyanResponse = server$(
           name: "Rastgele",
         },
       };
-      console.log(res.words[0].references);
-      return res;
     }
   },
 );
