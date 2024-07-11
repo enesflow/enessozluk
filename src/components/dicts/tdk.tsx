@@ -14,23 +14,37 @@ export function isOutLink(word: string): {
   outLink: boolean;
   cleanWord: string;
 } {
+  function romanToFront(word: string): string {
+    // example:
+    // input: heykel (I)
+    // output: (I) heykel
+    const words = word.split(" ");
+    if (words.length < 2) {
+      return word;
+    }
+    const lastWord = words[words.length - 1];
+    if (lastWord.startsWith("(") && lastWord.endsWith(")")) {
+      return `${lastWord} ${words.slice(0, -1).join(" ")}`;
+    }
+    return word;
+  }
   if (word.startsWith(TDK_LINK_DET)) {
     return {
       outLink: true,
-      cleanWord: word.slice(TDK_LINK_DET.length),
+      cleanWord: romanToFront(word.slice(TDK_LINK_DET.length)),
     };
   }
   // To make sense of this check, check queries "server" and "z kuşağı" on TDK
   if (word.startsWith("343 ")) {
     return {
       outLink: true,
-      cleanWord: word.slice(4),
+      cleanWord: romanToFront(word.slice(4)),
     };
   }
 
   return {
     outLink: false,
-    cleanWord: word,
+    cleanWord: romanToFront(word),
   };
 }
 
@@ -141,7 +155,7 @@ export const TDKView = component$<{
                       {isOutLink(meaning.anlam).outLink ? (
                         <Link
                           href={`/search/${
-                            isOutLink(meaning.anlam).cleanWord.split(" (")[0]
+                            isOutLink(meaning.anlam).cleanWord.split(") ")[1]
                           }`}
                           class="result-description"
                         >
