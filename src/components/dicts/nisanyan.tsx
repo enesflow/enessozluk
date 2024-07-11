@@ -159,8 +159,10 @@ export function formatRelation(
   lastJoinedIndex?: number,
 ): string {
   if (etm.relation.abbreviation == "+")
-    return index !== lastJoinedIndex ? "" : ` sözcüklerinin bileşiğidir.`;
+    return index !== lastJoinedIndex ? "" : " sözcüklerinin bileşiğidir.";
   else if (etm.relation.abbreviation == "§") return "";
+  else if (etm.languages[0].abbreviation === "onom")
+    return " ses yansımalı sözcüğüdür.";
   else
     return ` ${
       {
@@ -408,7 +410,11 @@ export const NisanyanView = component$<{
                           <span> Bu sözcüğün kökeni belirsizdir.</span>
                         ) : (
                           <>
-                            <strong>{etymology.languages[0].name}</strong>
+                            <strong>
+                              {etymology.languages
+                                .map((lang) => lang.name)
+                                .join(", ")}
+                            </strong>
                             <span> {formatDefinition(etymology)}</span>
                             <TextWithLinks
                               regex={NISANYAN_LINK_REGEX}
