@@ -4,6 +4,7 @@ import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { TextWithLinks } from "../textwithlinks";
 import { Recommendations } from "~/components/recommendations";
+import { removeNumbersAtEnd } from "#helpers/string";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -29,10 +30,6 @@ function convertDate(date: string): string {
   }
   return date;
 }
-function removeNumbersAtEnd(text: string): string {
-  return text.replace(/\d+$/, "");
-}
-
 function putTheNumbersAtTheEndAsRomanToTheBeginning(text: string): string {
   // example: a1 -> (I) a
   const match = text.match(/(\d+)$/);
