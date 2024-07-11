@@ -22,7 +22,6 @@ export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
         const recData = await recResponse.json();
         (data as TDKResponseError).recommendations = recData;
       }
-      console.log(data);
       return data;
     } catch (error) {
       return {

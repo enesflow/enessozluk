@@ -6,7 +6,9 @@ export default component$(() => {
   return (
     <>
       <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
-      <SearchBar />
+      <div class="results-container">
+        <SearchBar />
+      </div>
     </>
   );
 });
