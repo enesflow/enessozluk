@@ -34,8 +34,10 @@ export const onRequest: RequestHandler = async ({
     }
   }
   if (lower !== params.query) {
-    // for example, if the query is "Enes2", redirect to "enes"
-    throw redirect(301, `/search/${lower}`);
+    if (lower !== "") {
+      // for example, if the query is "Enes2", redirect to "enes"
+      throw redirect(301, `/search/${lower}`);
+    }
   }
 
   await next();
