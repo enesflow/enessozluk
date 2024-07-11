@@ -8,6 +8,33 @@ import { API_FAILED_TEXT } from "#helpers/constants";
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 const TDK_RECOMMENDATIONS_URL = "https://sozluk.gov.tr/oneri?soz=" as const;
+
+export function isOutLink(word: string): {
+  outLink: boolean;
+  cleanWord: string;
+} {
+  if (word.startsWith(TDK_LINK_DET)) {
+    return {
+      outLink: true,
+      cleanWord: word.slice(TDK_LINK_DET.length),
+    };
+  }
+  // for some words (like "server") the result starts with a number (like "343 sunucu")
+  // i don't know if the number is always 343, but let's check for all numbers
+  // let's see if it starts with a number then a space:
+  const match = word.match(/^\d+ /);
+  if (match) {
+    return {
+      outLink: true,
+      cleanWord: word.slice(match[0].length),
+    };
+  }
+  return {
+    outLink: false,
+    cleanWord: word,
+  };
+}
+
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
   async ({ params }) => {
@@ -69,16 +96,14 @@ export const TDKView = component$<{
                     key={meaning.anlam_id}
                     class="result-subitem result-description"
                   >
-                    {meaning.anlam.startsWith(TDK_LINK_DET) ? (
+                    {isOutLink(meaning.anlam).outLink ? (
                       <Link
                         href={`/search/${
-                          meaning.anlam
-                            .slice(TDK_LINK_DET.length)
-                            .split(" (")[0]
+                          isOutLink(meaning.anlam).cleanWord.split(" (")[0]
                         }`}
                         class="result-description"
                       >
-                        {meaning.anlam.slice(TDK_LINK_DET.length)}
+                        {isOutLink(meaning.anlam).cleanWord}
                       </Link>
                     ) : (
                       meaning.anlam
