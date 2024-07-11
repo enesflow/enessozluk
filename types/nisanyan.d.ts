@@ -141,6 +141,7 @@ type WordReference = {
 };
 
 type Word = {
+  serverDefinedLastJoinedIndex?: number;
   serverDefinedTitleDescription?: string;
   _id: string;
   etymologies: Etymology[];

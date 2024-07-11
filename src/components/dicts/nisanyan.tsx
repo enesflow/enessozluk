@@ -150,8 +150,13 @@ export function formatOrigin(etm: NisanyanEtymology): string {
   return con.join(" veya ");
 }
 
-export function formatRelation(etm: NisanyanEtymology): string {
-  if (etm.relation.abbreviation == "+") return ` sözcüklerinin bileşiğidir.`;
+export function formatRelation(
+  etm: NisanyanEtymology,
+  index: number,
+  lastJoinedIndex?: number,
+): string {
+  if (etm.relation.abbreviation == "+")
+    return index !== lastJoinedIndex ? "" : ` sözcüklerinin bileşiğidir.`;
   else if (etm.relation.abbreviation == "§") return "";
   else
     return ` ${
@@ -160,6 +165,7 @@ export function formatRelation(etm: NisanyanEtymology): string {
         f: "fiilin",
         s: "sözcüğün",
         b: "biçimin",
+        d: "deyimin",
       }[etm.wordClass.abbreviation] ?? etm.wordClass.name
     }${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ")[1]}`;
 }
@@ -179,6 +185,7 @@ export function fixForJoinedWords(
         etm.relation.abbreviation == "§"
       ) {
         detected = true;
+        data.words[wordIndex].serverDefinedLastJoinedIndex = etmIndex;
       } else if (detected) {
         data.words[wordIndex].etymologies[
           etmIndex
@@ -402,7 +409,11 @@ export const NisanyanView = component$<{
                             <span> {formatDefinition(etymology)}</span>
                             <TextWithLinks
                               regex={NISANYAN_LINK_REGEX}
-                              text={formatRelation(etymology)}
+                              text={formatRelation(
+                                etymology,
+                                index,
+                                word.serverDefinedLastJoinedIndex,
+                              )}
                             />
                           </>
                         )}
