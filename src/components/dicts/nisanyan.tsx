@@ -100,8 +100,12 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
     // 1. the word is surrounded by two spaces
     // 2. the word is at the beginning of the string and followed by a space
     // 3. the word is surrounded by > and < (for HTML tags) (example: <i>tr</i>)
-    const pattern = new RegExp(`(?<=^|\\s|>)${abbreviation}(?=\\s|$|<)`, "g");
-    result = result.replace(pattern, language);
+    if (abbreviation !== "?") {
+      // if we don't do this if check, the regex will be broken
+      // because of the question mark (see the word "kuşku")
+      const pattern = new RegExp(`(?<=^|\\s|>)${abbreviation}(?=\\s|$|<)`, "g");
+      result = result.replace(pattern, language);
+    }
   }
 
   return result;
@@ -358,12 +362,20 @@ export const NisanyanView = component$<{
                         ) : (
                           index !== 0 && <span>Bu sözcük </span>
                         )}
-                        <strong>{etymology.languages[0].name}</strong>
-                        {<span> {formatDefinition(etymology)}</span>}
-                        <TextWithLinks
-                          regex={NISANYAN_LINK_REGEX}
-                          text={formatRelation(etymology)}
-                        />
+                        {etymology.languages.every(
+                          (language) => language.abbreviation === "?",
+                        ) ? (
+                          <span> Bu sözcüğün kökeni belirsizdir.</span>
+                        ) : (
+                          <>
+                            <strong>{etymology.languages[0].name}</strong>
+                            <span> {formatDefinition(etymology)}</span>
+                            <TextWithLinks
+                              regex={NISANYAN_LINK_REGEX}
+                              text={formatRelation(etymology)}
+                            />
+                          </>
+                        )}
                       </li>
                     </ul>
                   ))}
