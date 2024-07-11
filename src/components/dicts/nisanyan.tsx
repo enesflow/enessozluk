@@ -279,9 +279,12 @@ export const useNisanyanLoader = routeLoader$<
       if (!response.isUnsuccessful) return response;
       // Well, this is a bad fix for this. It will make our app slower. Try the query "+loji" for the problem.
       else {
+        // remove all + ( and )
         throw redirect(
           301,
-          `/search/${encodeURIComponent(params.query.replaceAll("+", ""))}`,
+          `/search/${encodeURIComponent(
+            params.query.replace(/\(|\)|\+/g, ""),
+          )}`,
         );
       }
     }
