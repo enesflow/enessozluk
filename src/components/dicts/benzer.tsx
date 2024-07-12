@@ -202,7 +202,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 }}
               ></iframe>
               {loaded.value === 0 && (
-                <div class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50 text-center">
                   <p class="text-2xl text-white">
                     benzerkelimeler.com yükleniyor...
                   </p>
