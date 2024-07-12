@@ -1,4 +1,4 @@
-import { createHash } from "crypto";
+import { sha256 } from "js-sha256";
 
 // Function to convert hash to UUID format
 function toUUID(hash: string) {
@@ -9,11 +9,6 @@ function toUUID(hash: string) {
     hash.substring(15, 4),
     hash.substring(19, 12),
   ].join("-");
-}
-
-// Function to get SHA-256 hash
-function sha256(str: string) {
-  return createHash("sha256").update(str).digest("hex");
 }
 
 // Function to get UUID based on input string and version
