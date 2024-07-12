@@ -7,12 +7,14 @@ import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
-export { useLuggatLoader, useNisanyanLoader, useTDKLoader };
+import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
+export { useLuggatLoader, useNisanyanLoader, useTDKLoader, useBenzerLoader };
 
 type Links = {
   tdk: string;
   nisanayan: string;
   luggat: string;
+  benzer: string;
 };
 export function getLinks(query: string): Links {
   const tdk = `https://www.sozluk.gov.tr/?aranan=${encodeURIComponent(query)}`;
@@ -21,7 +23,8 @@ export function getLinks(query: string): Links {
       ? `https://www.nisanyansozluk.com/ek/${encodeURIComponent(query)}`
       : `https://www.nisanyansozluk.com/kelime/${encodeURIComponent(query)}`;
   const luggat = `https://www.luggat.com/${encodeURIComponent(query)}`;
-  return { tdk, nisanayan, luggat };
+  const benzer = `https://www.benzerkelimeler.com/kelime/${encodeURIComponent(query)}`;
+  return { tdk, nisanayan, luggat, benzer };
 }
 
 export default component$(() => {
@@ -29,6 +32,7 @@ export default component$(() => {
   const tdk = useTDKLoader();
   const nisanyan = useNisanyanLoader();
   const luggat = useLuggatLoader();
+  const benzer = useBenzerLoader();
   const links = useComputed$(() => getLinks(loc.params.query));
   return (
     <>
@@ -48,6 +52,10 @@ export default component$(() => {
           Luggat Sonuçları: <ExternalLink href={links.value.luggat} />
         </h1>
         <LuggatView data={luggat.value} />
+        <h1 style="results-heading">
+          Benzer Kelimeler Sonuçları: <ExternalLink href={links.value.benzer} />
+        </h1>
+        <BenzerView data={benzer.value} />
       </div>
     </>
   );

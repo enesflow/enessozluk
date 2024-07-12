@@ -21,12 +21,12 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
               <Link href={`/search/${removeNumbersAtEnd(word)}`}>
                 {putTheNumbersAtTheEndAsRomanToTheBeginning(word)}
               </Link>
-              {index < entries.value.length - (more ? 0 : 1) && ", "}
+              {index < entries.value.length - 1 && ", "}
             </span>
           ))
         }
         {more && (
-          <span class="result-description">
+          <div class="result-description">
             <Link
               onClick$={() => (showMore.value = !showMore.value)}
               class="cursor-pointer"
@@ -34,7 +34,7 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
               {showMore.value ? "«" : "»"} Daha{" "}
               {showMore.value ? "az" : "fazla"} göster
             </Link>
-          </span>
+          </div>
         )}
       </>
     );
