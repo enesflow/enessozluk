@@ -15,9 +15,7 @@ export const onRequest: RequestHandler = async ({
   const queryWithoutNumbers = removeNumbersInWord(params.query);
   const lower = queryWithoutNumbers.toLocaleLowerCase("tr");
 
-  // if the query ends with a hyphen, do this
-  // this is for turkish words
-  // get the last vowel, check if it's a back vowel or a front vowel (a, ı, o, u or e, i, ö, ü)
+  // FOR NISANYAN AFFIXES
   if (
     queryWithoutNumbers.startsWith("+") ||
     queryWithoutNumbers.endsWith("+")
@@ -25,6 +23,7 @@ export const onRequest: RequestHandler = async ({
     await next();
     return;
   }
+  // FOR VERBS
   if (queryWithoutNumbers.endsWith("-")) {
     const lastVowel = lower.match(/[aeıioöuü]/gi)?.slice(-1);
     // if it's a back vowel, add "mak" to the end
@@ -45,10 +44,10 @@ export const onRequest: RequestHandler = async ({
       }
     }
   }
-  if (queryWithoutNumbers !== params.query) {
-    if (queryWithoutNumbers !== "") {
+  if (lower !== params.query) {
+    if (lower !== "") {
       // for example, if the query is "Enes2", redirect to "enes"
-      throw redirect(301, `/search/${queryWithoutNumbers}`);
+      throw redirect(301, `/search/${encodeURIComponent(lower)}/`);
     }
   }
 
