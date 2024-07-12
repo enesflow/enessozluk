@@ -6,13 +6,14 @@ import type {
   NisanyanResponseError,
   NisanyanWord,
 } from "#/nisanyan";
-import { API_FAILED_TEXT } from "#helpers/constants";
+import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
+import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { TextWithLinks } from "../textwithlinks";
+import { WordLinks } from "../WordLinks";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_AFFIX_URL =
@@ -47,7 +48,6 @@ const NISANYAN_ABBREVIATIONS = {
   Moğ: "Moğolca",
   Çağ: "Çağatayca",
 } as const; // TODO: Complete the list
-const NISANYAN_NO_RESULT = "Sonuç bulunamadı" as const;
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET = "● " as const;
 
@@ -57,7 +57,9 @@ function convertDate(date: string): string {
   }
   return date;
 }
-function putTheNumbersAtTheEndAsRomanToTheBeginning(text: string): string {
+export function putTheNumbersAtTheEndAsRomanToTheBeginning(
+  text: string,
+): string {
   // example: a1 -> (I) a
   const match = text.match(/(\d+)$/);
   if (match) {
@@ -415,21 +417,6 @@ export const useNisanyanLoader = routeLoader$<
   }
 });
 
-export const WordLinks = component$<{ words: string[] }>(({ words }) => {
-  return (
-    <>
-      {words.map((word, index) => (
-        <span key={word} class="result-description">
-          <Link href={`/search/${removeNumbersAtEnd(word)}`}>
-            {putTheNumbersAtTheEndAsRomanToTheBeginning(word)}
-          </Link>
-          {index < words.length - 1 && ", "}
-        </span>
-      ))}
-    </>
-  );
-});
-
 export const NisanyanView = component$<{
   data: NisanyanResponse | NisanyanResponseError;
 }>(({ data }) => {
@@ -438,7 +425,7 @@ export const NisanyanView = component$<{
       {data.isUnsuccessful ? (
         <>
           <p class="error-message">
-            {data.serverDefinedErrorText ?? NISANYAN_NO_RESULT}
+            {data.serverDefinedErrorText ?? NO_RESULT}
           </p>
           {data.words && (
             <>

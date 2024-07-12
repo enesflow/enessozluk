@@ -4,7 +4,7 @@ import { routeLoader$, Link } from "@builder.io/qwik-city";
 import { convertToRoman } from "#helpers/roman";
 import { Recommendations } from "../recommendations";
 import { API_FAILED_TEXT } from "#helpers/constants";
-import { WordLinks } from "./nisanyan";
+import { WordLinks } from "../WordLinks";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;

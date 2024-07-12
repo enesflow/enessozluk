@@ -34,7 +34,8 @@
     }
   },
   "files": [
-    "./.eslintrc.cjs"
+    "./.eslintrc.cjs",
+    "src/components/WordLinks.tsx"
   ],
   "include": [
     "src",
