@@ -4,6 +4,7 @@ import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
 import { WordLinks } from "../WordLinks";
+import { Recommendations } from "~/components/recommendations";
 const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 
 const mostPopularUserAgents = [
@@ -84,7 +85,24 @@ export const useBenzerLoader = routeLoader$<
     const entryContentMainExists = $(".entry-content-main").length > 0;
 
     if (!entryContentMainExists) {
-      throw new Error("entry-content-main not found. Probably a captcha.");
+      const words: string[] = [];
+      const suggestionBoxExists = $(".suggestion-box").length > 0;
+      if (!suggestionBoxExists) {
+        return {
+          isUnsuccessful: true,
+          serverDefinedErrorText:
+            "Güvenlik doğrulaması. Lütfen yukarıdaki ok işaretine tıklayarak doğrulamayı tamamlayın.",
+          words: ["Tekrar", "dene-", params.query],
+        };
+      }
+      $(".suggestion-box > ul:nth-child(2) li a").each((_, element) => {
+        words.push($(element).text());
+      });
+
+      return {
+        isUnsuccessful: true,
+        words,
+      };
     }
 
     $(".entry-content-main ul li a").each((_, element) => {
@@ -137,7 +155,18 @@ export const BenzerView = component$<{
   return (
     <>
       {data.isUnsuccessful ? (
-        <p class="error-message">{data.serverDefinedErrorText ?? NO_RESULT}</p>
+        <>
+          <p class="error-message">
+            {data.serverDefinedErrorText ?? NO_RESULT}
+          </p>
+          {(data.words ?? []).length > 0 && (
+            <>
+              <div class="result-item result-subitem">
+                Öneriler: <Recommendations words={data.words!} />
+              </div>
+            </>
+          )}
+        </>
       ) : (
         <section class="result-section">
           <WordLinks
