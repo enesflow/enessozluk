@@ -1,3 +1,4 @@
+import { generateUUID } from "#helpers/generateUUID";
 import { removeNumbersInWord } from "#helpers/string";
 import type { RequestHandler } from "@builder.io/qwik-city";
 
@@ -6,7 +7,11 @@ export const onRequest: RequestHandler = async ({
   params,
   redirect,
   next,
+  platform,
+  sharedMap,
 }) => {
+  sharedMap.set("sessionUUID", generateUUID(platform));
+
   const queryWithoutNumbers = removeNumbersInWord(params.query);
   const lower = queryWithoutNumbers.toLocaleLowerCase("tr");
 

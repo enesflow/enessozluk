@@ -7,12 +7,13 @@ import type {
   NisanyanWord,
 } from "#/nisanyan";
 import { API_FAILED_TEXT } from "#helpers/constants";
-import { convertToRoman, generateUUID } from "#helpers/roman";
+import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { TextWithLinks } from "../textwithlinks";
+import { generateUUID } from "#helpers/generateUUID";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_AFFIX_URL =
@@ -223,75 +224,76 @@ function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
   return result;
 }
 
-export const getNisanyanAffixAsNisanyanResponse = server$(
-  async (query: string): Promise<NisanyanResponse | NisanyanResponseError> => {
-    const url = `${NISANYAN_AFFIX_URL}${encodeURIComponent(query)}?session=${generateUUID()}`;
-    const response = await fetch(url);
-    const data = (await response.json()) as
-      | NisanyanAffixResponse
-      | NisanyanAffixResponseError;
-    if ("error" in data) {
-      return {
-        isUnsuccessful: true,
-        words: [
-          {
-            _id: "1",
-            name: "Tekrar",
-          },
-          {
-            _id: "2",
-            name: "dene-",
-          },
-          {
-            _id: "3",
-            name: query,
-          },
-        ],
-      };
-    } else {
-      // return in a way so that we don't have to write a new ui for affixes
-      // return it as it's a word
-      data.affix.language;
-      const words = joinAllItemsEndingInWords(data);
-      return {
-        isUnsuccessful: false,
-        words: [
-          {
-            serverDefinedTitleDescription: `${words.length} kelime`,
-            _id: data.affix._id,
-            actualTimeUpdated: data.affix.timeUpdated,
-            etymologies: [],
-            id_depr: data.affix.id_depr,
-            name: data.affix.name,
-            note: data.affix.description,
-            queries: [],
-            references: [],
-            referenceOf: words.map((word) => ({
-              ...word,
-              similarWords: [],
-              histories: [],
-              referenceOf: [],
-              misspellings: [],
-            })),
-            timeCreated: data.affix.timeCreated,
-            timeUpdated: data.affix.timeUpdated,
-          },
-        ] satisfies NisanyanWord[],
-        fiveAfter: [],
-        fiveBefore: [],
-        randomWord: {
+export const getNisanyanAffixAsNisanyanResponse = server$(async function (
+  query: string,
+): Promise<NisanyanResponse | NisanyanResponseError> {
+  const url =
+    `${NISANYAN_AFFIX_URL}${encodeURIComponent(query)}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
+  const response = await fetch(url);
+  const data = (await response.json()) as
+    | NisanyanAffixResponse
+    | NisanyanAffixResponseError;
+  if ("error" in data) {
+    return {
+      isUnsuccessful: true,
+      words: [
+        {
           _id: "1",
-          name: "Rastgele",
+          name: "Tekrar",
         },
-      };
-    }
-  },
-);
+        {
+          _id: "2",
+          name: "dene-",
+        },
+        {
+          _id: "3",
+          name: query,
+        },
+      ],
+    };
+  } else {
+    // return in a way so that we don't have to write a new ui for affixes
+    // return it as it's a word
+    data.affix.language;
+    const words = joinAllItemsEndingInWords(data);
+    return {
+      isUnsuccessful: false,
+      words: [
+        {
+          serverDefinedTitleDescription: `${words.length} kelime`,
+          _id: data.affix._id,
+          actualTimeUpdated: data.affix.timeUpdated,
+          etymologies: [],
+          id_depr: data.affix.id_depr,
+          name: data.affix.name,
+          note: data.affix.description,
+          queries: [],
+          references: [],
+          referenceOf: words.map((word) => ({
+            ...word,
+            similarWords: [],
+            histories: [],
+            referenceOf: [],
+            misspellings: [],
+          })),
+          timeCreated: data.affix.timeCreated,
+          timeUpdated: data.affix.timeUpdated,
+        },
+      ] satisfies NisanyanWord[],
+      fiveAfter: [],
+      fiveBefore: [],
+      randomWord: {
+        _id: "1",
+        name: "Rastgele",
+      },
+    };
+  }
+});
 
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<
   NisanyanResponse | NisanyanResponseError
->(async ({ params, redirect }) => {
+>(async ({ params, redirect, sharedMap }) => {
   try {
     if (
       params.query.startsWith("+") ||
@@ -310,7 +312,8 @@ export const useNisanyanLoader = routeLoader$<
         );
       }
     }
-    const url = `${NISANYAN_URL}${params.query}?session=${generateUUID()}`;
+    const url =
+      `${NISANYAN_URL}${params.query}?session=${sharedMap.get("sessionUUID") as string}` as const;
     const response = await fetch(url);
     const data = (await response.json()) as
       | NisanyanResponse
