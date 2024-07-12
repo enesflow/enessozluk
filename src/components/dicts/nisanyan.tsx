@@ -394,7 +394,6 @@ export const useNisanyanLoader = routeLoader$<
     }
     return fixForJoinedWords(data);
   } catch (error) {
-    console.error(error);
     return {
       serverDefinedErrorText: API_FAILED_TEXT,
       isUnsuccessful: true,

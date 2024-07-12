@@ -22,8 +22,6 @@ export function generateUUID(
   clientConn: RequestEvent<QwikCityPlatform>["clientConn"],
 ): string {
   const ip = clientConn.ip;
-  console.log("ip", ip);
   const uuid = getUuid(ip || Math.random().toString());
-  console.log("uuid", uuid);
   return uuid;
 }
