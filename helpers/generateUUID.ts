@@ -21,7 +21,10 @@ export function getUuid(name: string) {
 export function generateUUID(
   headers: RequestEvent<QwikCityPlatform>["headers"],
 ): string {
-  const ip = headers.get("cf-connecting-ip") || headers.get("x-real-ip");
+  const obj: Record<string, string> = {};
+  headers.forEach((value, key) => (obj[key] = value));
+  console.log("obj", obj);
+  const ip = obj["cf-connecting-ip"] || obj["x-real-ip"];
   console.log("ip", ip);
   const uuid = getUuid(ip || Math.random().toString());
   console.log("uuid", uuid);
