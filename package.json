@@ -5,7 +5,6 @@
     "@builder.io/qwik-city": "^1.7.1",
     "@types/eslint": "^8.56.10",
     "@types/node": "^20.12.7",
-    "@types/user-agents": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
     "@typescript-eslint/parser": "^7.7.1",
     "autoprefixer": "^10.4.14",
@@ -49,8 +48,5 @@
     "sharp"
   ],
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
-  "type": "module",
-  "dependencies": {
-    "user-agents": "^1.1.262"
-  }
+  "type": "module"
 }
