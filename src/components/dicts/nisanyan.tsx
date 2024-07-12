@@ -13,7 +13,6 @@ import { component$ } from "@builder.io/qwik";
 import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { TextWithLinks } from "../textwithlinks";
-import { generateUUID } from "#helpers/generateUUID";
 
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_AFFIX_URL =
@@ -174,16 +173,40 @@ export function formatRelation(
   else if (etm.relation.abbreviation == "§") return "";
   else if (etm.languages[0].abbreviation === "onom")
     return " ses yansımalı sözcüğüdür.";
-  else
-    return ` ${
+  else {
+    /* return ` ${
       {
-        ö: "özel ismin",
-        f: "fiilin",
-        s: "sözcüğün",
-        b: "biçimin",
-        d: "deyimin",
+        ö: "özel ismi",
+        f: "fiili",
+        s: "sözcüğü",
+        b: "biçimi",
+        d: "deyimi",
       }[etm.wordClass.abbreviation] ?? etm.wordClass.name
-    }${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ")[1]}`;
+    }${etm.relation.text.startsWith(" ") ? "" : "n"}${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ").slice(1).join(" ")}.`; */
+    // let's break up this bad boy, this code is too hard to read
+    const wordClass =
+      ({
+        ö: "özel ismi",
+        f: "fiili",
+        s: "sözcüğü",
+        b: "biçimi",
+        d: "deyimi",
+      }[etm.wordClass.abbreviation] ?? etm.wordClass.name) +
+      (etm.relation.text.startsWith(" ") ? "" : "n");
+    const _relation = etm.relation.text.split(" ");
+    const relationFirst = _relation.shift();
+    const relationRest = " " + _relation.join(" ");
+    const prefix = etm.affixes?.prefix
+      ? ` %l${etm.affixes.prefix.name} ön ekiyle `
+      : "";
+    const suffix = etm.affixes?.suffix
+      ? ` %l${etm.affixes.suffix.name} ekiyle `
+      : "";
+    const dot = relationRest.endsWith(".") ? "" : ".";
+    return (
+      " " + wordClass + relationFirst + prefix + suffix + relationRest + dot
+    );
+  }
 }
 
 export function fixForJoinedWords(
