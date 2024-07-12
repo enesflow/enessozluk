@@ -48,8 +48,5 @@
     "sharp"
   ],
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
-  "type": "module",
-  "dependencies": {
-    "js-sha256": "^0.11.0"
-  }
+  "type": "module"
 }
