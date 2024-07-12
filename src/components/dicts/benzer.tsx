@@ -21,10 +21,8 @@ export const useBenzerLoader = routeLoader$<
 
     // cookie to header text
     let cookieText = "";
-    if (cookie) {
-      for (const [key, value] of Object.entries(cookie)) {
-        cookieText += `${key}=${value}; `;
-      }
+    for (const [key, value] of Object.entries(cookie)) {
+      cookieText += `${key}=${value}; `;
     }
 
     const response = await fetch(url, {
@@ -110,6 +108,7 @@ export const useBenzerLoader = routeLoader$<
       moreWords,
     };
   } catch (error) {
+    console.log(error);
     return {
       isUnsuccessful: true,
       serverDefinedErrorText: API_FAILED_TEXT,
