@@ -2,7 +2,7 @@ import { generateUUID } from "#helpers/generateUUID";
 import { removeNumbersInWord } from "#helpers/string";
 import type { RequestHandler } from "@builder.io/qwik-city";
 
-export const onRequest: RequestHandler = async ({
+export const onRequest: RequestHandler = async ({ 
   url,
   params,
   redirect,
