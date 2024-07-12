@@ -94,6 +94,7 @@ function formatSpecialChars(str: string): string {
 function replaceAbbrevations(str: string, data: NisanyanResponse): string {
   const languages: Record<string, string> = NISANYAN_ABBREVIATIONS;
   for (const word of data.words ?? []) {
+    if (!word.etymologies) continue;
     for (const etymology of word.etymologies) {
       for (const language of etymology.languages) {
         languages[language.abbreviation] = language.name;
@@ -163,14 +164,10 @@ export function formatOrigin(etm: NisanyanEtymology): string {
   return con.join(" veya ");
 }
 
-export function formatRelation(
-  etm: NisanyanEtymology,
-  index: number,
-  lastJoinedIndex?: number,
-): string {
-  if (etm.relation.abbreviation == "+")
-    return index !== lastJoinedIndex ? "" : " sözcüklerinin bileşiğidir.";
-  else if (etm.relation.abbreviation == "§") return "";
+export function formatRelation(etm: NisanyanEtymology): string {
+  if (etm.relation.abbreviation == "+") {
+    return etm.serverDefinedEndOfJoin ? " sözcüklerinin bileşiğidir." : "";
+  } else if (etm.relation.abbreviation == "§") return "";
   else if (etm.languages[0].abbreviation === "onom")
     return " ses yansımalı sözcüğüdür.";
   else {
@@ -224,19 +221,62 @@ export function fixForJoinedWords(
   if (!data.words) return data;
   for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
     const word = data.words[wordIndex];
+    if (!word.etymologies) continue;
     let detected = false;
+    let finished = false;
+    let detectedTemp = false;
     for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
       const etm = word.etymologies[etmIndex];
+      if (detected) {
+        if (finished) {
+          data.words[wordIndex].etymologies![
+            etmIndex
+          ].serverDefinedMoreIndentation = true;
+        }
+        if (etm.relation.abbreviation === "+") {
+          finished = true;
+        }
+        if (
+          !(
+            etm.relation.abbreviation === "+" ||
+            etm.relation.abbreviation === "§"
+          )
+        ) {
+          data.words[wordIndex].etymologies![
+            etmIndex
+          ].serverDefinedMoreIndentation = true;
+        }
+      } else {
+        if (
+          etm.relation.abbreviation === "+" ||
+          etm.relation.abbreviation === "§"
+        ) {
+          detected = true;
+          detectedTemp = true;
+        }
+      }
+
       if (
-        etm.relation.abbreviation == "+" ||
-        etm.relation.abbreviation == "§"
+        !(
+          etm.relation.abbreviation === "+" || etm.relation.abbreviation === "§"
+        ) &&
+        detectedTemp
       ) {
-        detected = true;
-        data.words[wordIndex].serverDefinedLastJoinedIndex = etmIndex;
-      } else if (detected) {
-        data.words[wordIndex].etymologies[
-          etmIndex
-        ].serverDefinedMoreIndentation = true;
+        detectedTemp = false;
+        data.words[wordIndex].etymologies![
+          etmIndex - 1
+        ].serverDefinedEndOfJoin = true;
+      }
+    }
+    // make the last one serverDefinedEndOfJoin if the abbreviation is +
+
+    if (data.words[wordIndex].etymologies) {
+      const len = data.words[wordIndex].etymologies!.length;
+      if (
+        data.words[wordIndex].etymologies![len - 1].relation.abbreviation == "+"
+      ) {
+        data.words[wordIndex].etymologies![len - 1].serverDefinedEndOfJoin =
+          true;
       }
     }
   }
@@ -354,6 +394,7 @@ export const useNisanyanLoader = routeLoader$<
     }
     return fixForJoinedWords(data);
   } catch (error) {
+    console.error(error);
     return {
       serverDefinedErrorText: API_FAILED_TEXT,
       isUnsuccessful: true,
@@ -435,15 +476,16 @@ export const NisanyanView = component$<{
                   )}
                 </i>
               </h2>
-              {word.etymologies.length > 0 && (
-                <section class="result-section">
-                  <h2 class="result-subtitle">Köken</h2>
-                  {word.etymologies.map((etymology, index) => (
+              <section class="result-section">
+                <h2 class="result-subtitle">Köken</h2>
+                {(word.etymologies ?? []).length > 0 &&
+                  word.etymologies?.map((etymology, index) => (
                     <ul key={index} class="result-list">
                       <li
                         class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
                       >
-                        {etymology.relation.abbreviation === "+" ? (
+                        {etymology.relation.abbreviation === "+" &&
+                        index !== 0 ? (
                           <span>ve </span>
                         ) : (
                           index !== 0 && <span>Bu sözcük </span>
@@ -462,28 +504,21 @@ export const NisanyanView = component$<{
                             <span> {formatDefinition(etymology)}</span>
                             <TextWithLinks
                               regex={NISANYAN_LINK_REGEX}
-                              text={formatRelation(
-                                etymology,
-                                index,
-                                word.serverDefinedLastJoinedIndex,
-                              )}
+                              text={formatRelation(etymology)}
                             />
                           </>
                         )}
                       </li>
                     </ul>
                   ))}
-                  {word.references.length > 0 && (
-                    <p class="result-description">
-                      Daha fazla bilgi için{" "}
-                      <WordLinks
-                        words={word.references.map((ref) => ref.name)}
-                      />{" "}
-                      maddelerine bakınız.
-                    </p>
-                  )}
-                </section>
-              )}
+                {word.references.length > 0 && (
+                  <p class="result-description">
+                    Daha fazla bilgi için{" "}
+                    <WordLinks words={word.references.map((ref) => ref.name)} />{" "}
+                    maddelerine bakınız.
+                  </p>
+                )}
+              </section>
               {word.note && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Ek açıklama</h2>

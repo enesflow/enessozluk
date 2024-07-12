@@ -65,6 +65,7 @@ type Affixes = {
 
 type Etymology = {
   serverDefinedMoreIndentation?: boolean;
+  serverDefinedEndOfJoin?: boolean;
   _id: string;
   id_depr: number;
   paranthesis: string;
@@ -118,7 +119,7 @@ type Reference = {
   queries: string[];
   similarWords: string[];
   references: { _id: string }[];
-  etymologies: { _id: string }[];
+  etymologies?: { _id: string }[];
   histories: { _id: string }[];
   referenceOf: WordReference[];
   alternateSpellings?: string[];
@@ -135,7 +136,7 @@ type WordReference = {
   queries: string[];
   similarWords: string[];
   references: { _id: string }[];
-  etymologies: { _id: string }[];
+  etymologies?: { _id: string }[];
   histories: { _id: string }[];
   referenceOf: WordReference[];
 };
@@ -144,7 +145,7 @@ type Word = {
   serverDefinedLastJoinedIndex?: number;
   serverDefinedTitleDescription?: string;
   _id: string;
-  etymologies: Etymology[];
+  etymologies?: Etymology[];
   histories?: History[];
   id_depr: number;
   misspellings?: string[] | null;
