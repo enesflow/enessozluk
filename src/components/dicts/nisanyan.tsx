@@ -184,18 +184,26 @@ export function formatRelation(
       }[etm.wordClass.abbreviation] ?? etm.wordClass.name
     }${etm.relation.text.startsWith(" ") ? "" : "n"}${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ").slice(1).join(" ")}.`; */
     // let's break up this bad boy, this code is too hard to read
-    const wordClass =
-      ({
-        ö: "özel ismi",
-        f: "fiili",
-        s: "sözcüğü",
-        b: "biçimi",
-        d: "deyimi",
-      }[etm.wordClass.abbreviation] ?? etm.wordClass.name) +
-      (etm.relation.text.startsWith(" ") ? "" : "n");
-    const _relation = etm.relation.text.split(" ");
+    const relationOverride = {
+      "~?": "bir sözcükten alıntı olabilir; ancak bu kesin değildir.",
+    } as Record<string, string>;
+    const _relationOverrid = relationOverride[etm.relation.abbreviation];
+    const _relation = (_relationOverrid || etm.relation.text).split(" ");
     const relationFirst = _relation.shift();
     const relationRest = " " + _relation.join(" ");
+
+    const wordClass = _relationOverrid
+      ? ""
+      : ({
+          ö: "özel ismi",
+          f: "fiili",
+          s: "sözcüğü",
+          b: "biçimi",
+          d: "deyimi",
+          k: "kökü",
+        }[etm.wordClass.abbreviation] ?? etm.wordClass.name) +
+        (etm.relation.text.startsWith(" ") ? "" : "n");
+
     const prefix = etm.affixes?.prefix
       ? ` %l${etm.affixes.prefix.name} ön ekiyle `
       : "";
