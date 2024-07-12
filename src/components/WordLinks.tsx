@@ -1,16 +1,30 @@
 import { removeNumbersAtEnd } from "#helpers/string";
-import { component$, useComputed$, useSignal } from "@builder.io/qwik";
-import { Link } from "@builder.io/qwik-city";
+import {
+  component$,
+  useComputed$,
+  useSignal,
+  useTask$,
+} from "@builder.io/qwik";
+import { Link, useLocation } from "@builder.io/qwik-city";
 import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "./dicts/nisanyan";
 
 export const WordLinks = component$<{ words: string[]; more?: string[] }>(
   ({ words, more }) => {
+    const loc = useLocation();
     const showMore = useSignal(false);
     const entries = useComputed$(() => {
+      showMore.value;
+      // if you remove the random code above, you get error
+      // Internal assert, this is likely caused by a bug in Qwik: resume: index is out of bounds
+
       if (more && showMore.value) {
         return words.concat(more);
       }
       return words;
+    });
+    useTask$(({ track }) => {
+      track(() => loc.isNavigating);
+      if (!loc.isNavigating) showMore.value = false;
     });
     return (
       <>
