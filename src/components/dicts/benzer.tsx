@@ -10,7 +10,7 @@ const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 // eslint-disable-next-line qwik/loader-location
 export const useBenzerLoader = routeLoader$<
   BenzerResponse | BenzerResponseError
->(async ({ params, request, clientConn }) => {
+>(async ({ params, request, clientConn, cookie }) => {
   try {
     const url = `${BENZER_URL}${params.query}`;
     /* const response = await fetch(url); */
@@ -18,6 +18,14 @@ export const useBenzerLoader = routeLoader$<
     // request as if it is coming from the user's browser
 
     // headers.get
+
+    // cookie to header text
+    let cookieText = "";
+    if (cookie) {
+      for (const [key, value] of Object.entries(cookie)) {
+        cookieText += `${key}=${value}; `;
+      }
+    }
 
     const response = await fetch(url, {
       ...request,
@@ -37,10 +45,24 @@ export const useBenzerLoader = routeLoader$<
         accept:
           "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
         "x-real-ip": clientConn.ip,
+        cookie: cookieText,
       },
     });
 
     const html = await response.text();
+    // (method) Cookie.set(name: string, value: string | number | Record<string, any>, options?: CookieOptions): void
+    // set all cookies as if they are coming from the browser
+    const cookieHeaders = response.headers.get("set-cookie");
+    if (cookieHeaders) {
+      const cookies = cookieHeaders.split("; ");
+      for (const cookieT of cookies) {
+        const [key, value] = cookieT.split("=");
+        if (key && value) {
+          // set the cookie
+          cookie.set(key, value, { path: "/" });
+        }
+      }
+    }
 
     const $ = load(html);
 
