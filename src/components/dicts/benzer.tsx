@@ -1,10 +1,17 @@
 import type { BenzerResponse, BenzerResponseError } from "#/benzer";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
-import { component$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
+import type { QRL } from "@builder.io/qwik";
+import {
+  $,
+  component$,
+  useComputed$,
+  useSignal,
+  useVisibleTask$,
+} from "@builder.io/qwik";
+import { Link, routeLoader$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
-import { WordLinks } from "../WordLinks";
 import { Recommendations } from "~/components/recommendations";
+import { WordLinks } from "../WordLinks";
 const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 
 const mostPopularUserAgents = [
@@ -82,20 +89,29 @@ export const useBenzerLoader = routeLoader$<
 
     // Extract words from the first list
     const words = new Set<string>();
-    const entryContentMainExists = $(".entry-content-main").length > 0;
+    const entryContentMain = $(".entry-content-main ul li a");
 
-    if (!entryContentMainExists) {
+    if (entryContentMain.length === 0) {
       const words: string[] = [];
-      const suggestionBoxExists = $(".suggestion-box").length > 0;
-      if (!suggestionBoxExists) {
+      const captchaButton = $(
+        "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
+      );
+      if (captchaButton.length > 0) {
         return {
           isUnsuccessful: true,
+          serverDefinedCaptchaError: true,
           serverDefinedErrorText:
-            "Güvenlik doğrulaması. Lütfen yukarıdaki ok işaretine tıklayarak doğrulamayı tamamlayın.",
+            "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
           words: ["Tekrar", "dene-", params.query],
         };
       }
-      $(".suggestion-box > ul:nth-child(2) li a").each((_, element) => {
+      const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
+      if (suggestionBox.length === 0) {
+        return {
+          isUnsuccessful: true,
+        };
+      }
+      suggestionBox.each((_, element) => {
         words.push($(element).text());
       });
 
@@ -105,7 +121,7 @@ export const useBenzerLoader = routeLoader$<
       };
     }
 
-    $(".entry-content-main ul li a").each((_, element) => {
+    entryContentMain.each((_, element) => {
       words.add($(element).text());
     });
 
@@ -149,13 +165,101 @@ export const useBenzerLoader = routeLoader$<
   }
 });
 
+export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
+  ({ src, callback }) => {
+    const LOCAL_STORAGE_ITEM = "show-captcha" as const;
+    const loaded = useSignal(0);
+
+    const show = useSignal(false);
+
+    // eslint-disable-next-line qwik/no-use-visible-task
+    useVisibleTask$(() => {
+      // read local storage LOCAL_STORAGE_ITEM
+      const showCaptcha = localStorage.getItem(LOCAL_STORAGE_ITEM);
+      if (showCaptcha) {
+        show.value = true;
+      }
+    });
+
+    return (
+      <>
+        {show.value ? (
+          <>
+            <div class="relative overflow-hidden rounded-lg">
+              <iframe
+                title="Benzer Kelimeler"
+                class="h-[30rem] w-full"
+                src={src}
+                onLoad$={async () => {
+                  loaded.value++;
+                  console.log("loaded", loaded.value);
+                  if (loaded.value >= 2) {
+                    console.log("reloading");
+                    localStorage.removeItem(LOCAL_STORAGE_ITEM);
+                    await callback?.();
+                    show.value = false;
+                  }
+                }}
+              ></iframe>
+              {loaded.value === 0 && (
+                <div class="absolute inset-0 flex items-center justify-center bg-gray-500 bg-opacity-50">
+                  <p class="text-2xl text-white">
+                    benzerkelimeler.com yükleniyor...
+                  </p>
+                </div>
+              )}
+            </div>
+            <div>
+              <Link
+                onClick$={() => {
+                  localStorage.removeItem(LOCAL_STORAGE_ITEM);
+                  show.value = false;
+                }}
+                class="cursor-pointer"
+              >
+                Güvenlik doğrulamasını kapat
+              </Link>
+            </div>
+          </>
+        ) : (
+          <Link
+            onClick$={() => {
+              localStorage.setItem(LOCAL_STORAGE_ITEM, "true");
+              loaded.value = 0;
+              setTimeout(() => {
+                show.value = true;
+              }, 100);
+            }}
+            class="cursor-pointer"
+          >
+            Güvenlik doğrulamasını göster
+          </Link>
+        )}
+      </>
+    );
+  },
+);
+
 export const BenzerView = component$<{
   data: BenzerResponse | BenzerResponseError;
 }>(({ data }) => {
+  const showCaptcha = useComputed$(
+    () => (data.isUnsuccessful && data.serverDefinedCaptchaError) || false,
+  );
   return (
     <>
       {data.isUnsuccessful ? (
         <>
+          {showCaptcha.value && (
+            <IFrame
+              // remove "kelime/" from the URL
+              src={`${BENZER_URL.split("/").slice(0, -1).join("/")}/dogrulama`}
+              callback={$(async () => {
+                data.serverDefinedCaptchaError = false;
+                window.location.reload();
+              })}
+            />
+          )}
           <p class="error-message">
             {data.serverDefinedErrorText ?? NO_RESULT}
           </p>

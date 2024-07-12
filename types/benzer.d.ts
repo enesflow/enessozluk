@@ -6,5 +6,6 @@ export type BenzerResponse = {
 export type BenzerResponseError = {
   isUnsuccessful: true;
   serverDefinedErrorText?: string;
+  serverDefinedCaptchaError?: boolean;
   words?: string[];
 };
