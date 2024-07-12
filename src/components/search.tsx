@@ -16,7 +16,8 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
   const loc = useLocation();
   const focusOnInput = $(() => {
     if (loc.isNavigating || !isBrowser) return;
-
+    // if on a mobile device, this would annoy the user
+    if (typeof screen.orientation !== "undefined") return;
     input.value?.focus();
     input.value?.setSelectionRange(0, input.value.value.length);
   });
