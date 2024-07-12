@@ -8,9 +8,9 @@ export const onRequest: RequestHandler = async ({
   redirect,
   next,
   sharedMap,
-  headers,
+  clientConn,
 }) => {
-  sharedMap.set("sessionUUID", generateUUID(headers));
+  sharedMap.set("sessionUUID", generateUUID(clientConn));
 
   const queryWithoutNumbers = removeNumbersInWord(params.query);
   const lower = queryWithoutNumbers.toLocaleLowerCase("tr");
