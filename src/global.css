@@ -12,6 +12,31 @@ body {
   @apply selection:bg-red-500 selection:text-white;
 }
 
+@keyframes bounceLeftToRight {
+  0% {
+    left: -11vw;
+    width: 20vw;
+  }
+  10% {
+    width: 20vw;
+  }
+  50% {
+    width: 55vw;
+  }
+  90% {
+    width: 20vw;
+  }
+  100% {
+    width: 20vw;
+    left: calc(100vw + 11vw);
+  }
+}
+
+.loader {
+  @apply fixed left-0 top-0 h-1 w-[20vw] translate-x-[-50%] rounded-full bg-red-500;
+  animation: bounceLeftToRight 2s infinite ease-in-out alternate;
+}
+
 .header {
   @apply mb-4 text-center text-4xl font-bold;
 }
