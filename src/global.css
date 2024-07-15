@@ -33,7 +33,7 @@ body {
 }
 
 .loader {
-  @apply fixed left-0 top-0 h-1 w-[20vw] translate-x-[-50%] rounded-full bg-red-500;
+  @apply fixed left-0 top-0 z-50 h-1 w-[20vw] translate-x-[-50%] rounded-full bg-red-500;
   animation: bounceLeftToRight 2s infinite ease-in-out alternate;
 }
 
