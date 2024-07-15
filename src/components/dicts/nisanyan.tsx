@@ -48,7 +48,7 @@ const NISANYAN_ABBREVIATIONS = {
   Çağ: "Çağatayca",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
-const NISANYAN_NEWLINE_DET = "● " as const;
+const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
 
 function convertDate(date: string): string {
   if (date.startsWith("<")) {
@@ -499,7 +499,7 @@ export const NisanyanView = component$<{
                   <h2 class="result-subtitle">Ek açıklama</h2>
                   <ul class="result-list">
                     {word.note
-                      .split(NISANYAN_NEWLINE_DET)
+                      .split(NISANYAN_NEWLINE_DET_REGEX)
                       .map((note, index) => (
                         <li key={index} class="result-subitem">
                           <TextWithLinks
