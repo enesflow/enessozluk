@@ -6,6 +6,7 @@ import { removeNumbersInWord } from "#helpers/string";
 import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
 import { fixForJoinedWords } from "~/components/dicts/nisanyan";
+import { flattenVerb } from "./redirect";
 
 function consolidateNames(names: string): string {
   // example:
@@ -190,9 +191,15 @@ export function parseNisanyan(
   data: NisanyanResponse,
   url: string,
 ): NisanyanPackage {
+  const mapper = (word: any & { name: string }) => ({
+    ...word,
+    name: removeNumbersInWord(word.name),
+  });
+
   const query = decodeURIComponent(
     new URL(url).pathname.split("/").pop() ?? "",
   );
+  data.words = data.words?.map(mapper);
   const misspellings = data.words?.map((i) => i.misspellings).flat();
   // if our word is a misspelling, we should return error
   if (misspellings?.includes(query)) {
@@ -206,18 +213,14 @@ export function parseNisanyan(
         })) ?? [],
     };
   }
-  const mapper = (word: any & { name: string }) => ({
-    ...word,
-    name: removeNumbersInWord(word.name),
-  });
-  data.words = data.words?.map(mapper);
   data.fiveAfter = data.fiveAfter.map(mapper);
   data.fiveBefore = data.fiveBefore.map(mapper);
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
-    if (word.name !== query) {
+    if (word.name !== query && flattenVerb(word.name) !== query) {
       word.serverDefinedTitleDescription = query;
+      word.serverDefinedIsMisspelling = true;
     }
   });
 

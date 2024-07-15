@@ -1,4 +1,27 @@
 import { removeNumbersInWord } from "#helpers/string";
+
+export function flattenVerb(verb: string): string {
+  // if hyphen then add mak or mek
+  if (verb.endsWith("-")) {
+    const lower = verb.toLocaleLowerCase("tr");
+    const lastVowel = lower.match(/[aeıioöuü]/gi)?.slice(-1);
+    // if it's a back vowel, add "mak" to the end
+    // if it's a front vowel, add "mek" to the end
+    if (lastVowel) {
+      const [vowel] = lastVowel;
+      const noHyphen = lower.slice(0, -1);
+      let toAdd = "";
+      if ("eiüö".includes(vowel.toLowerCase())) {
+        toAdd = "mek";
+      } else if ("aıou".includes(vowel.toLowerCase())) {
+        toAdd = "mak";
+      }
+      return noHyphen + toAdd;
+    }
+  }
+  return verb;
+}
+
 export function getRedirect(
   url: URL,
   params: { query: string },
@@ -23,31 +46,13 @@ export function getRedirect(
       shouldRedirect: false,
     };
   }
-  // FOR VERBS
-  if (queryWithoutNumbers.endsWith("-")) {
-    const lastVowel = lower.match(/[aeıioöuü]/gi)?.slice(-1);
-    // if it's a back vowel, add "mak" to the end
-    // if it's a front vowel, add "mek" to the end
-    if (lastVowel) {
-      const [vowel] = lastVowel;
-      const noHyphen = lower.slice(0, -1);
-      let toAdd = "";
-      if ("eiüö".includes(vowel.toLowerCase())) {
-        toAdd = "mek";
-      } else if ("aıou".includes(vowel.toLowerCase())) {
-        toAdd = "mak";
-      }
-      const to = `${url.origin}/search/${encodeURIComponent(noHyphen + toAdd)}/`;
-      if (url.pathname !== to) {
-        // just to be safe
-        /* throw redirect(301, to); */
-        return {
-          shouldRedirect: true,
-          to,
-          code: 301,
-        };
-      }
-    }
+  const to = `/search/${encodeURIComponent(flattenVerb(lower))}/`;
+  if (url.pathname !== to) {
+    return {
+      shouldRedirect: true,
+      to,
+      code: 301,
+    };
   }
   if (lower !== params.query) {
     if (lower !== "") {

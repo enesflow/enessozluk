@@ -9,7 +9,7 @@ import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$, server$, useLocation } from "@builder.io/qwik-city";
+import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
@@ -420,7 +420,6 @@ function getWordTitle(index: number, name: string) {
 export const NisanyanView = component$<{
   data: NisanyanWordPackage;
 }>(({ data }) => {
-  const query = useLocation().params.query;
   return (
     <>
       {data.isUnsuccessful ? (
@@ -451,12 +450,12 @@ export const NisanyanView = component$<{
             <li key={word._id} class="result-item">
               <h2 class="result-title">
                 {/* */}
-                {removeNumbersAtEnd(word.name) === query ? (
-                  <>{getWordTitle(index, word.name)}</>
-                ) : (
+                {word.serverDefinedIsMisspelling ? (
                   <LinkR href={`/search/${word.name}`}>
                     {getWordTitle(index, word.name)}
                   </LinkR>
+                ) : (
+                  <>{getWordTitle(index, word.name)}</>
                 )}
                 <i class="result-title-description">
                   {word.serverDefinedTitleDescription && (

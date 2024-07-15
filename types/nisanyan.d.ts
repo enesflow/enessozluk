@@ -144,6 +144,7 @@ type WordReference = {
 type Word = {
   serverDefinedLastJoinedIndex?: number;
   serverDefinedTitleDescription?: string;
+  serverDefinedIsMisspelling?: boolean;
   _id: string;
   etymologies?: Etymology[];
   histories?: History[];
