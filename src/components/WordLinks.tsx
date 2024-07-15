@@ -40,7 +40,7 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
             </span>
           ))
         }
-        {more && (
+        {more && more.length > 0 && (
           <div class="result-description">
             <Link
               onClick$={() => (showMore.value = !showMore.value)}
