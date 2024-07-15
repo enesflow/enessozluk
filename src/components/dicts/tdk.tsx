@@ -80,6 +80,7 @@ export function preprocessTDK(data: TDKPackage) {
         }
         data[i].anlamlarListe![j].serverDefinedPreText = meaning.ozelliklerListe
           ?.map((ozellik) => ozellik.tam_adi)
+          .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
           .join(", ");
       }
     }
