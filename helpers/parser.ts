@@ -99,7 +99,10 @@ export function parseLuggat(data: string): LuggatPackage {
 
 ////////
 
-export function parseBenzer(data: string, query: string): BenzerPackage {
+export function parseBenzer(data: string, url: string): BenzerPackage {
+  const query = decodeURIComponent(
+    new URL(url).pathname.split("/").pop() ?? "",
+  );
   const $ = load(data);
 
   // Extract words from the first list

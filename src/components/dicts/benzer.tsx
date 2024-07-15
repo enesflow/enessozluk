@@ -131,6 +131,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
             </div>
             <div>
               <Link
+                preventdefault:click
                 onClick$={() => {
                   localStorage.removeItem(LOCAL_STORAGE_ITEM);
                   show.value = false;
@@ -143,6 +144,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
           </>
         ) : (
           <Link
+            preventdefault:click
             onClick$={() => {
               localStorage.setItem(LOCAL_STORAGE_ITEM, "true");
               loaded.value = 0;

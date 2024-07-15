@@ -7,6 +7,7 @@ import {
 } from "@builder.io/qwik";
 import { Link, useLocation } from "@builder.io/qwik-city";
 import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "./dicts/nisanyan";
+import { LinkR } from "./linkWithRedirect";
 
 export const WordLinks = component$<{ words: string[]; more?: string[] }>(
   ({ words, more }) => {
@@ -32,9 +33,9 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
           // if showMore then join words and more, else just words
           entries.value.map((word, index) => (
             <span key={word} class="result-description">
-              <Link href={`/search/${removeNumbersAtEnd(word)}`}>
+              <LinkR href={`/search/${removeNumbersAtEnd(word)}`}>
                 {putTheNumbersAtTheEndAsRomanToTheBeginning(word)}
-              </Link>
+              </LinkR>
               {index < entries.value.length - 1 && ", "}
             </span>
           ))
@@ -44,6 +45,7 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
             <Link
               onClick$={() => (showMore.value = !showMore.value)}
               class="cursor-pointer"
+              preventdefault:click
             >
               {showMore.value ? "«" : "»"} Daha{" "}
               {showMore.value ? "az" : "fazla"} göster

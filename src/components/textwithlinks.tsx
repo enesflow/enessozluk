@@ -1,5 +1,5 @@
 import { component$ } from "@builder.io/qwik";
-import { Link } from "@builder.io/qwik-city";
+import { LinkR } from "./linkWithRedirect";
 
 function isALetter(char: string | undefined): boolean {
   return !(
@@ -39,11 +39,11 @@ export const TextWithLinks = component$<{
         return (
           <span key={index}>
             <>
-              <Link
+              <LinkR
                 href={`/search/${!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}`}
               >
                 {!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}
-              </Link>
+              </LinkR>
               {!isALetter(word[word.length - 1]) ? (
                 <>{word[word.length - 1]}</>
               ) : (

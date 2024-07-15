@@ -1,11 +1,12 @@
 import type { TDKPackage, TDKResponseError } from "#/tdk";
+import { fetchAPI } from "#helpers/cache";
 import { API_FAILED_TEXT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
-import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { routeLoader$ } from "@builder.io/qwik-city";
+import { LinkR } from "../linkWithRedirect";
 import { Recommendations } from "../recommendations";
 import { WordLinks } from "../WordLinks";
-import { fetchAPI } from "#helpers/cache";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
@@ -165,7 +166,7 @@ export const TDKView = component$<{
                     >
                       <strong>{meaning.serverDefinedPreText} </strong>
                       {isOutLink(meaning.anlam).outLink ? (
-                        <Link
+                        <LinkR
                           href={`/search/${isOutLink(meaning.anlam)
                             .cleanWord.split(" ")
                             .filter((word) => !word.startsWith("("))
@@ -173,7 +174,7 @@ export const TDKView = component$<{
                           class="result-description"
                         >
                           {isOutLink(meaning.anlam).cleanWord}
-                        </Link>
+                        </LinkR>
                       ) : (
                         meaning.anlam
                       )}
