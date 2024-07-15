@@ -96,7 +96,7 @@ function isTDKResponseError(
 
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKPackage>(async ({ params }) => {
-  const url = `${TDK_URL}${params.query}`;
+  const url = `${TDK_URL}${params.query.toLocaleLowerCase("tr")}`;
   try {
     const { data } = await fetchAPI(url, {
       provider: "tdk",
@@ -104,7 +104,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async ({ params }) => {
     if (!isTDKResponseError(data)) {
       return preprocessTDK(data);
     } else {
-      const url = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
+      const url = `${TDK_RECOMMENDATIONS_URL}${params.query.toLocaleLowerCase("tr")}`;
       const { data: recommendations } = await fetchAPI(url, {
         provider: "general-tdk-recommendations",
       });

@@ -145,11 +145,16 @@ export async function parseBenzer(
         isUnsuccessful: true,
       };
     }
-    suggestionBox.each((_, element) => {
-      const text = $(element).text();
-      words.push(text);
-    });
-    for (const word of words) {
+    for (const element of suggestionBox) {
+      const word = $(element).text();
+      words.push(word);
+      /* if (word.toLocaleLowerCase("tr") === query) {
+        return {
+          isUnsuccessful: true,
+          serverDefinedErrorText: DID_YOU_MEAN,
+          words: [word],
+        };
+      } */
       if (query === word.toLocaleLowerCase("tr") && word !== query) {
         console.log("from", query, "to", word);
         const originalURL = new URL(url);
@@ -193,7 +198,11 @@ export async function parseBenzer(
           categoryWords.add(text);
         }
       });
-    moreWords[category] = Array.from(categoryWords).sort();
+    // moreWords[category] = Array.from(categoryWords).sort();
+    // sort with support for turkish characters (ç, ı, ğ, ö, ş, ü)
+    moreWords[category] = Array.from(categoryWords).sort((a, b) =>
+      a.localeCompare(b, "tr"),
+    );
   });
 
   if (words.size === 0) {

@@ -14,7 +14,7 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(
   async ({ params }) => {
     // VERSION 2
     try {
-      const url = `${LUGGAT_URL}${params.query}`;
+      const url = `${LUGGAT_URL}${params.query.toLocaleLowerCase("tr")}`;
       const { data } = await fetchAPI(url, {
         provider: "luggat",
       });

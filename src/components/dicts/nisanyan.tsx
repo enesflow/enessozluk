@@ -301,7 +301,7 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
   query: string,
 ): Promise<NisanyanWordPackage> {
   const url =
-    `${NISANYAN_AFFIX_URL}${encodeURIComponent(query)}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
+    `${NISANYAN_AFFIX_URL}${encodeURIComponent(query.toLocaleLowerCase("tr"))}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
   const { data } = await fetchAPI(url, {
     provider: "nisanyanaffix",
   });
@@ -382,7 +382,7 @@ export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
         }
       }
       const url =
-        `${NISANYAN_URL}${params.query}?session=${sharedMap.get("sessionUUID") as string}` as const;
+        `${NISANYAN_URL}${params.query.toLocaleLowerCase("tr")}?session=${sharedMap.get("sessionUUID") as string}` as const;
       const { data } = await fetchAPI(url, {
         provider: "nisanyan",
       });
