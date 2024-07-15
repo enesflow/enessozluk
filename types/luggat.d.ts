@@ -11,3 +11,4 @@ export type LuggatResponseError = {
   isUnsuccessful: true;
   serverDefinedErrorText?: string;
 };
+export type LuggatPackage = LuggatResponse | LuggatResponseError;

@@ -9,3 +9,5 @@ export type BenzerResponseError = {
   serverDefinedCaptchaError?: boolean;
   words?: string[];
 };
+
+export type BenzerPackage = BenzerResponse | BenzerResponseError;

@@ -229,3 +229,9 @@ export type NisanyanAffixResponse = {
 export type NisanyanAffixResponseError = {
   error: {};
 };
+
+export type NisanyanWordPackage = NisanyanResponse | NisanyanResponseError;
+export type NisanyanAffixPackage =
+  | NisanyanAffixResponse
+  | NisanyanAffixResponseError;
+export type NisanyanPackage = NisanyanWordPackage | NisanyanAffixPackage;

@@ -1,4 +1,5 @@
-import type { BenzerResponse, BenzerResponseError } from "#/benzer";
+import type { BenzerPackage } from "#/benzer";
+import { fetchAPI } from "#helpers/cache";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import type { QRL } from "@builder.io/qwik";
 import {
@@ -9,7 +10,6 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { Link, routeLoader$ } from "@builder.io/qwik-city";
-import { load } from "cheerio";
 import { Recommendations } from "~/components/recommendations";
 import { WordLinks } from "../WordLinks";
 const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
@@ -28,142 +28,62 @@ const mostPopularUserAgents = [
 ];
 
 // eslint-disable-next-line qwik/loader-location
-export const useBenzerLoader = routeLoader$<
-  BenzerResponse | BenzerResponseError
->(async ({ params, request, clientConn, cookie }) => {
-  try {
-    const url = `${BENZER_URL}${params.query}`;
-    /* const response = await fetch(url); */
-    // this website has a captcha, so we need to send the
-    // request as if it is coming from the user's browser
-
-    // headers.get
-
-    // cookie to header text
-    let cookieText = "";
-    for (const [key, value] of Object.entries(cookie)) {
-      cookieText += `${key}=${value}; `;
-    }
-
-    const response = await fetch(url, {
-      ...request,
-      headers: {
-        // disguise as a browser
-        ...request.headers,
-        "user-agent":
-          mostPopularUserAgents[
-            Math.floor(Math.random() * mostPopularUserAgents.length)
-          ],
-        // some more fake headers
-        "accept-language": "en-US,en;q=0.9",
-        "accept-encoding": "gzip, deflate, br",
-        "upgrade-insecure-requests": "1",
-        "sec-fetch-mode": "navigate",
-        "sec-fetch-site": "none",
-        "sec-fetch-user": "?1",
-        "sec-fetch-dest": "document",
-        "cache-control": "max-age=0",
-        accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-        "x-real-ip": clientConn.ip,
-        cookie: cookieText,
-      },
-    });
-
-    const html = await response.text();
-    // (method) Cookie.set(name: string, value: string | number | Record<string, any>, options?: CookieOptions): void
-    // set all cookies as if they are coming from the browser
-    const cookieHeaders = response.headers.get("set-cookie");
-    if (cookieHeaders) {
-      const cookies = cookieHeaders.split("; ");
-      for (const cookieT of cookies) {
-        const [key, value] = cookieT.split("=");
-        if (key && value) {
-          // set the cookie
-          cookie.set(key, value, { path: "/" });
-        }
+export const useBenzerLoader = routeLoader$<BenzerPackage>(
+  async ({ params, request, clientConn, cookie }) => {
+    try {
+      const url = `${BENZER_URL}${params.query}`;
+      let cookieText = "";
+      for (const [key, value] of Object.entries(cookie)) {
+        cookieText += `${key}=${value}; `;
       }
-    }
 
-    const $ = load(html);
-
-    // Extract words from the first list
-    const words = new Set<string>();
-    const entryContentMain = $(".entry-content-main ul li a");
-
-    if (entryContentMain.length === 0) {
-      const words: string[] = [];
-      const captchaButton = $(
-        "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
-      );
-      if (captchaButton.length > 0) {
-        return {
-          isUnsuccessful: true,
-          serverDefinedCaptchaError: true,
-          serverDefinedErrorText:
-            "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-          words: ["Tekrar", "dene-", params.query],
-        };
-      }
-      const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
-      if (suggestionBox.length === 0) {
-        return {
-          isUnsuccessful: true,
-        };
-      }
-      suggestionBox.each((_, element) => {
-        words.push($(element).text());
+      const { data, response } = await fetchAPI(url, {
+        ...request,
+        provider: "benzer",
+        headers: {
+          // disguise as a browser
+          ...request.headers,
+          "user-agent":
+            mostPopularUserAgents[
+              Math.floor(Math.random() * mostPopularUserAgents.length)
+            ],
+          // some more fake headers
+          "accept-language": "en-US,en;q=0.9",
+          "accept-encoding": "gzip, deflate, br",
+          "upgrade-insecure-requests": "1",
+          "sec-fetch-mode": "navigate",
+          "sec-fetch-site": "none",
+          "sec-fetch-user": "?1",
+          "sec-fetch-dest": "document",
+          "cache-control": "max-age=0",
+          accept:
+            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+          "x-real-ip": clientConn.ip,
+          cookie: cookieText,
+        },
       });
 
-      return {
-        isUnsuccessful: true,
-        words,
-      };
-    }
-
-    entryContentMain.each((_, element) => {
-      words.add($(element).text());
-    });
-
-    // Extract more words from the second list
-    const moreWords: { [key: string]: string[] } = {};
-    $(".entry-content-sub").each((_, element) => {
-      const category = $(element)
-        .find(".entry-content-sub-title a")
-        .first()
-        .text();
-      const categoryWords = new Set<string>();
-      $(element)
-        .find(".entry-content-sub-content ul li a")
-        .each((_, elem) => {
-          const text = $(elem).text();
-          if (!words.has(text)) {
-            categoryWords.add(text);
+      const cookieHeaders = response.headers.get("set-cookie");
+      if (cookieHeaders) {
+        const cookies = cookieHeaders.split("; ");
+        for (const cookieT of cookies) {
+          const [key, value] = cookieT.split("=");
+          if (key && value) {
+            // set the cookie
+            cookie.set(key, value, { path: "/" });
           }
-        });
-      moreWords[category] = Array.from(categoryWords);
-    });
-
-    if (words.size === 0) {
+        }
+      }
+      return data;
+    } catch (error) {
+      console.log("BENZER FAILED", error);
       return {
         isUnsuccessful: true,
-        serverDefinedErrorText: NO_RESULT,
+        serverDefinedErrorText: API_FAILED_TEXT,
       };
     }
-
-    return {
-      isUnsuccessful: false,
-      words: Array.from(words),
-      moreWords,
-    };
-  } catch (error) {
-    console.log(error);
-    return {
-      isUnsuccessful: true,
-      serverDefinedErrorText: API_FAILED_TEXT,
-    };
-  }
-});
+  },
+);
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
@@ -241,7 +161,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
 );
 
 export const BenzerView = component$<{
-  data: BenzerResponse | BenzerResponseError;
+  data: BenzerPackage;
 }>(({ data }) => {
   const showCaptcha = useComputed$(
     () => (data.isUnsuccessful && data.serverDefinedCaptchaError) || false,

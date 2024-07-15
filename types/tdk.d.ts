@@ -80,3 +80,5 @@ export type TDKResponseError = {
   error: string;
   recommendations: { madde: string }[];
 };
+
+export type TDKPackage = TDKResponse | TDKResponseError;

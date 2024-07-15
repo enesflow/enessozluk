@@ -1,122 +1,37 @@
-import type { LuggatResponse, LuggatResponseError } from "#/luggat";
+import type { LuggatPackage } from "#/luggat";
+import { fetchAPI } from "#helpers/cache";
+import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { load } from "cheerio";
 import { TextWithLinks } from "../textwithlinks";
-import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 
 const LUGGAT_URL = "https://www.luggat.com/" as const;
 const LUGGAT_LINK_REGEX = /\(Bak[:.] (.+?)\)/g;
 
-function consolidateNames(names: string): string {
-  // example:
-  // input: kudsi / kudsi / kudsî / قُدْس۪ي
-  // output: kudsi / kudsî / قُدْس۪ي
-  const namesSet = new Set<string>();
-  const namesArray = names.split("/");
-  for (const name of namesArray) {
-    if (name.trim() === "") {
-      continue;
-    }
-    namesSet.add(name.trim());
-  }
-  return Array.from(namesSet).join(" / ");
-}
-
-function consolidateDefinitions(definitions: string[]): string[] {
-  const definitionsSet = new Set<string>();
-  for (const definition of definitions) {
-    definitionsSet.add(definition.trim());
-  }
-  return Array.from(definitionsSet);
-}
-
-function consolidateEntries(
-  words: LuggatResponse["words"],
-): LuggatResponse["words"] {
-  const resultRecord = new Map<string, string[]>();
-  for (const word of words) {
-    if (resultRecord.has(word.name)) {
-      resultRecord.set(word.name, [
-        ...resultRecord.get(word.name)!,
-        ...word.definitions,
-      ]);
-    } else {
-      resultRecord.set(word.name, word.definitions);
-    }
-  }
-  const result: LuggatResponse["words"] = [];
-  for (const [name, definitions] of resultRecord) {
-    result.push({
-      name: consolidateNames(name),
-      definitions: consolidateDefinitions(definitions),
-    });
-  }
-  return result;
-}
-
 // eslint-disable-next-line qwik/loader-location
-export const useLuggatLoader = routeLoader$<
-  LuggatResponse | LuggatResponseError
->(async ({ params }) => {
-  try {
-    const url = `${LUGGAT_URL}${params.query}`;
-    const response = await fetch(url);
-    const html = await response.text();
-    const $ = load(html);
-    const words: LuggatResponse["words"] = [];
-
-    $(".arama-sonucu-div").each((index, element) => {
-      const name = $(element)
-        .find("h2.heading-5")
-        .text()
-        .trim()
-        .replace(/\s+/g, " ");
-      const definitions: string[] = [];
-
-      // Process definitions inside <ol> lists
-      $(element)
-        .find("ol li")
-        .each((_, li) => {
-          const definition = $(li).text().trim();
-          definitions.push(definition);
-        });
-
-      // If no <ol> list definitions found, check for other possible definitions
-      if (definitions.length === 0) {
-        const potentialDefinition = $(element)
-          .contents()
-          .filter((_, node) => node.type === "text")
-          .text()
-          .trim();
-        if (potentialDefinition) {
-          definitions.push(potentialDefinition);
-        }
-      }
-
-      if (name && definitions.length) {
-        words.push({ name, definitions });
-      }
-    });
-    if (words.length === 0) {
-      return { isUnsuccessful: true };
+export const useLuggatLoader = routeLoader$<LuggatPackage>(
+  async ({ params }) => {
+    // VERSION 2
+    try {
+      const url = `${LUGGAT_URL}${params.query}`;
+      const { data } = await fetchAPI(url, {
+        provider: "luggat",
+      });
+      // the data is already parsed with parseLuggat
+      return data;
+    } catch (error) {
+      console.error("LUGGAT FAILED", error);
+      return {
+        isUnsuccessful: true,
+        serverDefinedErrorText: API_FAILED_TEXT,
+      };
     }
-
-    return {
-      isUnsuccessful: false,
-      words: consolidateEntries(words),
-    };
-  } catch (error) {
-    return {
-      isUnsuccessful: true,
-      serverDefinedErrorText: API_FAILED_TEXT,
-    };
-  }
-});
+  },
+);
 
 export const LuggatView = component$<{
-  data: LuggatResponse | LuggatResponseError;
+  data: LuggatPackage;
 }>(({ data }) => {
   return (
     <>

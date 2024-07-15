@@ -1,11 +1,10 @@
 import type {
-  NisanyanAffixResponse,
-  NisanyanAffixResponseError,
   NisanyanEtymology,
   NisanyanResponse,
-  NisanyanResponseError,
   NisanyanWord,
+  NisanyanWordPackage,
 } from "#/nisanyan";
+import { fetchAPI } from "#helpers/cache";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
@@ -217,8 +216,8 @@ export function formatRelation(etm: NisanyanEtymology): string {
 }
 
 export function fixForJoinedWords(
-  data: NisanyanResponse | NisanyanResponseError,
-): NisanyanResponse | NisanyanResponseError {
+  data: NisanyanWordPackage,
+): NisanyanWordPackage {
   if (data.isUnsuccessful) return data;
   if (!data.words) return data;
   for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
@@ -299,15 +298,15 @@ function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
 
 export const getNisanyanAffixAsNisanyanResponse = server$(async function (
   query: string,
-): Promise<NisanyanResponse | NisanyanResponseError> {
+): Promise<NisanyanWordPackage> {
   const url =
     `${NISANYAN_AFFIX_URL}${encodeURIComponent(query)}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
-  const response = await fetch(url);
-  const data = (await response.json()) as
-    | NisanyanAffixResponse
-    | NisanyanAffixResponseError;
+  const { data } = await fetchAPI(url, {
+    provider: "nisanyanaffix",
+  });
   if ("error" in data) {
     return {
+      serverDefinedErrorText: API_FAILED_TEXT,
       isUnsuccessful: true,
       words: [
         {
@@ -325,9 +324,6 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
       ],
     };
   } else {
-    // return in a way so that we don't have to write a new ui for affixes
-    // return it as it's a word
-    data.affix.language;
     const words = joinAllItemsEndingInWords(data);
     return {
       isUnsuccessful: false,
@@ -352,7 +348,7 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
           timeCreated: data.affix.timeCreated,
           timeUpdated: data.affix.timeUpdated,
         },
-      ] satisfies NisanyanWord[],
+      ],
       fiveAfter: [],
       fiveBefore: [],
       randomWord: {
@@ -363,62 +359,61 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
   }
 });
 
+function isAffix(query: string): boolean {
+  return query.startsWith("+") || removeNumbersInWord(query).endsWith("+");
+}
+
 // eslint-disable-next-line qwik/loader-location
-export const useNisanyanLoader = routeLoader$<
-  NisanyanResponse | NisanyanResponseError
->(async ({ params, redirect, sharedMap }) => {
-  try {
-    if (
-      params.query.startsWith("+") ||
-      removeNumbersInWord(params.query).endsWith("+")
-    ) {
-      const response = await getNisanyanAffixAsNisanyanResponse(params.query);
-      if (!response.isUnsuccessful) return response;
-      // Well, this is a bad fix for this. It will make our app slower. Try the query "+loji" for the problem.
-      else {
-        // remove all + ( and )
-        throw redirect(
-          301,
-          `/search/${encodeURIComponent(
-            params.query.replace(/\(|\)|\+/g, ""),
-          )}`,
-        );
+export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
+  async ({ params, redirect, sharedMap }) => {
+    // VERSION 2
+    try {
+      const affix = isAffix(params.query);
+      if (affix) {
+        const response = await getNisanyanAffixAsNisanyanResponse(params.query);
+        if (!response.isUnsuccessful) return response;
+        else {
+          // remove all + ( and )
+          throw redirect(
+            301,
+            `/search/${encodeURIComponent(params.query.replace(/\(|\)|\+/g, "" as const))}`,
+          );
+        }
       }
+      const url =
+        `${NISANYAN_URL}${params.query}?session=${sharedMap.get("sessionUUID") as string}` as const;
+      const { data } = await fetchAPI(url, {
+        provider: "nisanyan",
+      });
+      if ("error" in data) {
+        data.isUnsuccessful = true;
+      }
+      return fixForJoinedWords(data);
+    } catch (error) {
+      return {
+        serverDefinedErrorText: API_FAILED_TEXT,
+        isUnsuccessful: true,
+        words: [
+          {
+            _id: "1",
+            name: "Tekrar",
+          },
+          {
+            _id: "2",
+            name: "dene-",
+          },
+          {
+            _id: "3",
+            name: params.query,
+          },
+        ],
+      };
     }
-    const url =
-      `${NISANYAN_URL}${params.query}?session=${sharedMap.get("sessionUUID") as string}` as const;
-    const response = await fetch(url);
-    const data = (await response.json()) as
-      | NisanyanResponse
-      | NisanyanResponseError;
-    if ("error" in (data as any)) {
-      data.isUnsuccessful = true;
-    }
-    return fixForJoinedWords(data);
-  } catch (error) {
-    return {
-      serverDefinedErrorText: API_FAILED_TEXT,
-      isUnsuccessful: true,
-      words: [
-        {
-          _id: "1",
-          name: "Tekrar",
-        },
-        {
-          _id: "2",
-          name: "dene-",
-        },
-        {
-          _id: "3",
-          name: params.query,
-        },
-      ],
-    };
-  }
-});
+  },
+);
 
 export const NisanyanView = component$<{
-  data: NisanyanResponse | NisanyanResponseError;
+  data: NisanyanWordPackage;
 }>(({ data }) => {
   return (
     <>

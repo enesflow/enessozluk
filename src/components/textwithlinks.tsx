@@ -41,10 +41,9 @@ export const TextWithLinks = component$<{
             <>
               <Link
                 href={`/search/${!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}`}
-                dangerouslySetInnerHTML={
-                  !isALetter(word[word.length - 1]) ? word.slice(0, -1) : word
-                }
-              />
+              >
+                {!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}
+              </Link>
               {!isALetter(word[word.length - 1]) ? (
                 <>{word[word.length - 1]}</>
               ) : (

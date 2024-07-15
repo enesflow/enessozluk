@@ -1,10 +1,11 @@
-import type { TDKResponse, TDKResponseError } from "#/tdk";
-import { component$ } from "@builder.io/qwik";
-import { routeLoader$, Link } from "@builder.io/qwik-city";
-import { convertToRoman } from "#helpers/roman";
-import { Recommendations } from "../recommendations";
+import type { TDKPackage, TDKResponseError } from "#/tdk";
 import { API_FAILED_TEXT } from "#helpers/constants";
+import { convertToRoman } from "#helpers/roman";
+import { component$ } from "@builder.io/qwik";
+import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { Recommendations } from "../recommendations";
 import { WordLinks } from "../WordLinks";
+import { fetchAPI } from "#helpers/cache";
 
 const TDK_LINK_DET = "► " as const;
 const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
@@ -48,7 +49,7 @@ export function isOutLink(word: string): {
   };
 }
 
-export function preprocessTDK(data: TDKResponse | TDKResponseError) {
+export function preprocessTDK(data: TDKPackage) {
   if ("error" in data) {
     return data;
   }
@@ -84,36 +85,47 @@ export function preprocessTDK(data: TDKResponse | TDKResponseError) {
   }
   return data;
 }
+
+function isTDKResponseError(
+  data: TDKPackage | TDKResponseError,
+): data is TDKResponseError {
+  return "error" in data || !("anlamlarListe" in data[0]);
+}
+
 // eslint-disable-next-line qwik/loader-location
-export const useTDKLoader = routeLoader$<TDKResponse | TDKResponseError>(
-  async ({ params }) => {
-    const url = `${TDK_URL}${params.query}`;
-    const response = await fetch(url);
-    try {
-      const data = (await response.json()) as TDKResponse | TDKResponseError;
-      if ("error" in data || !("anlamlarListe" in data[0])) {
-        // then we need to get the recommendations
-        const recUrl = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
-        const recResponse = await fetch(recUrl);
-        const recData = await recResponse.json();
-        (data as TDKResponseError).recommendations = recData;
-      }
+export const useTDKLoader = routeLoader$<TDKPackage>(async ({ params }) => {
+  const url = `${TDK_URL}${params.query}`;
+  try {
+    const { data } = await fetchAPI(url, {
+      provider: "tdk",
+    });
+    if (!isTDKResponseError(data)) {
       return preprocessTDK(data);
-    } catch (error) {
+    } else {
+      const url = `${TDK_RECOMMENDATIONS_URL}${params.query}`;
+      const { data: recommendations } = await fetchAPI(url, {
+        provider: "general-tdk-recommendations",
+      });
       return {
-        error: API_FAILED_TEXT,
-        recommendations: [
-          { madde: "Tekrar" },
-          { madde: "dene-" },
-          { madde: params.query },
-        ],
+        error: "error" in data ? data.error : API_FAILED_TEXT,
+        recommendations: recommendations as any,
       };
     }
-  },
-);
+  } catch (error) {
+    console.error("TDK FAILED", error);
+    return {
+      error: API_FAILED_TEXT,
+      recommendations: [
+        { madde: "Tekrar" },
+        { madde: "dene-" },
+        { madde: params.query },
+      ],
+    };
+  }
+});
 
 export const TDKView = component$<{
-  data: TDKResponse | TDKResponseError;
+  data: TDKPackage;
 }>(({ data }) => {
   return (
     <>
