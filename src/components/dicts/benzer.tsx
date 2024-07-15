@@ -1,4 +1,8 @@
-import type { BenzerPackage } from "#/benzer";
+import type {
+  BenzerPackage,
+  BenzerResponse,
+  BenzerResponseError,
+} from "#/benzer";
 import { fetchAPI } from "#helpers/cache";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import type { QRL } from "@builder.io/qwik";
@@ -9,7 +13,7 @@ import {
   useSignal,
   useVisibleTask$,
 } from "@builder.io/qwik";
-import { Link, routeLoader$ } from "@builder.io/qwik-city";
+import { Link, routeLoader$, server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { WordLinks } from "../WordLinks";
 const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
@@ -46,52 +50,55 @@ export function getFakeHeaders() {
   };
 }
 
-// eslint-disable-next-line qwik/loader-location
-export const useBenzerLoader = routeLoader$<BenzerPackage>(
-  async ({ params, request, clientConn, cookie }) => {
-    try {
-      const url = `${BENZER_URL}${params.query}`;
-      let cookieText = "";
-      for (const [key, value] of Object.entries(cookie)) {
-        cookieText += `${key}=${value}; `;
-      }
+const benzerLoaderServer = server$(async function (): Promise<BenzerPackage> {
+  const { params, cookie, request, clientConn } = this;
+  try {
+    const url = `${BENZER_URL}${params.query}`;
+    let cookieText = "";
+    for (const [key, value] of Object.entries(cookie)) {
+      cookieText += `${key}=${value}; `;
+    }
 
-      const { data, response } = await fetchAPI(url, {
-        ...request,
-        provider: "benzer",
-        forceRefreshIf(data) {
-          return data.isUnsuccessful && data.serverDefinedCaptchaError;
-        },
-        headers: {
-          // disguise as a browser
-          ...request.headers,
-          ...getFakeHeaders(),
-          "x-real-ip": clientConn.ip,
-          cookie: cookieText,
-        },
-      });
+    const { data, response } = await fetchAPI(url, {
+      ...request,
+      provider: "benzer",
+      forceRefreshIf(data) {
+        return data.isUnsuccessful && data.serverDefinedCaptchaError;
+      },
+      headers: {
+        // disguise as a browser
+        ...request.headers,
+        ...getFakeHeaders(),
+        "x-real-ip": clientConn.ip,
+        cookie: cookieText,
+      },
+    });
 
-      const cookieHeaders = response.headers.get("set-cookie");
-      if (cookieHeaders) {
-        const cookies = cookieHeaders.split("; ");
-        for (const cookieT of cookies) {
-          const [key, value] = cookieT.split("=");
-          if (key && value) {
-            // set the cookie
-            cookie.set(key, value, { path: "/" });
-          }
+    const cookieHeaders = response.headers.get("set-cookie");
+    if (cookieHeaders) {
+      const cookies = cookieHeaders.split("; ");
+      for (const cookieT of cookies) {
+        const [key, value] = cookieT.split("=");
+        if (key && value) {
+          // set the cookie
+          cookie.set(key, value, { path: "/" });
         }
       }
-      return data;
-    } catch (error) {
-      console.log("BENZER FAILED", error);
-      return {
-        isUnsuccessful: true,
-        serverDefinedErrorText: API_FAILED_TEXT,
-      };
     }
-  },
-);
+    return data;
+  } catch (error) {
+    console.log("BENZER FAILED", error);
+    return {
+      isUnsuccessful: true,
+      serverDefinedErrorText: API_FAILED_TEXT,
+    };
+  }
+});
+
+// eslint-disable-next-line qwik/loader-location
+export const useBenzerLoader = routeLoader$<BenzerPackage>(async (event) => {
+  return benzerLoaderServer.call(event);
+});
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
@@ -121,11 +128,11 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 onLoad$={async () => {
                   loaded.value++;
                   console.log("loaded", loaded.value);
-                  if (loaded.value >= 2) {
+                  if (loaded.value === 2) {
                     console.log("reloading");
                     localStorage.removeItem(LOCAL_STORAGE_ITEM);
-                    await callback?.();
                     show.value = false;
+                    await callback?.();
                   }
                 }}
               ></iframe>
@@ -172,31 +179,37 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
 
 export const BenzerView = component$<{
   data: BenzerPackage;
-}>(({ data }) => {
+}>(({ data: _data }) => {
+  const data = useComputed$(() => _data);
   const showCaptcha = useComputed$(
-    () => (data.isUnsuccessful && data.serverDefinedCaptchaError) || false,
+    () =>
+      (data.value.isUnsuccessful && data.value.serverDefinedCaptchaError) ||
+      false,
   );
   return (
     <>
-      {data.isUnsuccessful ? (
+      {data.value.isUnsuccessful ? (
         <>
           {showCaptcha.value && (
             <IFrame
               // remove "kelime/" from the URL
               src={`${BENZER_URL.split("/").slice(0, -1).join("/")}/dogrulama`}
               callback={$(async () => {
-                data.serverDefinedCaptchaError = false;
-                window.location.reload();
+                showCaptcha.value = false;
+                (data.value as BenzerResponseError).serverDefinedErrorText =
+                  "Yükleniyor...";
+                (data.value as BenzerResponseError).words = [];
+                data.value = await benzerLoaderServer();
               })}
             />
           )}
           <p class="error-message">
-            {data.serverDefinedErrorText ?? NO_RESULT}
+            {data.value.serverDefinedErrorText ?? NO_RESULT}
           </p>
-          {(data.words ?? []).length > 0 && (
+          {(data.value.words ?? []).length > 0 && (
             <>
               <div class="result-item result-subitem">
-                Öneriler: <Recommendations words={data.words!} />
+                Öneriler: <Recommendations words={data.value.words!} />
               </div>
             </>
           )}
@@ -204,9 +217,9 @@ export const BenzerView = component$<{
       ) : (
         <section class="result-section">
           <WordLinks
-            words={data.words}
-            more={Object.keys(data.moreWords).flatMap(
-              (category) => data.moreWords[category],
+            words={data.value.words}
+            more={Object.keys(data.value.moreWords).flatMap(
+              (category) => (data.value as BenzerResponse).moreWords[category],
             )}
           />
         </section>
