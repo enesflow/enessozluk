@@ -1,3 +1,4 @@
+import { getLink, getRedirect } from "#helpers/redirect";
 import { component$, Slot } from "@builder.io/qwik";
 import type { LinkProps } from "@builder.io/qwik-city";
 import { Link, useLocation } from "@builder.io/qwik-city";
@@ -10,7 +11,7 @@ export const LinkR = component$<LinkProps>((props) => {
     ? `${loc.url.origin}${props.href}`
     : props.href;
   return (
-    <Link {...props} href={href}>
+    <Link {...props} href={getLink(href)}>
       <Slot />
     </Link>
   );

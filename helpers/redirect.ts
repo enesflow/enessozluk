@@ -67,7 +67,10 @@ export function getRedirect(
   };
 }
 
-export function getLink(href: string): string {
+export function getLink(href: string | undefined): string {
+  if (!href) {
+    return "";
+  }
   const url = new URL(href);
   // if shouldredirect return to, else return href
   const red = getRedirect(url, {
