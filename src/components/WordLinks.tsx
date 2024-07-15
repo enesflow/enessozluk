@@ -44,7 +44,7 @@ export const WordLinks = component$<{ words: string[]; more?: string[] }>(
           <div class="result-description">
             <Link
               onClick$={() => (showMore.value = !showMore.value)}
-              class="cursor-pointer"
+              class="cursor-pointer font-bold"
               preventdefault:click
             >
               {showMore.value ? "«" : "»"} Daha{" "}

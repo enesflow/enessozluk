@@ -2,6 +2,7 @@ import type { BenzerPackage } from "#/benzer";
 import type { LuggatPackage, LuggatResponse } from "#/luggat";
 import type { NisanyanPackage, NisanyanResponse } from "#/nisanyan";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
+import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
 import { removeNumbersInWord } from "#helpers/string";
 import { fixForJoinedWords } from "~/components/dicts/nisanyan";
@@ -100,6 +101,14 @@ export function parseLuggat(data: string): LuggatPackage {
   }
 }
 
+export function isBenzerCaptcha(data: string | CheerioAPI): boolean {
+  const $ = typeof data === "string" ? load(data) : data;
+  const captchaButton = $(
+    "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
+  );
+  return captchaButton.length > 0;
+}
+
 ////////
 
 export function parseBenzer(data: string, url: string): BenzerPackage {
@@ -114,10 +123,7 @@ export function parseBenzer(data: string, url: string): BenzerPackage {
 
   if (entryContentMain.length === 0) {
     const words: string[] = [];
-    const captchaButton = $(
-      "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
-    );
-    if (captchaButton.length > 0) {
+    if (isBenzerCaptcha($)) {
       return {
         isUnsuccessful: true,
         serverDefinedCaptchaError: true,
@@ -158,11 +164,11 @@ export function parseBenzer(data: string, url: string): BenzerPackage {
       .find(".entry-content-sub-content ul li a")
       .each((_, elem) => {
         const text = $(elem).text();
-        if (!words.has(text)) {
+        if (!words.has(text) && text !== query) {
           categoryWords.add(text);
         }
       });
-    moreWords[category] = Array.from(categoryWords);
+    moreWords[category] = Array.from(categoryWords).sort();
   });
 
   if (words.size === 0) {

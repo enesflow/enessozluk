@@ -40,6 +40,9 @@ export const useBenzerLoader = routeLoader$<BenzerPackage>(
       const { data, response } = await fetchAPI(url, {
         ...request,
         provider: "benzer",
+        forceRefreshIf(data) {
+          return data.isUnsuccessful && data.serverDefinedCaptchaError;
+        },
         headers: {
           // disguise as a browser
           ...request.headers,

@@ -69,6 +69,7 @@ export async function fetchAPI<T extends PROVDIDER_TYPE>(
   options: RequestInit & {
     provider: T;
     forceRefresh?: boolean;
+    forceRefreshIf?: (data: ProviderType[T]) => boolean | undefined;
   },
 ): Promise<{
   data: ProviderType[T];
@@ -77,24 +78,21 @@ export async function fetchAPI<T extends PROVDIDER_TYPE>(
 }> {
   const cachedResponse = await checkForCache(options.provider, url);
   if (cachedResponse && !options.forceRefresh) {
-    console.log("cache hit", options.provider);
-    return {
-      data: cachedResponse,
-      isCached: true,
-      response: new Response(),
-    };
+    if (!options.forceRefreshIf?.(cachedResponse)) {
+      console.log("cache hit", options.provider);
+      return {
+        data: cachedResponse,
+        isCached: true,
+        response: new Response(),
+      };
+    } else {
+      console.log("Forcing a refresh", options.provider);
+    }
   }
   console.log("cache miss", options.provider);
   const response = await fetch(url, options);
-  /* const fn =
-    options.provider in parser ? (parser as any)[options.provider] : null;
-  const data =
-    options.provider in parser
-      ? fn(await response.text(), url)
-      : ((await response.json()) as ProviderType[T]); */
   const htmlParser = (parseHTML as any)[options.provider];
   const jsonParser = (parseJSON as any)[options.provider];
-  // if htmlparser, then parse html, else if jsonparser, then parse json else return response.json
   const data = htmlParser
     ? htmlParser(await response.text(), url)
     : jsonParser
