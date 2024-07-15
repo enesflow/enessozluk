@@ -1,4 +1,4 @@
-import { getLink, getRedirect } from "#helpers/redirect";
+import { getLink } from "#helpers/redirect";
 import { component$, Slot } from "@builder.io/qwik";
 import type { LinkProps } from "@builder.io/qwik-city";
 import { Link, useLocation } from "@builder.io/qwik-city";
