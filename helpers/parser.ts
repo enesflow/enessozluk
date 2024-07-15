@@ -155,7 +155,10 @@ export async function parseBenzer(
           words: [word],
         };
       } */
-      if (query === word.toLocaleLowerCase("tr") && word !== query) {
+      if (
+        query.toLocaleLowerCase("tr") === word.toLocaleLowerCase("tr") &&
+        word !== query
+      ) {
         console.log("from", query, "to", word);
         const originalURL = new URL(url);
         const decodedURL = decodeURIComponent(originalURL.href.split("?")[0]);
@@ -252,9 +255,8 @@ export function parseNisanyan(
 
   data.words?.forEach((word) => {
     if (
-      word.name !== query &&
-      flattenVerb(word.name) !== query &&
-      word.name.toLocaleLowerCase("tr") !== query
+      word.name.toLocaleLowerCase("tr") !== query.toLocaleLowerCase("tr") &&
+      flattenVerb(word.name) !== query
     ) {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
