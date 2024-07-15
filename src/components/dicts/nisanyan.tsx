@@ -388,7 +388,7 @@ export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
       if ("error" in data) {
         data.isUnsuccessful = true;
       }
-      return fixForJoinedWords(data);
+      return data;
     } catch (error) {
       return {
         serverDefinedErrorText: API_FAILED_TEXT,
@@ -429,15 +429,9 @@ export const NisanyanView = component$<{
                 <Recommendations
                   words={Array.from(
                     new Set([
-                      ...data.words.map((word) =>
-                        removeNumbersAtEnd(word.name),
-                      ),
-                      ...(data.fiveAfter?.map((word) =>
-                        removeNumbersAtEnd(word.name),
-                      ) || []),
-                      ...(data.fiveBefore?.map((word) =>
-                        removeNumbersAtEnd(word.name),
-                      ) || []),
+                      ...data.words.map((word) => word.name),
+                      ...(data.fiveAfter?.map((word) => word.name) || []),
+                      ...(data.fiveBefore?.map((word) => word.name) || []),
                     ]),
                   )}
                 />

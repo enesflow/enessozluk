@@ -1,7 +1,10 @@
 import type { BenzerPackage } from "#/benzer";
 import type { LuggatPackage, LuggatResponse } from "#/luggat";
+import type { NisanyanPackage, NisanyanResponse } from "#/nisanyan";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { load } from "cheerio";
+import { removeNumbersInWord } from "#helpers/string";
+import { fixForJoinedWords } from "~/components/dicts/nisanyan";
 
 function consolidateNames(names: string): string {
   // example:
@@ -174,4 +177,17 @@ export function parseBenzer(data: string, url: string): BenzerPackage {
     words: Array.from(words),
     moreWords,
   };
+}
+
+//////
+export function parseNisanyan(data: NisanyanResponse): NisanyanPackage {
+  const mapper = (word: any & { name: string }) => ({
+    ...word,
+    name: removeNumbersInWord(word.name),
+  });
+  data.words = data.words?.map(mapper);
+  data.fiveAfter = data.fiveAfter.map(mapper);
+  data.fiveBefore = data.fiveBefore.map(mapper);
+  data.randomWord = mapper(data.randomWord);
+  return fixForJoinedWords(data);
 }

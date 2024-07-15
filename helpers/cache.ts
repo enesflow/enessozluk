@@ -5,7 +5,7 @@ import type {
   NisanyanWordPackage,
 } from "../types/nisanyan";
 import type { TDKPackage } from "../types/tdk";
-import { parseBenzer, parseLuggat } from "./parser";
+import { parseBenzer, parseLuggat, parseNisanyan } from "./parser";
 export type PROVDIDER_TYPE =
   | "tdk"
   | "nisanyan"
@@ -22,9 +22,13 @@ type ProviderType = {
   [key: string]: unknown;
 };
 
-const parser = {
+const parseHTML = {
   luggat: parseLuggat,
   benzer: parseBenzer,
+} as const;
+
+const parseJSON = {
+  nisanyan: parseNisanyan,
 } as const;
 
 const dumbCache = new Map<
@@ -82,11 +86,19 @@ export async function fetchAPI<T extends PROVDIDER_TYPE>(
   }
   console.log("cache miss", options.provider);
   const response = await fetch(url, options);
-  const fn =
+  /* const fn =
     options.provider in parser ? (parser as any)[options.provider] : null;
   const data =
     options.provider in parser
       ? fn(await response.text(), url)
+      : ((await response.json()) as ProviderType[T]); */
+  const htmlParser = (parseHTML as any)[options.provider];
+  const jsonParser = (parseJSON as any)[options.provider];
+  // if htmlparser, then parse html, else if jsonparser, then parse json else return response.json
+  const data = htmlParser
+    ? htmlParser(await response.text(), url)
+    : jsonParser
+      ? jsonParser(await response.json())
       : ((await response.json()) as ProviderType[T]);
   await setCache(options.provider, url, data);
   return {
