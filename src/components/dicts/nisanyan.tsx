@@ -9,8 +9,9 @@ import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$, server$ } from "@builder.io/qwik-city";
+import { routeLoader$, server$, useLocation } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
+import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
 
@@ -412,9 +413,14 @@ export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   },
 );
 
+function getWordTitle(index: number, name: string) {
+  return `(${convertToRoman(index + 1)}) ${removeNumbersAtEnd(name)}`;
+}
+
 export const NisanyanView = component$<{
   data: NisanyanWordPackage;
 }>(({ data }) => {
+  const query = useLocation().params.query;
   return (
     <>
       {data.isUnsuccessful ? (
@@ -444,7 +450,14 @@ export const NisanyanView = component$<{
           {data.words?.map((word, index) => (
             <li key={word._id} class="result-item">
               <h2 class="result-title">
-                ({convertToRoman(index + 1)}) {removeNumbersAtEnd(word.name)}
+                {/* */}
+                {removeNumbersAtEnd(word.name) === query ? (
+                  <>{getWordTitle(index, word.name)}</>
+                ) : (
+                  <LinkR href={`/search/${word.name}`}>
+                    {getWordTitle(index, word.name)}
+                  </LinkR>
+                )}
                 <i class="result-title-description">
                   {word.serverDefinedTitleDescription && (
                     <> ({word.serverDefinedTitleDescription ?? ""})</>
@@ -524,6 +537,12 @@ export const NisanyanView = component$<{
                 <section class="result-section">
                   <h2 class="result-subtitle">Bu maddeye gönderenler</h2>
                   <WordLinks words={word.referenceOf.map((ref) => ref.name)} />
+                </section>
+              )}
+              {word.misspellings && (
+                <section class="result-section">
+                  <h2 class="result-subtitle">Yanlış yazımlar</h2>
+                  <WordLinks words={word.misspellings} />
                 </section>
               )}
               {!word.histories ? (

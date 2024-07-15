@@ -96,7 +96,7 @@ export async function fetchAPI<T extends PROVDIDER_TYPE>(
   const data = htmlParser
     ? htmlParser(await response.text(), url)
     : jsonParser
-      ? jsonParser(await response.json())
+      ? jsonParser(await response.json(), url)
       : ((await response.json()) as ProviderType[T]);
   await setCache(options.provider, url, data);
   return {

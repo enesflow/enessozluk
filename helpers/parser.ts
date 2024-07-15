@@ -1,10 +1,10 @@
 import type { BenzerPackage } from "#/benzer";
 import type { LuggatPackage, LuggatResponse } from "#/luggat";
 import type { NisanyanPackage, NisanyanResponse } from "#/nisanyan";
-import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
+import { API_FAILED_TEXT, DID_YOU_MEAN, NO_RESULT } from "#helpers/constants";
+import { removeNumbersInWord } from "#helpers/string";
 import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
-import { removeNumbersInWord } from "#helpers/string";
 import { fixForJoinedWords } from "~/components/dicts/nisanyan";
 
 function consolidateNames(names: string): string {
@@ -186,7 +186,26 @@ export function parseBenzer(data: string, url: string): BenzerPackage {
 }
 
 //////
-export function parseNisanyan(data: NisanyanResponse): NisanyanPackage {
+export function parseNisanyan(
+  data: NisanyanResponse,
+  url: string,
+): NisanyanPackage {
+  const query = decodeURIComponent(
+    new URL(url).pathname.split("/").pop() ?? "",
+  );
+  const misspellings = data.words?.map((i) => i.misspellings).flat();
+  // if our word is a misspelling, we should return error
+  if (misspellings?.includes(query)) {
+    return {
+      serverDefinedErrorText: DID_YOU_MEAN,
+      isUnsuccessful: true,
+      words:
+        data.words?.map((i) => ({
+          _id: i._id,
+          name: i.name,
+        })) ?? [],
+    };
+  }
   const mapper = (word: any & { name: string }) => ({
     ...word,
     name: removeNumbersInWord(word.name),
@@ -195,5 +214,12 @@ export function parseNisanyan(data: NisanyanResponse): NisanyanPackage {
   data.fiveAfter = data.fiveAfter.map(mapper);
   data.fiveBefore = data.fiveBefore.map(mapper);
   data.randomWord = mapper(data.randomWord);
+
+  data.words?.forEach((word) => {
+    if (word.name !== query) {
+      word.serverDefinedTitleDescription = query;
+    }
+  });
+
   return fixForJoinedWords(data);
 }
