@@ -27,6 +27,25 @@ const mostPopularUserAgents = [
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.44",
 ];
 
+export function getFakeHeaders() {
+  return {
+    "user-agent":
+      mostPopularUserAgents[
+        Math.floor(Math.random() * mostPopularUserAgents.length)
+      ],
+    "accept-language": "en-US,en;q=0.9",
+    "accept-encoding": "gzip, deflate, br",
+    "upgrade-insecure-requests": "1",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "none",
+    "sec-fetch-user": "?1",
+    "sec-fetch-dest": "document",
+    "cache-control": "max-age=0",
+    accept:
+      "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+  };
+}
+
 // eslint-disable-next-line qwik/loader-location
 export const useBenzerLoader = routeLoader$<BenzerPackage>(
   async ({ params, request, clientConn, cookie }) => {
@@ -46,21 +65,7 @@ export const useBenzerLoader = routeLoader$<BenzerPackage>(
         headers: {
           // disguise as a browser
           ...request.headers,
-          "user-agent":
-            mostPopularUserAgents[
-              Math.floor(Math.random() * mostPopularUserAgents.length)
-            ],
-          // some more fake headers
-          "accept-language": "en-US,en;q=0.9",
-          "accept-encoding": "gzip, deflate, br",
-          "upgrade-insecure-requests": "1",
-          "sec-fetch-mode": "navigate",
-          "sec-fetch-site": "none",
-          "sec-fetch-user": "?1",
-          "sec-fetch-dest": "document",
-          "cache-control": "max-age=0",
-          accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+          ...getFakeHeaders(),
           "x-real-ip": clientConn.ip,
           cookie: cookieText,
         },

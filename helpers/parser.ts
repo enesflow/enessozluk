@@ -7,6 +7,8 @@ import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
 import { fixForJoinedWords } from "~/components/dicts/nisanyan";
 import { flattenVerb } from "./redirect";
+import { fetchAPI } from "./cache";
+import { getFakeHeaders } from "~/components/dicts/benzer";
 
 function consolidateNames(names: string): string {
   // example:
@@ -112,10 +114,14 @@ export function isBenzerCaptcha(data: string | CheerioAPI): boolean {
 
 ////////
 
-export function parseBenzer(data: string, url: string): BenzerPackage {
+export async function parseBenzer(
+  data: string,
+  url: string,
+): Promise<BenzerPackage> {
   const query = decodeURIComponent(
     new URL(url).pathname.split("/").pop() ?? "",
   );
+  await new Promise((resolve) => setTimeout(resolve, 1000));
   const $ = load(data);
 
   // Extract words from the first list
@@ -140,8 +146,26 @@ export function parseBenzer(data: string, url: string): BenzerPackage {
       };
     }
     suggestionBox.each((_, element) => {
-      words.push($(element).text());
+      const text = $(element).text();
+      words.push(text);
     });
+    for (const word of words) {
+      if (query === word.toLocaleLowerCase("tr") && word !== query) {
+        console.log("from", query, "to", word);
+        const originalURL = new URL(url);
+        const decodedURL = decodeURIComponent(originalURL.href.split("?")[0]);
+        const suffix = decodedURL.endsWith("/") ? "/" : "";
+        const baseURL = decodedURL.slice(0, -query.length - suffix.length);
+        const newURL = `${baseURL}${word}${suffix}`;
+
+        const { data } = await fetchAPI(newURL, {
+          provider: "benzer",
+          headers: getFakeHeaders(),
+        });
+
+        return data;
+      }
+    }
 
     return {
       isUnsuccessful: true,
@@ -218,7 +242,11 @@ export function parseNisanyan(
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
-    if (word.name !== query && flattenVerb(word.name) !== query) {
+    if (
+      word.name !== query &&
+      flattenVerb(word.name) !== query &&
+      word.name.toLocaleLowerCase("tr") !== query
+    ) {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
     }
