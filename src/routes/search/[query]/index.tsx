@@ -1,15 +1,16 @@
 import { removeNumbersInWord } from "#helpers/string";
 import { component$, useComputed$ } from "@builder.io/qwik";
 import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
-import { LuggatView, useLuggatLoader } from "~/components/dicts/luggat";
+import { LuggatView } from "~/components/dicts/luggat";
 import { useNisanyanLoader } from "~/components/dicts/nisanyan";
 import { TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
-import { NisanyanView } from "../../../components/dicts/nisanyan";
-import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
+import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
-export { useLuggatLoader, useNisanyanLoader, useTDKLoader, useBenzerLoader };
+import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
+import { NisanyanView } from "../../../components/dicts/nisanyan";
+export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type Links = {
   tdk: string;

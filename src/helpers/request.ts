@@ -1,6 +1,9 @@
 import type { Dicts } from "#/dicts";
 import type { SharedMap } from "#/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
+import { ZodSchema, z } from "zod";
+import { LuggatPackageSchema } from "~/types/luggat";
+import { TDKPackageSchema } from "~/types/tdk";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -38,7 +41,7 @@ function buildError(response: Response) {
  * @param init - Optional request initialization options.
  * @returns A promise that resolves to the API response based on the specified return type.
  */
-export async function fetchAPI<T extends "json" | "text" = "json">(
+export async function fetchAPI<T extends "json" | "html" = "json">(
   url: string,
   returnType: T = "json" as T,
   init?: RequestInit,
@@ -47,4 +50,25 @@ export async function fetchAPI<T extends "json" | "text" = "json">(
   const error = buildError(res);
   if (error) throw error;
   return returnType === "json" ? res.json() : res.text();
+}
+
+const Packages: Record<Dicts, ZodSchema> = {
+  tdk: TDKPackageSchema,
+  luggat: LuggatPackageSchema,
+  "nisanyan-affix": TDKPackageSchema, // TODO: change this
+  "tdk-rec": TDKPackageSchema, // TODO: change this
+  benzer: TDKPackageSchema, // TODO: change this
+  nisanyan: TDKPackageSchema, // TODO: change this
+} as const;
+
+// TODO: fix this, the return type is "any"
+export function loadCache<T extends Dicts>(
+  e: RequestEventBase,
+  dict: T,
+): z.infer<(typeof Packages)[T]> | null {
+  const sharedMap = loadSharedMap(e);
+  const cache = (sharedMap.cache as any)[dict]; // TODO: change this
+  if (!cache) return null;
+  const parsed = Packages[dict].safeParse(cache);
+  return parsed.success ? parsed.data : null;
 }

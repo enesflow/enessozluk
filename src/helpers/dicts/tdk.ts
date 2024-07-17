@@ -1,18 +1,22 @@
 import type { TDKResponse, TDKResponseError } from "#/tdk";
 import {
-  TDKPackageSchema,
   TDKRecommendationSchema,
   TDKResponseErrorSchema,
   TDKResponseSchema,
   type TDKPackage,
 } from "#/tdk";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
-import { fetchAPI, loadSharedMap, setSharedMapResult } from "#helpers/request";
+import {
+  fetchAPI,
+  loadCache,
+  loadSharedMap,
+  setSharedMapResult,
+} from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
-import { to } from "../to";
 import { debugAPI } from "../log";
+import { to } from "../to";
+import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
@@ -21,11 +25,14 @@ const loadTDKRecommendations = async (e: RequestEventBase) => {
   return data;
 };
 
-function buildTDKAPIError(e: RequestEventBase, title: string) {
-  debugAPI(e, title);
+function buildTDKAPIError(
+  e: RequestEventBase,
+  title: string,
+): TDKResponseError {
+  debugAPI(e, `TDK API Error: ${title}`);
   const { query } = loadSharedMap(e);
   return {
-    error: `${API_FAILED_TEXT}: ${title}`,
+    error: title,
     recommendations: [
       { madde: "Tekrar" },
       { madde: "dene-" },
@@ -73,27 +80,27 @@ const cleanseTDKResponse = (data: TDKResponse) => {
 
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
-  const sharedMap = loadSharedMap(e);
   // If there is data in cache, return it
   {
-    const parsed = TDKPackageSchema.safeParse(sharedMap.cache.tdk);
-    if (parsed.success) return setSharedMapResult(e, "tdk", parsed.data);
+    const cache = loadCache(e, "tdk");
+    if (cache) return setSharedMapResult(e, "tdk", cache);
   } /////////////////////////////
   const url = buildTDKUrl(e);
   const [error, response] = await to(fetchAPI(url));
   // Returns error if request failed
   if (error) {
-    return buildTDKAPIError(e, error.message);
+    return buildTDKAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
   }
   const parsed = TDKResponseSchema.safeParse(response);
   // Error handling
   {
     // Returns recommendations if the response is an error or has no results
-    const error = TDKResponseErrorSchema.safeParse(parsed.data);
-    if (
-      error.success ||
-      !("anlamlarListe" in (parsed.data as TDKResponse)[0])
-    ) {
+    const error = TDKResponseErrorSchema.safeParse(response);
+    const first = (parsed.data as TDKResponse | undefined)?.[0];
+    if (!first) {
+      return buildTDKAPIError(e, NO_RESULT);
+    }
+    if (error.success || !("anlamlarListe" in first)) {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
         recommendations: await loadTDKRecommendations(e),
@@ -102,7 +109,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildTDKAPIError(e, parsed.error.message);
+      return buildTDKAPIError(e, `${API_FAILED_TEXT}: ${parsed.error.message}`);
     }
   } /////////////////////////////
   const data = cleanseTDKResponse(parsed.data);

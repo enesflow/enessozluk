@@ -1,34 +1,10 @@
 import type { LuggatPackage } from "#/luggat";
-import { fetchAPI } from "#helpers/cache";
-import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
+import { NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
 import { TextWithLinks } from "../textwithlinks";
 
-const LUGGAT_URL = "https://www.luggat.com/" as const;
 const LUGGAT_LINK_REGEX = /\(Bak[:.] (.+?)\)/g;
-
-// eslint-disable-next-line qwik/loader-location
-export const useLuggatLoader = routeLoader$<LuggatPackage>(
-  async ({ params }) => {
-    // VERSION 2
-    try {
-      const url = `${LUGGAT_URL}${params.query.toLocaleLowerCase("tr")}`;
-      const { data } = await fetchAPI(url, {
-        provider: "luggat",
-      });
-      // the data is already parsed with parseLuggat
-      return data;
-    } catch (error) {
-      console.error("LUGGAT FAILED", error);
-      return {
-        isUnsuccessful: true,
-        serverDefinedErrorText: API_FAILED_TEXT,
-      };
-    }
-  },
-);
 
 export const LuggatView = component$<{
   data: LuggatPackage;

@@ -5,10 +5,10 @@ import { API_FAILED_TEXT, DID_YOU_MEAN, NO_RESULT } from "#helpers/constants";
 import { removeNumbersInWord } from "#helpers/string";
 import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
-import { fixForJoinedWords } from "~/components/dicts/nisanyan";
-import { flattenVerb } from "./redirect";
-import { fetchAPI } from "./cache";
 import { getFakeHeaders } from "~/components/dicts/benzer";
+import { fixForJoinedWords } from "~/components/dicts/nisanyan";
+import { fetchAPI } from "./cache";
+import { flattenVerb } from "./redirect";
 
 function consolidateNames(names: string): string {
   // example:

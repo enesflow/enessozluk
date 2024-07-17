@@ -1,4 +1,4 @@
-import type { LuggatPackage } from "#/luggat";
+import type { LuggatPackage } from "~/types/luggat";
 import type { BenzerPackage } from "../types/benzer";
 import type {
   NisanyanAffixPackage,

@@ -9,5 +9,5 @@ export const debugLog = (...args: any[]) => {
 
 export const debugAPI = (e: RequestEventBase, title: string) => {
   const { query } = loadSharedMap(e);
-  debugLog(`[${query}] TDK API Error: ${title}`);
+  debugLog(`[${query}] ${title}`);
 };
