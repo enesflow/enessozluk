@@ -7,7 +7,8 @@ export const TDK_RECOMMENDATIONS_URL =
   "https://sozluk.gov.tr/oneri?soz=" as const;
 export const LUGGAT_URL = "https://www.luggat.com/" as const;
 const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
-// const NISANYAN_AFFIX_URL ="https://www.nisanyansozluk.com/api/affixes-1/" as const;
+const NISANYAN_AFFIX_URL =
+  "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 
 const baseBuilder = (
   base: string,
@@ -54,4 +55,22 @@ export const buildNisanyanUrl = (
       `?session=${session}`;
   }
   return baseBuilder(NISANYAN_URL, s, lowercase);
+};
+
+export const buildNisanyanAffixUrl = (
+  e: RequestEventBase | string,
+  lowercase = true,
+) => {
+  let s = "";
+  if (typeof e === "string") {
+    s = encodeURIComponent(e) + `?session=${generateUUID()}`;
+  } else {
+    const session = e.sharedMap.get("sessionUUID") as string;
+    const sharedMap = loadSharedMap(e);
+    s =
+      encodeURIComponent(
+        lowercase ? sharedMap.lowerCaseQuery : sharedMap.query,
+      ) + `?session=${session}`;
+  }
+  return baseBuilder(NISANYAN_AFFIX_URL, s, lowercase);
 };

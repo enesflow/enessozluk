@@ -2,22 +2,17 @@ import type {
   NisanyanEtymology,
   NisanyanPackage,
   NisanyanResponse,
-  NisanyanWord,
-  NisanyanWordPackage,
 } from "#/nisanyan";
-import { fetchAPI } from "#helpers/cache";
-import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
+import { NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
 
-const NISANYAN_AFFIX_URL =
-  "https://www.nisanyansozluk.com/api/affixes-1/" as const;
+//const NISANYAN_AFFIX_URL = "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
   Fa: "Farsça",
   Ger: "Germence",
@@ -139,7 +134,7 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
   return result;
 }
 
-export function formatDefinition(etymology: NisanyanEtymology): string {
+function formatDefinition(etymology: NisanyanEtymology): string {
   if (etymology.definition.includes("a.a.")) {
     return `aynı anlama gelen ${formatOrigin(etymology)}`;
   } else {
@@ -152,7 +147,7 @@ export function formatDefinition(etymology: NisanyanEtymology): string {
   }
 }
 
-export function formatOrigin(etm: NisanyanEtymology): string {
+function formatOrigin(etm: NisanyanEtymology): string {
   if (etm.romanizedText.startsWith("*")) {
     etm.romanizedText = `yazılı örneği bulunmayan ${etm.romanizedText}`;
   }
@@ -167,7 +162,7 @@ export function formatOrigin(etm: NisanyanEtymology): string {
   return con.join(" veya ");
 }
 
-export function formatRelation(etm: NisanyanEtymology): string {
+function formatRelation(etm: NisanyanEtymology): string {
   if (etm.relation.abbreviation == "+") {
     return etm.serverDefinedEndOfJoin ? " sözcüklerinin bileşiğidir." : "";
   } else if (etm.relation.abbreviation == "§") return "";
@@ -207,137 +202,12 @@ export function formatRelation(etm: NisanyanEtymology): string {
   }
 }
 
-export function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
-  //get all the keys
-  const keys = Object.keys(data);
-  let result = [] as any;
-  for (const key of keys) {
-    if (key.toLocaleLowerCase().endsWith("words")) {
-      result = result.concat(data[key]);
-    }
-  }
-  return result;
-}
-
-export const getNisanyanAffixAsNisanyanResponse = server$(async function (
-  query: string,
-): Promise<NisanyanPackage> {
-  const url =
-    `${NISANYAN_AFFIX_URL}${encodeURIComponent(query.toLocaleLowerCase("tr"))}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
-  const { data } = (await fetchAPI(url, {
-    provider: "nisanyanaffix",
-  })) as any; // TODO: Fix the type
-  if ("error" in data) {
-    return {
-      serverDefinedErrorText: API_FAILED_TEXT,
-      isUnsuccessful: true,
-      words: [
-        {
-          _id: "1",
-          name: "Tekrar",
-        },
-        {
-          _id: "2",
-          name: "dene-",
-        },
-        {
-          _id: "3",
-          name: query,
-        },
-      ],
-    };
-  } else {
-    const words = joinAllItemsEndingInWords(data);
-    return {
-      isUnsuccessful: false,
-      words: [
-        {
-          serverDefinedTitleDescription: `${words.length} kelime`,
-          _id: data.affix._id,
-          actualTimeUpdated: data.affix.timeUpdated,
-          etymologies: [],
-          // @ts-expect-error // TODO: Fix the type
-          id_depr: data.affix.id_depr,
-          name: data.affix.name,
-          note: data.affix.description,
-          queries: [],
-          references: [],
-          referenceOf: words.map((word) => ({
-            ...word,
-            similarWords: [],
-            histories: [],
-            referenceOf: [],
-            misspellings: [],
-          })),
-          timeCreated: data.affix.timeCreated,
-          timeUpdated: data.affix.timeUpdated,
-        },
-      ],
-      fiveAfter: [],
-      fiveBefore: [],
-      randomWord: {
-        _id: "1",
-        name: "Rastgele",
-      },
-    };
-  }
-});
-
-// eslint-disable-next-line qwik/loader-location
-/* export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
-  async ({ params, redirect, sharedMap }) => {
-    // VERSION 2
-    try {
-      const affix = isAffix(params.query);
-      if (affix) {
-        const response = await getNisanyanAffixAsNisanyanResponse(params.query);
-        if (!response.isUnsuccessful) return response;
-        else {
-          // remove all + ( and )
-          throw redirect(
-            301,
-            `/search/${encodeURIComponent(params.query.replace(/\(|\)|\+/g, "" as const))}`,
-          );
-        }
-      }
-      const url =
-        `${NISANYAN_URL}${params.query.toLocaleLowerCase("tr")}?session=${sharedMap.get("sessionUUID") as string}` as const;
-      const { data } = await fetchAPI(url, {
-        provider: "nisanyan",
-      });
-      if ("error" in data) {
-        data.isUnsuccessful = true;
-      }
-      return data;
-    } catch (error) {
-      return {
-        serverDefinedErrorText: API_FAILED_TEXT,
-        isUnsuccessful: true,
-        words: [
-          {
-            _id: "1",
-            name: "Tekrar",
-          },
-          {
-            _id: "2",
-            name: "dene-",
-          },
-          {
-            _id: "3",
-            name: params.query,
-          },
-        ],
-      };
-    }
-  },
-); */
-
 function getWordTitle(index: number, name: string) {
   return `(${convertToRoman(index + 1)}) ${removeNumbersAtEnd(name)}`;
 }
 
 export const NisanyanView = component$<{
-  data: NisanyanWordPackage;
+  data: NisanyanPackage;
 }>(({ data }) => {
   return (
     <>
@@ -417,10 +287,12 @@ export const NisanyanView = component$<{
                       </li>
                     </ul>
                   ))}
-                {word.references.length > 0 && (
+                {(word.references ?? []).length > 0 && (
                   <p class="result-description">
                     Daha fazla bilgi için{" "}
-                    <WordLinks words={word.references.map((ref) => ref.name)} />{" "}
+                    <WordLinks
+                      words={word.references!.map((ref) => ref.name)}
+                    />{" "}
                     maddelerine bakınız.
                   </p>
                 )}
@@ -437,7 +309,7 @@ export const NisanyanView = component$<{
                             regex={NISANYAN_LINK_REGEX}
                             text={replaceAbbrevations(
                               formatSpecialChars(note),
-                              data,
+                              data as NisanyanResponse, // TODO: Fix this
                             )}
                           />
                         </li>

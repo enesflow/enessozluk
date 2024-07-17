@@ -1,13 +1,17 @@
 import type {
+  NisanyanAffixPackage,
+  NisanyanPackage,
   NisanyanResponse,
   NisanyanResponseError,
   NisanyanWordPackage,
 } from "#/nisanyan";
 import {
+  NisanyanAffixResponseErrorSchema,
+  NisanyanAffixResponseSchema,
   NisanyanResponseErrorSchema,
   NisanyanResponseSchema,
 } from "#/nisanyan";
-import { API_FAILED_TEXT } from "#helpers/constants";
+import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import {
   fetchAPI,
   loadCache,
@@ -19,9 +23,10 @@ import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { DID_YOU_MEAN } from "~/helpers/constants";
 import { flattenVerb } from "~/helpers/redirect";
 import { removeNumbersInWord } from "~/helpers/string";
+import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
-import { buildNisanyanUrl } from "./url";
+import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -194,13 +199,88 @@ const loadNisanyanWord = server$(
   },
 );
 
-// eslint-disable-next-line qwik/loader-location
-export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
-  async (e) => {
-    if (isWord(e.params.query)) {
-      return loadNisanyanWord.call(e);
-    } else {
-      return buildNisanyanAPIError(e, "Invalid query");
+function cleanseNisanyanAffixResponse(
+  e: RequestEventBase,
+  data: NisanyanAffixPackage,
+): NisanyanAffixPackage {
+  const words = ((data: any): NisanyanWord[] => {
+    //get all the keys
+    const keys = Object.keys(data);
+    let result = [] as any;
+    for (const key of keys) {
+      if (key.toLocaleLowerCase().endsWith("words")) {
+        result = result.concat(data[key]);
+      }
     }
+    return result;
+  })(data);
+  if ("affix" in data)
+    return {
+      affix: data.affix,
+      isUnsuccessful: false,
+      words: [
+        {
+          serverDefinedTitleDescription: `${words.length} kelime`,
+          _id: data.affix._id,
+          name: data.affix.name,
+          note: data.affix.note,
+          referenceOf: data.words?.map((word) => ({
+            _id: word._id,
+            name: word.name,
+            histories: word.histories,
+          })),
+        },
+      ],
+    };
+  else {
+    return buildNisanyanAPIError(e, "Invalid query");
+  }
+}
+
+const loadNisanyanAffix = server$(
+  async function (): Promise<NisanyanAffixPackage> {
+    const e = this;
+    // If there is data in cache, return it
+    {
+      const cache = loadCache(e, "nisanyan-affix");
+      if (cache) return setSharedMapResult(e, "nisanyan-affix", cache);
+    } /////////////////////////////
+    const url = buildNisanyanAffixUrl(e);
+    const [error, response] = await to(fetchAPI(url));
+    // Returns error if request failed
+    if (error) {
+      return buildNisanyanAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
+    }
+    const parsed = NisanyanAffixResponseSchema.safeParse(response);
+    /* console.log(JSON.stringify(parsed.error, null, 2));
+
+    console.log(response);
+    return buildNisanyanAPIError(e, "debug"); */
+    // Error handling
+    {
+      // Returns recommendations if the response is an error or has no results
+      const error = NisanyanAffixResponseErrorSchema.safeParse(response);
+      if (error.success) {
+        return buildNisanyanAPIError(e, NO_RESULT);
+      }
+      // Returns error if parsing failed
+      if (!parsed.success) {
+        return buildNisanyanAPIError(
+          e,
+          `${API_FAILED_TEXT}: ${parsed.error.message}`,
+        );
+      }
+    } /////////////////////////////
+    const data = cleanseNisanyanAffixResponse(e, parsed.data);
+    return setSharedMapResult(e, "nisanyan-affix", data);
   },
 );
+
+// eslint-disable-next-line qwik/loader-location
+export const useNisanyanLoader = routeLoader$<NisanyanPackage>(async (e) => {
+  if (isWord(e.params.query)) {
+    return loadNisanyanWord.call(e);
+  } else {
+    return loadNisanyanAffix.call(e);
+  }
+});

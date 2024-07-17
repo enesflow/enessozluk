@@ -32,8 +32,8 @@ export const NisanyanSemiticFormSchema = z.object({
   name: z.string(),
   description: z.string(),
   language: NisanyanLanguageSchema,
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
 });
 
 export const NisanyanGrammarSchema = z.object({
@@ -55,8 +55,8 @@ export const NisanyanAffixSchema = z.object({
   name: z.string(),
   description: z.string(),
   language: NisanyanLanguageSchema,
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   nisaid_depr: z.number().optional(),
 });
 
@@ -79,8 +79,8 @@ export const NisanyanEtymologySchema = z.object({
   definition: z.string(),
   neologism: z.string(),
   wordClass: NisanyanWordClassSchema,
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   affixes: NisanyanAffixesSchema.optional(),
 });
 
@@ -90,8 +90,8 @@ export const NisanyanSourceSchema = z.object({
   book: z.string(),
   editor: z.string(),
   datePublished: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   nisaid_depr: z.number().optional(),
   abbreviation: z.string(),
   date: z.string(),
@@ -106,8 +106,8 @@ export const NisanyanHistorySchema = z.object({
   date: z.string(),
   dateSortable: z.number(),
   quote: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   language: NisanyanLanguageSchema.optional(),
 });
 
@@ -116,8 +116,8 @@ export const NisanyanWordReferenceSchema = z.object({
   nisaid_depr: z.number().optional(),
   name: z.string(),
   note: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   queries: z.array(z.string()),
   similarWords: z.array(z.string()).optional(),
   references: z.array(z.object({ _id: z.string() })),
@@ -131,8 +131,8 @@ export const NisanyanReferenceSchema = z.object({
   nisaid_depr: z.number().optional(),
   name: z.string(),
   note: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
   queries: z.array(z.string()),
   similarWords: z.array(z.string()).optional(),
   references: z.array(z.object({ _id: z.string() })),
@@ -151,16 +151,16 @@ export const NisanyanWordSchema = z.object({
   etymologies: z.array(NisanyanEtymologySchema).optional(),
   histories: z.array(NisanyanHistorySchema).optional(),
   nisaid_depr: z.number().optional(),
-  misspellings: z.array(z.string()).nullable(),
+  misspellings: z.array(z.string()).nullable().optional(),
   name: z.string(),
-  note: z.string(),
-  queries: z.array(z.string()),
-  references: z.array(NisanyanReferenceSchema),
+  note: z.string().optional(),
+  queries: z.array(z.string()).optional(),
+  references: z.array(NisanyanReferenceSchema).optional(),
   referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
-  similarWords: z.array(z.string()).nullable(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
-  actualTimeUpdated: z.string(),
+  similarWords: z.array(z.string()).nullable().optional(),
+  timeCreated: z.string().optional(),
+  timeUpdated: z.string().optional(),
+  actualTimeUpdated: z.string().optional(),
 });
 
 export const NisanyanRelatedWordSchema = z.object({
@@ -177,7 +177,7 @@ export const NisanyanGeneralResponseSchema = z.object({
   isUnsuccessful: z.boolean(),
   fiveBefore: z.array(NisanyanRelatedWordSchema),
   fiveAfter: z.array(NisanyanRelatedWordSchema),
-  randomWord: NisanyanRandomWordSchema,
+  randomWord: NisanyanRandomWordSchema.nullable(),
 });
 
 export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.extend({
@@ -195,38 +195,32 @@ export const NisanyanResponseErrorSchema = z.object({
   serverDefinedErrorText: z.string().optional(),
 });
 
-export const NisanyanLanguageSchema2 = z.object({
-  _id: z.string(),
-  name: z.string(),
-  description: z.string(),
-  description2: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
-  abbreviation: z.string().optional(),
-  nisaid_depr: z.number().optional(),
-});
-
-export const NisanyanAffixSchema2 = z.object({
-  _id: z.string(),
-  name: z.string(),
-  language: NisanyanLanguageSchema2,
-  description: z.string(),
-  timeCreated: z.string(),
-  timeUpdated: z.string(),
-});
-
-export const NisanyanWordSchema2 = z.object({
-  _id: z.string(),
-  name: z.string(),
-});
-
 export const NisanyanAffixResponseSchema = z.object({
-  affix: NisanyanAffixSchema2,
-  words: z.array(NisanyanWordSchema2),
+  isUnsuccessful: z.literal(false).optional(),
+  affix: NisanyanAffixSchema,
+  /* words: z.array(
+    NisanyanRelatedWordSchema.extend({
+      serverDefinedIsMisspelling: z.boolean().optional(),
+      etymologies: z.array(NisanyanEtymologySchema).optional(),
+      references: z.array(NisanyanReferenceSchema),
+      note: z.string().optional(),
+      serverDefinedTitleDescription: z.string().optional(),
+      referenceOf: z
+        .array(z.object({ _id: z.string(), name: z.string() }))
+        .optional(),
+    }),
+  ), */
+  words: z.array(NisanyanWordSchema).optional(),
 });
 
 export const NisanyanAffixResponseErrorSchema = z.object({
+  isUnsuccessful: z.literal(true),
+  serverDefinedErrorText: z.string().optional(),
   error: z.unknown(),
+  words: z.array(NisanyanRelatedWordSchema).optional(),
+  fiveBefore: z.array(NisanyanRelatedWordSchema).optional(),
+  fiveAfter: z.array(NisanyanRelatedWordSchema).optional(),
+  randomWord: NisanyanRandomWordSchema.optional(),
 });
 
 export const NisanyanWordPackageSchema = NisanyanResponseSchema.or(
@@ -262,9 +256,6 @@ export type NisanyanGeneralResponse = z.infer<
 >;
 export type NisanyanResponse = z.infer<typeof NisanyanResponseSchema>;
 export type NisanyanResponseError = z.infer<typeof NisanyanResponseErrorSchema>;
-export type NisanyanLanguage2 = z.infer<typeof NisanyanLanguageSchema2>;
-export type NisanyanAffix2 = z.infer<typeof NisanyanAffixSchema2>;
-export type NisanyanWord2 = z.infer<typeof NisanyanWordSchema2>;
 export type NisanyanAffixResponse = z.infer<typeof NisanyanAffixResponseSchema>;
 export type NisanyanAffixResponseError = z.infer<
   typeof NisanyanAffixResponseErrorSchema
