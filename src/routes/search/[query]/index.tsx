@@ -8,7 +8,7 @@ import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
-import { useTDKLoader } from "#helpers/dics/tdk";
+import { useTDKLoader } from "~/helpers/dicts/tdk";
 export { useLuggatLoader, useNisanyanLoader, useTDKLoader, useBenzerLoader };
 
 type Links = {
