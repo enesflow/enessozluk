@@ -1,7 +1,7 @@
 import type { Dicts } from "#/dicts";
 import type { SharedMap } from "#/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
-import { ZodSchema, z } from "zod";
+import type { ZodSchema, z } from "zod";
 import { LuggatPackageSchema } from "~/types/luggat";
 import { TDKPackageSchema } from "~/types/tdk";
 
@@ -19,7 +19,7 @@ export function setSharedMapResult<T>(
   data: T,
 ): T {
   const sharedMap = loadSharedMap(e);
-  sharedMap.result.tdk = data;
+  (sharedMap.result as any)[dict] = data; // TODO: change this
   e.sharedMap.set("data", sharedMap);
   return data;
 }

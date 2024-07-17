@@ -89,6 +89,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   const [error, response] = await to(fetchAPI(url));
   // Returns error if request failed
   if (error) {
+    debugAPI(e, `TDK API Error: ${error.message}`);
     return buildTDKAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
   }
   const parsed = TDKResponseSchema.safeParse(response);
@@ -97,10 +98,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     // Returns recommendations if the response is an error or has no results
     const error = TDKResponseErrorSchema.safeParse(response);
     const first = (parsed.data as TDKResponse | undefined)?.[0];
-    if (!first) {
-      return buildTDKAPIError(e, NO_RESULT);
-    }
-    if (error.success || !("anlamlarListe" in first)) {
+    if (error.success || !first || !("anlamlarListe" in first)) {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
         recommendations: await loadTDKRecommendations(e),

@@ -2,7 +2,6 @@ import { removeNumbersInWord } from "#helpers/string";
 import { component$, useComputed$ } from "@builder.io/qwik";
 import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import { LuggatView } from "~/components/dicts/luggat";
-import { useNisanyanLoader } from "~/components/dicts/nisanyan";
 import { TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
@@ -10,6 +9,7 @@ import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
+import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type Links = {

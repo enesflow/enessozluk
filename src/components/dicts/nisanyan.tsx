@@ -1,5 +1,6 @@
 import type {
   NisanyanEtymology,
+  NisanyanPackage,
   NisanyanResponse,
   NisanyanWord,
   NisanyanWordPackage,
@@ -7,15 +8,14 @@ import type {
 import { fetchAPI } from "#helpers/cache";
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
-import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
+import { removeNumbersAtEnd } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$, server$ } from "@builder.io/qwik-city";
+import { server$ } from "@builder.io/qwik-city";
 import { Recommendations } from "~/components/recommendations";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
 
-const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
 const NISANYAN_AFFIX_URL =
   "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -99,7 +99,8 @@ function replaceAbbrevations(str: string, data: NisanyanResponse): string {
     if (!word.etymologies) continue;
     for (const etymology of word.etymologies) {
       for (const language of etymology.languages) {
-        languages[language.abbreviation] = language.name;
+        if (language.abbreviation)
+          (languages as any)[language.abbreviation] = language.name;
       }
     }
   }
@@ -176,7 +177,7 @@ export function formatRelation(etm: NisanyanEtymology): string {
     const relationOverride = {
       "~?": "bir sözcükten alıntı olabilir; ancak bu kesin değildir.",
     } as Record<string, string>;
-    const _relationOverrid = relationOverride[etm.relation.abbreviation];
+    const _relationOverrid = relationOverride[etm.relation.abbreviation ?? ""];
     const _relation = (_relationOverrid || etm.relation.text).split(" ");
     const relationFirst = _relation.shift();
     const relationRest = " " + _relation.join(" ");
@@ -206,76 +207,7 @@ export function formatRelation(etm: NisanyanEtymology): string {
   }
 }
 
-export function fixForJoinedWords(
-  data: NisanyanWordPackage,
-): NisanyanWordPackage {
-  if (data.isUnsuccessful) return data;
-  if (!data.words) return data;
-  for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
-    const word = data.words[wordIndex];
-    if (!word.etymologies) continue;
-    let detected = false;
-    let finished = false;
-    let detectedTemp = false;
-    for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
-      const etm = word.etymologies[etmIndex];
-      if (detected) {
-        if (finished) {
-          data.words[wordIndex].etymologies![
-            etmIndex
-          ].serverDefinedMoreIndentation = true;
-        }
-        if (etm.relation.abbreviation === "+") {
-          finished = true;
-        }
-        if (
-          !(
-            etm.relation.abbreviation === "+" ||
-            etm.relation.abbreviation === "§"
-          )
-        ) {
-          data.words[wordIndex].etymologies![
-            etmIndex
-          ].serverDefinedMoreIndentation = true;
-        }
-      } else {
-        if (
-          etm.relation.abbreviation === "+" ||
-          etm.relation.abbreviation === "§"
-        ) {
-          detected = true;
-          detectedTemp = true;
-        }
-      }
-
-      if (
-        !(
-          etm.relation.abbreviation === "+" || etm.relation.abbreviation === "§"
-        ) &&
-        detectedTemp
-      ) {
-        detectedTemp = false;
-        data.words[wordIndex].etymologies![
-          etmIndex - 1
-        ].serverDefinedEndOfJoin = true;
-      }
-    }
-    // make the last one serverDefinedEndOfJoin if the abbreviation is +
-
-    if (data.words[wordIndex].etymologies) {
-      const len = data.words[wordIndex].etymologies!.length;
-      if (
-        data.words[wordIndex].etymologies![len - 1].relation.abbreviation == "+"
-      ) {
-        data.words[wordIndex].etymologies![len - 1].serverDefinedEndOfJoin =
-          true;
-      }
-    }
-  }
-  return data;
-}
-
-function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
+export function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
   //get all the keys
   const keys = Object.keys(data);
   let result = [] as any;
@@ -289,12 +221,12 @@ function joinAllItemsEndingInWords(data: any): NisanyanWord[] {
 
 export const getNisanyanAffixAsNisanyanResponse = server$(async function (
   query: string,
-): Promise<NisanyanWordPackage> {
+): Promise<NisanyanPackage> {
   const url =
     `${NISANYAN_AFFIX_URL}${encodeURIComponent(query.toLocaleLowerCase("tr"))}?session=${this.sharedMap.get("sessionUUID") as string}` as const;
-  const { data } = await fetchAPI(url, {
+  const { data } = (await fetchAPI(url, {
     provider: "nisanyanaffix",
-  });
+  })) as any; // TODO: Fix the type
   if ("error" in data) {
     return {
       serverDefinedErrorText: API_FAILED_TEXT,
@@ -324,6 +256,7 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
           _id: data.affix._id,
           actualTimeUpdated: data.affix.timeUpdated,
           etymologies: [],
+          // @ts-expect-error // TODO: Fix the type
           id_depr: data.affix.id_depr,
           name: data.affix.name,
           note: data.affix.description,
@@ -350,12 +283,8 @@ export const getNisanyanAffixAsNisanyanResponse = server$(async function (
   }
 });
 
-function isAffix(query: string): boolean {
-  return query.startsWith("+") || removeNumbersInWord(query).endsWith("+");
-}
-
 // eslint-disable-next-line qwik/loader-location
-export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
+/* export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   async ({ params, redirect, sharedMap }) => {
     // VERSION 2
     try {
@@ -401,7 +330,7 @@ export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
       };
     }
   },
-);
+); */
 
 function getWordTitle(index: number, name: string) {
   return `(${convertToRoman(index + 1)}) ${removeNumbersAtEnd(name)}`;

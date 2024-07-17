@@ -1,10 +1,13 @@
 import { loadSharedMap } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
+import { generateUUID } from "~/helpers/generateUUID";
 
 export const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 export const TDK_RECOMMENDATIONS_URL =
   "https://sozluk.gov.tr/oneri?soz=" as const;
 export const LUGGAT_URL = "https://www.luggat.com/" as const;
+const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
+// const NISANYAN_AFFIX_URL ="https://www.nisanyansozluk.com/api/affixes-1/" as const;
 
 const baseBuilder = (
   base: string,
@@ -12,11 +15,10 @@ const baseBuilder = (
   lowercase = true,
 ) => {
   if (typeof e === "string") return base + e;
-  else
-    return (
-      base +
-      (lowercase ? loadSharedMap(e).lowerCaseQuery : loadSharedMap(e).query)
-    );
+  else {
+    const sharedMap = loadSharedMap(e);
+    return base + (lowercase ? sharedMap.lowerCaseQuery : sharedMap.query);
+  }
 };
 
 export const buildTDKUrl = (e: RequestEventBase | string, lowercase = true) => {
@@ -35,4 +37,21 @@ export const buildLuggatUrl = (
   lowercase = true,
 ) => {
   return baseBuilder(LUGGAT_URL, e, lowercase);
+};
+
+export const buildNisanyanUrl = (
+  e: RequestEventBase | string,
+  lowercase = true,
+) => {
+  let s = "";
+  if (typeof e === "string") {
+    s = e + `?session=${generateUUID()}`;
+  } else {
+    const session = e.sharedMap.get("sessionUUID") as string;
+    const sharedMap = loadSharedMap(e);
+    s =
+      (lowercase ? sharedMap.lowerCaseQuery : sharedMap.query) +
+      `?session=${session}`;
+  }
+  return baseBuilder(NISANYAN_URL, s, lowercase);
 };

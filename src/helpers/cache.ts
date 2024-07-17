@@ -5,7 +5,7 @@ import type {
   NisanyanWordPackage,
 } from "../types/nisanyan";
 import type { TDKPackage } from "../types/tdk";
-import { parseBenzer, parseLuggat, parseNisanyan } from "./parser";
+import { parseBenzer } from "./parser";
 export type PROVDIDER_TYPE =
   | "tdk"
   | "nisanyan"
@@ -23,13 +23,10 @@ type ProviderType = {
 };
 
 const parseHTML = {
-  luggat: parseLuggat,
   benzer: parseBenzer,
 } as const;
 
-const parseJSON = {
-  nisanyan: parseNisanyan,
-} as const;
+const parseJSON = {} as const;
 
 const dumbCache = new Map<
   string,

@@ -90,7 +90,8 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
   const [error, responseHTML] = await to(fetchAPI(url, "html"));
   // Returns error if request failed
   if (error || !responseHTML) {
-    return buildLuggatAPIError(e, error?.message || "No response");
+    debugAPI(e, `Luggat API Error: ${error?.message || "No response"}`);
+    return buildLuggatAPIError(e, API_FAILED_TEXT);
   }
   const response = parseLuggat(e, responseHTML);
   const parsed = LuggatResponseSchema.safeParse(response);
