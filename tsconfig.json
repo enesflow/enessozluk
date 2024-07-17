@@ -26,10 +26,10 @@
         "./src/*"
       ],
       "#/*": [
-        "./types/*"
+        "./src/types/*"
       ],
       "#helpers/*": [
-        "./helpers/*"
+        "./src/helpers/*"
       ]
     }
   },
@@ -41,7 +41,7 @@
     "src",
     "./*.d.ts",
     "./*.config.ts",
-    "./types",
+    "src/types",
     "./helpers",
   ],
 }

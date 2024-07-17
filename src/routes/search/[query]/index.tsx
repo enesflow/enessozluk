@@ -3,11 +3,12 @@ import { component$, useComputed$ } from "@builder.io/qwik";
 import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import { LuggatView, useLuggatLoader } from "~/components/dicts/luggat";
 import { useNisanyanLoader } from "~/components/dicts/nisanyan";
-import { TDKView, useTDKLoader } from "~/components/dicts/tdk";
+import { TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
+import { useTDKLoader } from "#helpers/dics/tdk";
 export { useLuggatLoader, useNisanyanLoader, useTDKLoader, useBenzerLoader };
 
 type Links = {

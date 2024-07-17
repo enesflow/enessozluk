@@ -48,5 +48,8 @@
     "sharp"
   ],
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "zod": "^3.23.8"
+  }
 }

@@ -1,16 +1,11 @@
-import type { TDKPackage, TDKResponseError } from "#/tdk";
-import { fetchAPI } from "#helpers/cache";
-import { API_FAILED_TEXT } from "#helpers/constants";
+import type { TDKPackage } from "#/tdk";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
 import { LinkR } from "../linkWithRedirect";
 import { Recommendations } from "../recommendations";
 import { WordLinks } from "../WordLinks";
 
 const TDK_LINK_DET = "► " as const;
-const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
-const TDK_RECOMMENDATIONS_URL = "https://sozluk.gov.tr/oneri?soz=" as const;
 
 export function isOutLink(word: string): {
   outLink: boolean;
@@ -49,82 +44,6 @@ export function isOutLink(word: string): {
     cleanWord: romanToFront(word),
   };
 }
-
-export function preprocessTDK(data: TDKPackage) {
-  if ("error" in data) {
-    return data;
-  }
-  // 1. remove the paranthesises from the beginning and the end of lisan if they exist
-  // and only from the beginning ( and the end ) of lisan
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].lisan) {
-      data[i].lisan = data[i].lisan.replace(/^\(/, "").replace(/\)$/, "");
-    }
-  }
-  // 2. add serverDefinedPreText to every meaning
-  const firstAttributes = data[0].anlamlarListe?.[0].ozelliklerListe;
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].anlamlarListe) {
-      for (let j = 0; j < (data[i].anlamlarListe ?? []).length; j++) {
-        const meaning = data[i].anlamlarListe![j];
-        // if there is not a attribute with the same type as the first attribute
-        // then add firstAttributes to the start of meaning.ozelliklerListe
-        if (
-          !meaning.ozelliklerListe?.some(
-            (ozellik) => ozellik.tur === firstAttributes?.[0].tur,
-          )
-        ) {
-          meaning.ozelliklerListe = firstAttributes?.concat(
-            meaning.ozelliklerListe ?? [],
-          );
-        }
-        data[i].anlamlarListe![j].serverDefinedPreText = meaning.ozelliklerListe
-          ?.map((ozellik) => ozellik.tam_adi)
-          .filter((value, index, self) => self.indexOf(value) === index) // remove duplicates
-          .join(", ");
-      }
-    }
-  }
-  return data;
-}
-
-function isTDKResponseError(
-  data: TDKPackage | TDKResponseError,
-): data is TDKResponseError {
-  return "error" in data || !("anlamlarListe" in data[0]);
-}
-
-// eslint-disable-next-line qwik/loader-location
-export const useTDKLoader = routeLoader$<TDKPackage>(async ({ params }) => {
-  const url = `${TDK_URL}${params.query.toLocaleLowerCase("tr")}`;
-  try {
-    const { data } = await fetchAPI(url, {
-      provider: "tdk",
-    });
-    if (!isTDKResponseError(data)) {
-      return preprocessTDK(data);
-    } else {
-      const url = `${TDK_RECOMMENDATIONS_URL}${params.query.toLocaleLowerCase("tr")}`;
-      const { data: recommendations } = await fetchAPI(url, {
-        provider: "general-tdk-recommendations",
-      });
-      return {
-        error: "error" in data ? data.error : API_FAILED_TEXT,
-        recommendations: recommendations as any,
-      };
-    }
-  } catch (error) {
-    console.error("TDK FAILED", error);
-    return {
-      error: API_FAILED_TEXT,
-      recommendations: [
-        { madde: "Tekrar" },
-        { madde: "dene-" },
-        { madde: params.query },
-      ],
-    };
-  }
-});
 
 export const TDKView = component$<{
   data: TDKPackage;

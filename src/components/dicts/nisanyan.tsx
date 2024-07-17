@@ -173,16 +173,6 @@ export function formatRelation(etm: NisanyanEtymology): string {
   else if (etm.languages[0].abbreviation === "onom")
     return " ses yansımalı sözcüğüdür.";
   else {
-    /* return ` ${
-      {
-        ö: "özel ismi",
-        f: "fiili",
-        s: "sözcüğü",
-        b: "biçimi",
-        d: "deyimi",
-      }[etm.wordClass.abbreviation] ?? etm.wordClass.name
-    }${etm.relation.text.startsWith(" ") ? "" : "n"}${etm.relation.text.split(" ")[0]}${etm.affixes?.prefix ? ` %l${etm.affixes.prefix.name} ön ekiyle ` : ""}${etm.affixes?.suffix ? ` %l${etm.affixes.suffix.name} ekiyle ` : ""} ${etm.relation.text.split(" ").slice(1).join(" ")}.`; */
-    // let's break up this bad boy, this code is too hard to read
     const relationOverride = {
       "~?": "bir sözcükten alıntı olabilir; ancak bu kesin değildir.",
     } as Record<string, string>;
