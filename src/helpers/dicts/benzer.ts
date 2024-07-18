@@ -139,7 +139,9 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
     const cache = loadCache(e, "benzer") as BenzerPackage | null;
     if (cache) {
       console.log("cache names", sharedMap.cleanedQuery, (cache as any).names);
-      if (!(sharedMap.cleanedQuery in ("names" in cache ? cache.names : []))) {
+      if (
+        !("names" in cache ? cache.names : []).includes(sharedMap.cleanedQuery)
+      ) {
         // This means the casing between the query and the cache is different
         // we will refetch the data, append it to the cache and return it
         e.sharedMap.set("data", {
