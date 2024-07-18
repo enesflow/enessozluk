@@ -169,7 +169,8 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
         isUnsuccessful: true,
       };
       return setSharedMapResult(e, "benzer", data); */
-      return setSharedMapResult(e, "benzer", error.data);
+      if (error.data.serverDefinedCaptchaError) return error.data;
+      else return setSharedMapResult(e, "benzer", error.data);
     }
     // Returns error if parsing failed
     if (!parsed.success) {
