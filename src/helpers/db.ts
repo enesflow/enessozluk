@@ -23,6 +23,7 @@ export function getDB(e: RequestEventBase): D1Database | undefined {
     return e.sharedMap.get("db") as D1Database;
   }
   const DB = e.platform.env?.DB as D1Database;
+  console.log("DB is", DB);
   e.sharedMap.set("db", DB);
   return DB;
 }
