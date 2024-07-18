@@ -94,7 +94,6 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `Luggat API Error: ${error?.message || "No response"}`);
-    // return buildLuggatAPIError(e, API_FAILED_TEXT);
     // if 4xx, return no result
     if (response?.code && Math.floor(response.code / 100) === 4) {
       return setSharedMapResult(e, "luggat", {

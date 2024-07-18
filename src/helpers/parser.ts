@@ -22,7 +22,6 @@ export async function parseBenzer(
   const query = decodeURIComponent(
     new URL(url).pathname.split("/").pop() ?? "",
   );
-  await new Promise((resolve) => setTimeout(resolve, 1000));
   const $ = load(data);
 
   // Extract words from the first list

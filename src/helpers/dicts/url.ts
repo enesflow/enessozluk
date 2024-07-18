@@ -6,9 +6,11 @@ export const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 export const TDK_RECOMMENDATIONS_URL =
   "https://sozluk.gov.tr/oneri?soz=" as const;
 export const LUGGAT_URL = "https://www.luggat.com/" as const;
-const NISANYAN_URL = "https://www.nisanyansozluk.com/api/words/" as const;
-const NISANYAN_AFFIX_URL =
+export const NISANYAN_URL =
+  "https://www.nisanyansozluk.com/api/words/" as const;
+export const NISANYAN_AFFIX_URL =
   "https://www.nisanyansozluk.com/api/affixes-1/" as const;
+export const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 
 const baseBuilder = (
   base: string,
@@ -77,4 +79,11 @@ export const buildNisanyanAffixUrl = (
       ) + `?session=${session}`;
   }
   return baseBuilder(NISANYAN_AFFIX_URL, s, lowercase);
+};
+
+export const buildBenzerUrl = (
+  e: RequestEventBase | string,
+  lowercase = false,
+) => {
+  return baseBuilder(BENZER_URL, e, lowercase);
 };
