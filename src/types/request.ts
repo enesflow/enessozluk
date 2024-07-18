@@ -15,4 +15,7 @@ export type SharedMap = {
     luggat?: unknown;
     benzer?: unknown;
   };
+  forceFetch: {
+    benzer?: boolean;
+  };
 };

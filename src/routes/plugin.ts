@@ -52,6 +52,7 @@ export const onRequest: RequestHandler = async (e) => {
     cleanedAndLowerCaseQuery: cleaned.toLocaleLowerCase("tr"),
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
+    forceFetch: {},
   };
   e.sharedMap.set("data", data);
   e.sharedMap.set("sessionUUID", generateUUID(e.clientConn));

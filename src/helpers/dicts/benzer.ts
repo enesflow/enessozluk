@@ -116,6 +116,7 @@ function parseBenzer(
   }
 
   return {
+    name: query,
     url,
     isUnsuccessful: false,
     words: Array.from(words),
@@ -127,9 +128,32 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   const e = this;
   const sharedMap = loadSharedMap(e);
   // If there is data in cache, return it
-  {
+  console.log("Force fetch is", sharedMap.forceFetch.benzer);
+  if (!sharedMap.forceFetch.benzer) {
     const cache = loadCache(e, "benzer");
-    if (cache) return setSharedMapResult(e, "benzer", cache);
+    if (cache) {
+      if (cache.name !== sharedMap.query) {
+        // This means the casing between the query and the cache is different
+        // we will refetch the data, append it to the cache and return it
+        e.sharedMap.set("data", {
+          ...sharedMap,
+          forceFetch: {
+            ...sharedMap.forceFetch,
+            benzer: true,
+          },
+        });
+        const fetched = await benzerLoader.call(e);
+        return setSharedMapResult(e, "benzer", {
+          ...cache,
+          words: [...cache.words, ...(fetched.words ?? [])],
+          moreWords: {
+            ...("moreWords" in cache ? cache.moreWords : {}),
+            ...("moreWords" in fetched ? fetched.moreWords : {}),
+          },
+        });
+      }
+      return setSharedMapResult(e, "benzer", cache);
+    }
   } /////////////////////////////
 
   // We do some cookie manupulation so that we don't hit the captcha too often

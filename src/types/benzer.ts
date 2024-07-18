@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const BenzerResponseSchema = z.object({
+  name: z.string(),
   url: z.string(),
   isUnsuccessful: z.literal(false),
   words: z.array(z.string()),
