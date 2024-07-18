@@ -164,7 +164,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
         return setSharedMapResult(e, "benzer", {
           ...cache,
           isUnsuccessful:
-            newWords.length > 0 || Object.keys(newMoreWords).length > 0,
+            newWords.length === 0 && Object.keys(newMoreWords).length === 0,
           words: newWords,
           names: newNames,
           moreWords: newMoreWords,
