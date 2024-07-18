@@ -188,7 +188,7 @@ const loadNisanyanWord = server$(
     }
     const parsed = NisanyanResponseSchema.safeParse({
       ...response.data,
-      url,
+      url: url.user,
     });
     // Error handling
     {

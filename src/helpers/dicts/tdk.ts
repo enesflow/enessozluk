@@ -110,7 +110,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   }
   const parsed = TDKResponseSchema.safeParse({
     meanings: response.data,
-    url,
+    url: url.user,
   });
   // Error handling
   {
