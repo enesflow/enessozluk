@@ -134,11 +134,9 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   const e = this;
   const sharedMap = loadSharedMap(e);
   // If there is data in cache, return it
-  console.log("Force fetch is", sharedMap.forceFetch.benzer);
   if (!sharedMap.forceFetch.benzer) {
     const cache = loadCache(e, "benzer") as BenzerPackage | null;
     if (cache) {
-      console.log("cache names", sharedMap.cleanedQuery, (cache as any).names);
       if (
         !("names" in cache ? cache.names : []).includes(sharedMap.cleanedQuery)
       ) {
