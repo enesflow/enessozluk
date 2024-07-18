@@ -20,7 +20,7 @@ import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
-  const [error, response] = await to(fetchAPI(url));
+  const [error, response] = await to(fetchAPI(url.api));
   if (error || !response?.success) {
     debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
     return [
@@ -98,13 +98,13 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     if (cache) return setSharedMapResult(e, "tdk", cache);
   } /////////////////////////////
   const url = buildTDKUrl(e);
-  const [error, response] = await to(fetchAPI(url));
+  const [error, response] = await to(fetchAPI(url.api));
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
     return buildTDKAPIError(
       e,
-      url,
+      url.user,
       `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
     );
   }
@@ -121,7 +121,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
         recommendations: await loadTDKRecommendations(e),
-        url,
+        url: url.user,
       };
       return setSharedMapResult(e, "tdk", data);
     }
@@ -129,7 +129,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     if (!parsed.success) {
       return buildTDKAPIError(
         e,
-        url,
+        url.user,
         `${API_FAILED_TEXT}: ${parsed.error.message}`,
       );
     }

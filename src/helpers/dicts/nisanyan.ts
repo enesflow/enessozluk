@@ -177,12 +177,12 @@ const loadNisanyanWord = server$(
       if (cache) return setSharedMapResult(e, "nisanyan", cache);
     } /////////////////////////////
     const url = buildNisanyanUrl(e);
-    const [error, response] = await to(fetchAPI(url));
+    const [error, response] = await to(fetchAPI(url.api));
     // Returns error if request failed
     if (error || !response?.success) {
       return buildNisanyanAPIError(
         e,
-        url,
+        url.user,
         `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
       );
     }
@@ -201,12 +201,12 @@ const loadNisanyanWord = server$(
       if (!parsed.success) {
         return buildNisanyanAPIError(
           e,
-          url,
+          url.user,
           `${API_FAILED_TEXT}: ${parsed.error.message}`,
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanResponse(parsed.data, url, e.params.query);
+    const data = cleanseNisanyanResponse(parsed.data, url.user, e.params.query);
     return setSharedMapResult(e, "nisanyan", data);
   },
 );
@@ -271,7 +271,7 @@ const loadNisanyanAffix = server$(
       if (cache) return setSharedMapResult(e, "nisanyan-affix", cache);
     } /////////////////////////////
     const url = buildNisanyanAffixUrl(e);
-    const [error, response] = await to(fetchAPI(url));
+    const [error, response] = await to(fetchAPI(url.api));
     // Returns error if request failed
     if (error || !response?.success) {
       try {
@@ -279,7 +279,7 @@ const loadNisanyanAffix = server$(
       } catch (error) {
         return buildNisanyanAPIError(
           e,
-          url,
+          url.user,
           `${API_FAILED_TEXT}: ${(error as Error | undefined)?.message || response?.code}`,
         );
       }
@@ -290,18 +290,18 @@ const loadNisanyanAffix = server$(
       // Returns recommendations if the response is an error or has no results
       const error = NisanyanAffixResponseErrorSchema.safeParse(response.data);
       if (error.success) {
-        return buildNisanyanAPIError(e, url, NO_RESULT);
+        return buildNisanyanAPIError(e, url.user, NO_RESULT);
       }
       // Returns error if parsing failed
       if (!parsed.success) {
         return buildNisanyanAPIError(
           e,
-          url,
+          url.user,
           `${API_FAILED_TEXT}: ${parsed.error.message}`,
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanAffixResponse(e, url, parsed.data);
+    const data = cleanseNisanyanAffixResponse(e, url.user, parsed.data);
     return setSharedMapResult(e, "nisanyan-affix", data);
   },
 );

@@ -12,7 +12,6 @@ import { useBenzerLoader } from "~/helpers/dicts/benzer";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
-import { loadSharedMap } from "~/helpers/request";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };

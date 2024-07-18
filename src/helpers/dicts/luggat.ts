@@ -98,7 +98,7 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
     if (cache) return setSharedMapResult(e, "luggat", cache);
   } /////////////////////////////
   const url = buildLuggatUrl(e);
-  const [error, response] = await to(fetchAPI(url, "html"));
+  const [error, response] = await to(fetchAPI(url.api, "html"));
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `Luggat API Error: ${error?.message || "No response"}`);
@@ -109,10 +109,10 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
         isUnsuccessful: true,
       });
     } else {
-      return buildLuggatAPIError(e, url, API_FAILED_TEXT);
+      return buildLuggatAPIError(e, url.user, API_FAILED_TEXT);
     }
   }
-  const result = parseLuggat(e, url, response.data);
+  const result = parseLuggat(e, url.user, response.data);
   const parsed = LuggatResponseSchema.safeParse(result);
   // Error handling
   {
@@ -128,7 +128,7 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildLuggatAPIError(e, url, parsed.error.message);
+      return buildLuggatAPIError(e, url.user, parsed.error.message);
     }
   } /////////////////////////////
   const { data } = parsed;

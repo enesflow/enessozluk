@@ -139,7 +139,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   //////////////////
   const url = buildBenzerUrl(e);
   const [error, response] = await to(
-    fetchAPI(url, "html", {
+    fetchAPI(url.api, "html", {
       ...e.request,
       headers: {
         // disguise as a browser
@@ -153,7 +153,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `Benzer API Error: ${error?.message || "No response"}`);
-    return buildBenzerAPIError(e, url, API_FAILED_TEXT);
+    return buildBenzerAPIError(e, url.user, API_FAILED_TEXT);
   }
   // We set the cookies
   response.raw.headers
@@ -164,7 +164,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
       key && value && e.cookie.set(key, value, { path: "/" });
     });
   /////////////////////
-  const result = parseBenzer(e, url, response.data);
+  const result = parseBenzer(e, url.user, response.data);
   const parsed = BenzerResponseSchema.safeParse(result);
   // Error handling
   {
@@ -186,7 +186,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildBenzerAPIError(e, url, parsed.error.message);
+      return buildBenzerAPIError(e, url.user, parsed.error.message);
     }
   } /////////////////////////////
   const { data } = parsed;
