@@ -1,5 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 import { LinkR } from "./linkWithRedirect";
+import { removeNumbersInWord } from "~/helpers/string";
 
 function isALetter(char: string | undefined): boolean {
   return !(
@@ -28,7 +29,8 @@ export const TextWithLinks = component$<{
     <>
       {parts.map((part, index) => {
         // If the part contains a space, it is likely a link; otherwise, it's text
-        const [word, ...rest] = part.split(" ");
+        const [rawWord, ...rest] = part.split(" ");
+        const word = removeNumbersInWord(rawWord);
         const remainingText = rest.join(" ");
 
         if (index === 0) {
