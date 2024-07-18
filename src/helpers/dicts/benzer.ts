@@ -130,9 +130,9 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   // If there is data in cache, return it
   console.log("Force fetch is", sharedMap.forceFetch.benzer);
   if (!sharedMap.forceFetch.benzer) {
-    const cache = loadCache(e, "benzer");
+    const cache = loadCache(e, "benzer") as BenzerPackage | null;
     if (cache) {
-      if (cache.name !== sharedMap.query) {
+      if ("name" in cache ? cache.name : "" !== sharedMap.query) {
         // This means the casing between the query and the cache is different
         // we will refetch the data, append it to the cache and return it
         e.sharedMap.set("data", {
@@ -145,7 +145,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
         const fetched = await benzerLoader.call(e);
         return setSharedMapResult(e, "benzer", {
           ...cache,
-          words: [...cache.words, ...(fetched.words ?? [])],
+          words: [...(cache.words ?? []), ...(fetched.words ?? [])],
           moreWords: {
             ...("moreWords" in cache ? cache.moreWords : {}),
             ...("moreWords" in fetched ? fetched.moreWords : {}),
