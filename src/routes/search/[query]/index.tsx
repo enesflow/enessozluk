@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
+import type { RequestEventBase } from "@builder.io/qwik-city";
 import {
-  RequestEventBase,
   routeLoader$,
   server$,
   useLocation,
@@ -27,7 +27,7 @@ type URLs = {
 };
 
 const test = server$(function (this: RequestEventBase) {
-  console.log("test", loadSharedMap(this));
+  console.log("urls", loadSharedMap(this).urls);
 });
 
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
