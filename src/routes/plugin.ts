@@ -24,9 +24,10 @@ export const onRequest: RequestHandler = async ({
   const red = getRedirect(url, {
     query: params.query,
   });
-  if (!red.shouldRedirect) {
-    return next();
-  } else {
+  if (red.shouldRedirect) {
     throw redirect(red.code, red.to);
   }
+  await next();
+  console.log("This is done");
+  console.log(sharedMap.get("data"));
 };
