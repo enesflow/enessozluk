@@ -110,7 +110,7 @@ export const buildNisanyanUrl = (
 
 export const buildNisanyanAffixUrl = (
   e: RequestEventBase | string,
-  lowercase = true,
+  lowercase = false,
 ) => {
   let s = "";
   if (typeof e === "string") {

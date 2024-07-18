@@ -229,10 +229,12 @@ export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
   }),
 );
 
-export const NisanyanAffixResponseSchema = z.object({
-  affix: NisanyanAffixSchema,
-  words: z.array(NisanyanWordSchema),
-});
+export const NisanyanAffixResponseSchema = z
+  .object({
+    affix: NisanyanAffixSchema,
+    words: z.array(NisanyanWordSchema).optional(),
+  })
+  .catchall(z.unknown());
 
 export const NisanyanWordPackageSchema = NisanyanResponseSchema.or(
   NisanyanResponseErrorSchema,
