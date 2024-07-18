@@ -34,7 +34,7 @@ const baseBuilder = (
       base +
       (lowercase
         ? sharedMap.cleanedAndLowerCaseQuery
-        : sharedMap.lowerCaseQuery);
+        : sharedMap.cleanedQuery);
   }
   return encode ? encodeURI(s) : s;
 };
