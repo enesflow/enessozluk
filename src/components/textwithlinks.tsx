@@ -29,8 +29,8 @@ export const TextWithLinks = component$<{
     <>
       {parts.map((part, index) => {
         // If the part contains a space, it is likely a link; otherwise, it's text
-        const [rawWord, ...rest] = part.split(" ");
-        const word = removeNumbersInWord(rawWord);
+        const [word, ...rest] = part.split(" ");
+        //const word = removeNumbersInWord(rawWord);
         const remainingText = rest.join(" ");
 
         if (index === 0) {
@@ -44,10 +44,12 @@ export const TextWithLinks = component$<{
               <LinkR
                 href={`/search/${!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}`}
               >
-                {!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}
+                {removeNumbersInWord(
+                  !isALetter(word[word.length - 1]) ? word.slice(0, -1) : word,
+                )}
               </LinkR>
               {!isALetter(word[word.length - 1]) ? (
-                <>{word[word.length - 1]}</>
+                <>{removeNumbersInWord(word[word.length - 1])}</>
               ) : (
                 <></>
               )}{" "}

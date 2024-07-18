@@ -5,8 +5,9 @@ import type {
 } from "#/nisanyan";
 import { NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
-import { removeNumbersAtEnd } from "#helpers/string";
+import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
+import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "~/components/WordLinks";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
@@ -204,7 +205,11 @@ function formatRelation(
 }
 
 function getWordTitle(index: number, name: string) {
-  return `(${convertToRoman(index + 1)}) ${removeNumbersAtEnd(name)}`;
+  if (/\d$/.test(name)) {
+    return `${putTheNumbersAtTheEndAsRomanToTheBeginning(name)}`;
+  } else {
+    return `(${convertToRoman(index + 1)}) ${removeNumbersInWord(name)}`;
+  }
 }
 
 export const NisanyanView = component$<{
