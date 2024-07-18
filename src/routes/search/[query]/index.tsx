@@ -27,15 +27,13 @@ type URLs = {
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
   const tdk = await e.resolveValue(useTDKLoader);
   const nisanyan = await e.resolveValue(useNisanyanLoader);
-  await e.resolveValue(useLuggatLoader);
-  await e.resolveValue(useBenzerLoader);
-  const sharedMap = loadSharedMap(e);
-  console.log(sharedMap);
+  const luggat = await e.resolveValue(useLuggatLoader);
+  const benzer = await e.resolveValue(useBenzerLoader);
   return {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
-    luggat: "https://example.com",
-    benzer: "https://example.com",
+    luggat: luggat.url,
+    benzer: benzer.url,
   };
 });
 
