@@ -30,6 +30,7 @@ export const useURLsLoader = routeLoader$<URLs>(async (e) => {
   await e.resolveValue(useLuggatLoader);
   await e.resolveValue(useBenzerLoader);
   const sharedMap = loadSharedMap(e);
+  console.log(sharedMap);
   return {
     tdk: "https://example.com",
     nisanyan: "https://example.com",
