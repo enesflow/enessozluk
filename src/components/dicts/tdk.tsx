@@ -71,7 +71,7 @@ export const TDKView = component$<{
         <>
           {" "}
           <ul class="results-list">
-            {data.map((result, index) => (
+            {data.meanings.map((result, index) => (
               <li key={result.madde_id} class="result-item">
                 <h2 class="result-title">
                   ({convertToRoman(index + 1)}) {result.madde}{" "}
@@ -121,7 +121,7 @@ export const TDKView = component$<{
               </li>
             ))}
           </ul>
-          {data
+          {data.meanings
             .map((result) =>
               result.birlesikler?.split(", ").map((word) => word.trim()),
             )
@@ -131,7 +131,7 @@ export const TDKView = component$<{
               <h2 class="result-subtitle">Birleşik sözcükler</h2>
               <WordLinks
                 words={
-                  data
+                  data.meanings
                     .map((result) =>
                       result.birlesikler
                         ?.split(", ")

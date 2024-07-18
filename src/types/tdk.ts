@@ -88,7 +88,9 @@ export const TDKResponseErrorSchema = z.object({
   recommendations: TDKRecommendationSchema,
 });
 
-export const TDKResponseSchema = TDKResultSchema.array();
+export const TDKResponseSchema = z.object({
+  meanings: TDKResultSchema.array(),
+});
 
 export const TDKPackageSchema = TDKResponseSchema.or(TDKResponseErrorSchema);
 

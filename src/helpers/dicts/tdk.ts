@@ -51,15 +51,17 @@ function buildTDKAPIError(
 
 const cleanseTDKResponse = (data: TDKResponse) => {
   // For each lisan "(Arapça)" -> "Arapça"
-  for (let i = 0; i < data.length; i++) {
-    if (data[i].lisan) {
-      data[i].lisan = data[i].lisan?.replace(/^\(/, "").replace(/\)$/, "");
+  for (let i = 0; i < data.meanings.length; i++) {
+    if (data.meanings[i].lisan) {
+      data.meanings[i].lisan = data.meanings[i].lisan
+        ?.replace(/^\(/, "")
+        .replace(/\)$/, "");
     }
   }
   // Add serverDefinedPreText to every meaning (e.g. isim, mecaz...)
-  const firstAttributes = data[0].anlamlarListe?.[0].ozelliklerListe;
+  const firstAttributes = data.meanings[0].anlamlarListe?.[0].ozelliklerListe;
 
-  for (const item of data) {
+  for (const item of data.meanings) {
     if (!item.anlamlarListe) continue;
 
     for (const meaning of item.anlamlarListe) {
@@ -108,7 +110,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   {
     // Returns recommendations if the response is an error or has no results
     const error = TDKResponseErrorSchema.safeParse(response.data);
-    const first = (parsed.data as TDKResponse | undefined)?.[0];
+    const first = (parsed.data as TDKResponse | undefined)?.meanings[0];
     if (error.success || !first || !("anlamlarListe" in first)) {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
