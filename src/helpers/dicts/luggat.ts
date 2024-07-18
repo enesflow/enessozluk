@@ -18,22 +18,29 @@ import {
 
 function buildLuggatAPIError(
   e: RequestEventBase,
+  url: string,
   title: string,
 ): LuggatResponseError {
   debugAPI(e, `Luggat API Error: ${title}`);
   return {
+    url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
   };
 }
 
-function parseLuggat(e: RequestEventBase, response: string): LuggatPackage {
+function parseLuggat(
+  e: RequestEventBase,
+  url: string,
+  response: string,
+): LuggatPackage {
   try {
     const $ = load(response);
     const words: LuggatResponse["words"] = [];
     const wordElements = $(".arama-sonucu-div");
     if (wordElements.length === 0) {
       return {
+        url,
         isUnsuccessful: true,
         serverDefinedErrorText: NO_RESULT,
       };
@@ -59,6 +66,7 @@ function parseLuggat(e: RequestEventBase, response: string): LuggatPackage {
       if (name && definitions.length) words.push({ name, definitions });
     });
     return {
+      url,
       isUnsuccessful: false,
       // Consolidate entries
       words: ((words: LuggatResponse["words"]): LuggatResponse["words"] => {
@@ -78,7 +86,7 @@ function parseLuggat(e: RequestEventBase, response: string): LuggatPackage {
       })(words),
     };
   } catch (error) {
-    return buildLuggatAPIError(e, API_FAILED_TEXT);
+    return buildLuggatAPIError(e, url, API_FAILED_TEXT);
   }
 }
 
@@ -101,10 +109,10 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
         isUnsuccessful: true,
       });
     } else {
-      return buildLuggatAPIError(e, API_FAILED_TEXT);
+      return buildLuggatAPIError(e, url, API_FAILED_TEXT);
     }
   }
-  const result = parseLuggat(e, response.data);
+  const result = parseLuggat(e, url, response.data);
   const parsed = LuggatResponseSchema.safeParse(result);
   // Error handling
   {
@@ -120,7 +128,7 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildLuggatAPIError(e, parsed.error.message);
+      return buildLuggatAPIError(e, url, parsed.error.message);
     }
   } /////////////////////////////
   const { data } = parsed;

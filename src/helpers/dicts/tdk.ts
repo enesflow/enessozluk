@@ -35,11 +35,13 @@ const loadTDKRecommendations = async (e: RequestEventBase) => {
 
 function buildTDKAPIError(
   e: RequestEventBase,
+  url: string,
   title: string,
 ): TDKResponseError {
   debugAPI(e, `TDK API Error: ${title}`);
   const { query } = loadSharedMap(e);
   return {
+    url,
     error: title,
     recommendations: [
       { madde: "Tekrar" },
@@ -102,11 +104,13 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
     return buildTDKAPIError(
       e,
+      url,
       `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
     );
   }
   const parsed = TDKResponseSchema.safeParse({
     meanings: response.data,
+    url,
   });
   // Error handling
   {
@@ -117,12 +121,17 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
         recommendations: await loadTDKRecommendations(e),
+        url,
       };
       return setSharedMapResult(e, "tdk", data);
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildTDKAPIError(e, `${API_FAILED_TEXT}: ${parsed.error.message}`);
+      return buildTDKAPIError(
+        e,
+        url,
+        `${API_FAILED_TEXT}: ${parsed.error.message}`,
+      );
     }
   } /////////////////////////////
   const data = cleanseTDKResponse(parsed.data);

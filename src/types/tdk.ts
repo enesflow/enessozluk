@@ -86,10 +86,12 @@ export const TDKRecommendationSchema = z.array(
 export const TDKResponseErrorSchema = z.object({
   error: z.string(),
   recommendations: TDKRecommendationSchema,
+  url: z.string(),
 });
 
 export const TDKResponseSchema = z.object({
   meanings: TDKResultSchema.array(),
+  url: z.string(),
 });
 
 export const TDKPackageSchema = TDKResponseSchema.or(TDKResponseErrorSchema);

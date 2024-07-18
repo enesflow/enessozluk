@@ -1,8 +1,6 @@
 import { component$ } from "@builder.io/qwik";
-import type { RequestEventBase } from "@builder.io/qwik-city";
 import {
   routeLoader$,
-  server$,
   useLocation,
   type DocumentHead,
 } from "@builder.io/qwik-city";
@@ -27,18 +25,17 @@ type URLs = {
 };
 
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
-  await e.resolveValue(useTDKLoader);
-  await e.resolveValue(useNisanyanLoader);
+  const tdk = await e.resolveValue(useTDKLoader);
+  const nisanyan = await e.resolveValue(useNisanyanLoader);
   await e.resolveValue(useLuggatLoader);
   await e.resolveValue(useBenzerLoader);
   const sharedMap = loadSharedMap(e);
   console.log(sharedMap);
   return {
-    tdk: "https://example.com",
-    nisanyan: "https://example.com",
+    tdk: tdk.url,
+    nisanyan: nisanyan.url,
     luggat: "https://example.com",
     benzer: "https://example.com",
-    ...sharedMap.urls,
   };
 });
 

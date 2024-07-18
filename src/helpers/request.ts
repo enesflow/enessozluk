@@ -53,7 +53,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
   init?: RequestInit,
 ): Promise<
   | {
-      data: T extends "json" ? unknown : string;
+      data: T extends "json" ? {} : string;
       success: true;
       code: number;
       raw: Response;

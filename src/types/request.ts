@@ -15,10 +15,4 @@ export type SharedMap = {
     luggat?: unknown;
     benzer?: unknown;
   };
-  urls: {
-    tdk?: string;
-    nisanyan?: string;
-    luggat?: string;
-    benzer?: string;
-  };
 };

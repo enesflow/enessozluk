@@ -20,16 +20,22 @@ import {
 
 function buildBenzerAPIError(
   e: RequestEventBase,
+  url: string,
   title: string,
 ): BenzerResponseError {
   debugAPI(e, `Benzer API Error: ${title}`);
   return {
+    url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
   };
 }
 
-function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
+function parseBenzer(
+  e: RequestEventBase,
+  url: string,
+  response: string,
+): BenzerPackage {
   const sharedMap = loadSharedMap(e);
   const query = sharedMap.query;
   const $ = load(response);
@@ -44,6 +50,7 @@ function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
     ).length;
     if (isCaptcha) {
       return {
+        url,
         isUnsuccessful: true,
         serverDefinedCaptchaError: true,
         serverDefinedErrorText:
@@ -54,6 +61,7 @@ function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
     const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
     if (suggestionBox.length === 0) {
       return {
+        url,
         isUnsuccessful: true,
       };
     }
@@ -65,6 +73,7 @@ function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
     );
     if (didYouMeanWord) {
       return {
+        url,
         isUnsuccessful: true,
         serverDefinedErrorText: DID_YOU_MEAN,
         serverDefinedReFetchWith: didYouMeanWord,
@@ -72,6 +81,7 @@ function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
       };
     }
     return {
+      url,
       isUnsuccessful: true,
       words,
     };
@@ -99,12 +109,14 @@ function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
 
   if (words.size === 0) {
     return {
+      url,
       isUnsuccessful: true,
       serverDefinedErrorText: NO_RESULT,
     };
   }
 
   return {
+    url,
     isUnsuccessful: false,
     words: Array.from(words),
     moreWords,
@@ -141,7 +153,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `Benzer API Error: ${error?.message || "No response"}`);
-    return buildBenzerAPIError(e, API_FAILED_TEXT);
+    return buildBenzerAPIError(e, url, API_FAILED_TEXT);
   }
   // We set the cookies
   response.raw.headers
@@ -152,7 +164,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
       key && value && e.cookie.set(key, value, { path: "/" });
     });
   /////////////////////
-  const result = parseBenzer(e, response.data);
+  const result = parseBenzer(e, url, response.data);
   const parsed = BenzerResponseSchema.safeParse(result);
   // Error handling
   {
@@ -174,7 +186,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
     }
     // Returns error if parsing failed
     if (!parsed.success) {
-      return buildBenzerAPIError(e, parsed.error.message);
+      return buildBenzerAPIError(e, url, parsed.error.message);
     }
   } /////////////////////////////
   const { data } = parsed;

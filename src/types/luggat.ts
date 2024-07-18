@@ -6,11 +6,13 @@ export const LuggatWordSchema = z.object({
 });
 
 export const LuggatResponseSchema = z.object({
+  url: z.string(),
   isUnsuccessful: z.literal(false),
   words: LuggatWordSchema.array(),
 });
 
 export const LuggatResponseErrorSchema = z.object({
+  url: z.string(),
   isUnsuccessful: z.literal(true),
   serverDefinedErrorText: z.string().optional(),
 });

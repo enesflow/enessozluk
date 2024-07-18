@@ -156,6 +156,7 @@ export const NisanyanGeneralResponseSchema = z.object({
 });
 
 export const NisanyanResponseErrorSchema = z.object({
+  url: z.string(),
   isUnsuccessful: z.literal(true),
   error: z.object({}).optional(),
   words: z.array(NisanyanelatedWordSchema).optional(),
@@ -224,6 +225,7 @@ export const NisanyanWordSchema = z.object({
 
 export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
   z.object({
+    url: z.string(),
     isUnsuccessful: z.literal(false),
     words: z.array(NisanyanWordSchema).optional(),
   }),

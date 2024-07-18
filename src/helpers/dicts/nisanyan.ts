@@ -33,11 +33,13 @@ function isWord(query: string): boolean {
 
 function buildNisanyanAPIError(
   e: RequestEventBase,
+  url: string,
   title: string,
 ): NisanyanResponseError {
   debugAPI(e, `Nisanyan API Error: ${title}`);
   const { query } = loadSharedMap(e);
   return {
+    url,
     serverDefinedErrorText: API_FAILED_TEXT,
     isUnsuccessful: true,
     words: [
@@ -126,6 +128,7 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
 
 function cleanseNisanyanResponse(
   data: NisanyanResponse,
+  url: string,
   query: string,
 ): NisanyanWordPackage {
   const mapper = (word: any & { name: string }) => ({
@@ -134,10 +137,11 @@ function cleanseNisanyanResponse(
   });
   data.words = data.words?.map(mapper);
   const misspellings = data.words?.map((i) => i.misspellings).flat();
-  const names = data.words?.map((i) => i.name).flat(); 
+  const names = data.words?.map((i) => i.name).flat();
   // if our word is a misspelling, we should return error
-  if (misspellings?.includes(query) && !names.includes(query)) {
+  if (misspellings?.includes(query) && !names?.includes(query)) {
     return {
+      url,
       serverDefinedErrorText: DID_YOU_MEAN,
       isUnsuccessful: true,
       words:
@@ -178,10 +182,14 @@ const loadNisanyanWord = server$(
     if (error || !response?.success) {
       return buildNisanyanAPIError(
         e,
+        url,
         `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
       );
     }
-    const parsed = NisanyanResponseSchema.safeParse(response.data);
+    const parsed = NisanyanResponseSchema.safeParse({
+      ...response.data,
+      url,
+    });
     // Error handling
     {
       // Returns recommendations if the response is an error or has no results
@@ -193,17 +201,19 @@ const loadNisanyanWord = server$(
       if (!parsed.success) {
         return buildNisanyanAPIError(
           e,
+          url,
           `${API_FAILED_TEXT}: ${parsed.error.message}`,
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanResponse(parsed.data, e.params.query);
+    const data = cleanseNisanyanResponse(parsed.data, url, e.params.query);
     return setSharedMapResult(e, "nisanyan", data);
   },
 );
 
 function cleanseNisanyanAffixResponse(
   e: RequestEventBase,
+  url: string,
   data: NisanyanAffixPackage,
 ): NisanyanWordPackage {
   const words = ((data: any): NisanyanWord[] => {
@@ -219,6 +229,7 @@ function cleanseNisanyanAffixResponse(
   })(data);
   if ("affix" in data)
     return {
+      url,
       isUnsuccessful: false,
       serverDefinedIsGeneratedFromAffix: true,
       words: [
@@ -245,7 +256,7 @@ function cleanseNisanyanAffixResponse(
       ],
     };
   else {
-    return buildNisanyanAPIError(e, "Invalid query");
+    return buildNisanyanAPIError(e, url, "Invalid query");
   }
 }
 
@@ -268,6 +279,7 @@ const loadNisanyanAffix = server$(
       } catch (error) {
         return buildNisanyanAPIError(
           e,
+          url,
           `${API_FAILED_TEXT}: ${(error as Error | undefined)?.message || response?.code}`,
         );
       }
@@ -278,17 +290,18 @@ const loadNisanyanAffix = server$(
       // Returns recommendations if the response is an error or has no results
       const error = NisanyanAffixResponseErrorSchema.safeParse(response.data);
       if (error.success) {
-        return buildNisanyanAPIError(e, NO_RESULT);
+        return buildNisanyanAPIError(e, url, NO_RESULT);
       }
       // Returns error if parsing failed
       if (!parsed.success) {
         return buildNisanyanAPIError(
           e,
+          url,
           `${API_FAILED_TEXT}: ${parsed.error.message}`,
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanAffixResponse(e, parsed.data);
+    const data = cleanseNisanyanAffixResponse(e, url, parsed.data);
     return setSharedMapResult(e, "nisanyan-affix", data);
   },
 );
