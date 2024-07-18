@@ -1,6 +1,8 @@
 import { component$ } from "@builder.io/qwik";
 import {
+  RequestEventBase,
   routeLoader$,
+  server$,
   useLocation,
   type DocumentHead,
 } from "@builder.io/qwik-city";
@@ -24,11 +26,16 @@ type URLs = {
   benzer: string;
 };
 
+const test = server$(function (this: RequestEventBase) {
+  console.log("test", loadSharedMap(this));
+});
+
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
   await e.resolveValue(useTDKLoader);
   await e.resolveValue(useNisanyanLoader);
   await e.resolveValue(useLuggatLoader);
   await e.resolveValue(useBenzerLoader);
+  test();
   const sharedMap = loadSharedMap(e);
   console.log(sharedMap);
   return {
