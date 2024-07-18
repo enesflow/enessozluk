@@ -13,7 +13,6 @@ export function putTheNumbersAtTheEndAsRomanToTheBeginning(
   text: string,
 ): string {
   // example: a1 -> (I) a
-  console.log("Text", text);
   const match = text.match(/(\d+)$/);
   if (match) {
     const number = match[1];
