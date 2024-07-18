@@ -4,7 +4,7 @@ import { loadSharedMap } from "~/helpers/request";
 
 export const debugLog = (...args: any[]) => {
   //isDev &&
-  console.log("%cDEBUG:", "color: #00f; font-weight: bold;", ...args);
+  console.log("🛠️ DEBUG:", ...args);
 };
 
 export const debugAPI = (e: RequestEventBase, title: string) => {
