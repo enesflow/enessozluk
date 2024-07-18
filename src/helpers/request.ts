@@ -9,6 +9,7 @@ import {
   NisanyanPackageSchema,
 } from "~/types/nisanyan";
 import { TDKPackageSchema, TDKRecommendationSchema } from "~/types/tdk";
+import { debugLog } from "./log";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -99,10 +100,17 @@ export function loadCache<T extends Dicts>(
   dict: T,
 ): z.infer<(typeof Packages)[T]> | null {
   const sharedMap = loadSharedMap(e);
-  const cache = (sharedMap.cache as any)[dict]; // TODO: change this
-  if (!cache) return null;
-  const parsed = Packages[dict].safeParse(cache);
-  return parsed.success ? parsed.data : null;
+  const cache = (sharedMap.cache as any)[dict];
+  if (cache) {
+    const parsed = Packages[dict].safeParse(cache);
+    if (parsed.success) {
+      debugLog("Using cache for", dict);
+      return parsed.data;
+    }
+  } else {
+    debugLog("Cache not found for", dict);
+    return null;
+  }
 }
 
 export function getFakeHeaders() {
