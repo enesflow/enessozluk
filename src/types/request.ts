@@ -1,6 +1,8 @@
 export type SharedMap = {
   query: string;
   lowerCaseQuery: string;
+  cleanedQuery: string;
+  cleanedAndLowerCaseQuery: string;
   cache: {
     tdk?: unknown; // a json, it will be checked by the loader
     nisanyan?: unknown;

@@ -12,9 +12,14 @@ export const onRequest: RequestHandler = async ({
   clientConn,
 }) => {
   if (!params.query) return next();
+  const decoded = decodeURIComponent(params.query);
+  const cleaned = decoded.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, "");
   const data: SharedMap = {
-    query: params.query,
+    query: decoded,
     lowerCaseQuery: params.query.toLocaleLowerCase("tr"),
+    // remove all + and numbers
+    cleanedQuery: cleaned,
+    cleanedAndLowerCaseQuery: cleaned.toLocaleLowerCase("tr"),
     cache: {},
     result: {},
   };

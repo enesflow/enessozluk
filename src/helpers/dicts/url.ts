@@ -20,7 +20,12 @@ const baseBuilder = (
   if (typeof e === "string") return base + e;
   else {
     const sharedMap = loadSharedMap(e);
-    return base + (lowercase ? sharedMap.lowerCaseQuery : sharedMap.query);
+    return (
+      base +
+      (lowercase
+        ? sharedMap.cleanedAndLowerCaseQuery
+        : sharedMap.lowerCaseQuery)
+    );
   }
 };
 
