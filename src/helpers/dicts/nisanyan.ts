@@ -186,10 +186,11 @@ const loadNisanyanWord = server$(
         `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
       );
     }
-    const parsed = NisanyanResponseSchema.safeParse({
+    response.data = {
       ...response.data,
       url: url.user,
-    });
+    };
+    const parsed = NisanyanResponseSchema.safeParse(response.data);
     // Error handling
     {
       // Returns recommendations if the response is an error or has no results
