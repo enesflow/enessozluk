@@ -13,6 +13,8 @@ export const onRequest: RequestHandler = async (e) => {
   const decoded = decodeURIComponent(e.params.query);
   const cleaned = decoded.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, "");
   const key = decoded.toLocaleLowerCase("tr");
+  console.log("env is", e.platform.env);
+  console.log("the other env", e.env, e.env.get("DB"));
   const cache = await getCacheByKey(e, key);
   console.log("Cache:", cache);
   const data: SharedMap = {
