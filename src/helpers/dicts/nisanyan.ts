@@ -134,8 +134,9 @@ function cleanseNisanyanResponse(
   });
   data.words = data.words?.map(mapper);
   const misspellings = data.words?.map((i) => i.misspellings).flat();
+  const names = data.words?.map((i) => i.name).flat(); 
   // if our word is a misspelling, we should return error
-  if (misspellings?.includes(query)) {
+  if (misspellings?.includes(query) && !names.includes(query)) {
     return {
       serverDefinedErrorText: DID_YOU_MEAN,
       isUnsuccessful: true,
