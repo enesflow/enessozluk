@@ -1,36 +1,56 @@
 import { loadSharedMap } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { generateUUID } from "~/helpers/generateUUID";
+import type { SharedMap } from "~/types/request";
 
 export const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
+export const TDK_USER_URL = "https://www.sozluk.gov.tr/?aranan=" as const;
 export const TDK_RECOMMENDATIONS_URL =
   "https://sozluk.gov.tr/oneri?soz=" as const;
 export const LUGGAT_URL = "https://www.luggat.com/" as const;
+export const LUGGAT_USER_URL = LUGGAT_URL;
 export const NISANYAN_URL =
   "https://www.nisanyansozluk.com/api/words/" as const;
+export const NISANYAN_USER_URL =
+  "https://www.nisanyansozluk.com/kelime/" as const;
 export const NISANYAN_AFFIX_URL =
   "https://www.nisanyansozluk.com/api/affixes-1/" as const;
+export const NISANYAN_AFFIX_USER_URL =
+  "https://www.nisanyansozluk.com/ek/" as const;
 export const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
+export const BENZER_USER_URL = BENZER_URL;
 
 const baseBuilder = (
   base: string,
   e: RequestEventBase | string,
   lowercase = true,
+  encode = false,
 ) => {
-  if (typeof e === "string") return base + e;
+  let s = "";
+  if (typeof e === "string") s = base + e;
   else {
     const sharedMap = loadSharedMap(e);
-    return (
+    s =
       base +
       (lowercase
         ? sharedMap.cleanedAndLowerCaseQuery
-        : sharedMap.lowerCaseQuery)
-    );
+        : sharedMap.lowerCaseQuery);
   }
+  return encode ? encodeURI(s) : s;
 };
 
 export const buildTDKUrl = (e: RequestEventBase | string, lowercase = true) => {
-  return baseBuilder(TDK_URL, e, lowercase);
+  const url = baseBuilder(TDK_URL, e, lowercase);
+  if (typeof e !== "string") {
+    e.sharedMap.set("data", {
+      ...e.sharedMap.get("data"),
+      urls: {
+        ...e.sharedMap.get("data").urls,
+        tdk: baseBuilder(TDK_USER_URL, e, lowercase, true),
+      },
+    } satisfies SharedMap);
+  }
+  return url;
 };
 
 export const buildTDKRecommendationsUrl = (
@@ -44,7 +64,17 @@ export const buildLuggatUrl = (
   e: RequestEventBase | string,
   lowercase = true,
 ) => {
-  return baseBuilder(LUGGAT_URL, e, lowercase);
+  const url = baseBuilder(LUGGAT_URL, e, lowercase);
+  if (typeof e !== "string") {
+    e.sharedMap.set("data", {
+      ...e.sharedMap.get("data"),
+      urls: {
+        ...e.sharedMap.get("data").urls,
+        luggat: baseBuilder(LUGGAT_USER_URL, e, lowercase, true),
+      },
+    } satisfies SharedMap);
+  }
+  return url;
 };
 
 export const buildNisanyanUrl = (
@@ -65,7 +95,17 @@ export const buildNisanyanUrl = (
     const session = e.sharedMap.get("sessionUUID") as string;
     s = word + `?session=${session}`;
   }
-  return baseBuilder(NISANYAN_URL, s, lowercase);
+  const url = baseBuilder(NISANYAN_URL, s, lowercase);
+  if (typeof e !== "string") {
+    e.sharedMap.set("data", {
+      ...e.sharedMap.get("data"),
+      urls: {
+        ...e.sharedMap.get("data").urls,
+        nisanyan: baseBuilder(NISANYAN_USER_URL, s, lowercase, true),
+      },
+    } satisfies SharedMap);
+  }
+  return url;
 };
 
 export const buildNisanyanAffixUrl = (
@@ -83,12 +123,32 @@ export const buildNisanyanAffixUrl = (
         lowercase ? sharedMap.lowerCaseQuery : sharedMap.query,
       ) + `?session=${session}`;
   }
-  return baseBuilder(NISANYAN_AFFIX_URL, s, lowercase);
+  const url = baseBuilder(NISANYAN_AFFIX_URL, s, lowercase, true);
+  if (typeof e !== "string") {
+    e.sharedMap.set("data", {
+      ...e.sharedMap.get("data"),
+      urls: {
+        ...e.sharedMap.get("data").urls,
+        nisanyan: baseBuilder(NISANYAN_AFFIX_USER_URL, s, lowercase),
+      },
+    } satisfies SharedMap);
+  }
+  return url;
 };
 
 export const buildBenzerUrl = (
   e: RequestEventBase | string,
   lowercase = false,
 ) => {
-  return baseBuilder(BENZER_URL, e, lowercase);
+  const url = baseBuilder(BENZER_URL, e, lowercase);
+  if (typeof e !== "string") {
+    e.sharedMap.set("data", {
+      ...e.sharedMap.get("data"),
+      urls: {
+        ...e.sharedMap.get("data").urls,
+        benzer: baseBuilder(BENZER_USER_URL, e, lowercase, true),
+      },
+    } satisfies SharedMap);
+  }
+  return url;
 };
