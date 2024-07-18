@@ -2,37 +2,52 @@ import type { SharedMap } from "#/request";
 import { generateUUID } from "#helpers/generateUUID";
 import { getRedirect } from "#helpers/redirect";
 import type { RequestHandler } from "@builder.io/qwik-city";
+import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
+import * as compressJSON from "compress-json";
+import { sha256 } from "~/helpers/sha256";
 
-export const onRequest: RequestHandler = async ({
-  url,
-  params,
-  redirect,
-  next,
-  sharedMap,
-  clientConn,
-}) => {
-  if (!params.query) return next();
-  const decoded = decodeURIComponent(params.query);
+export const onRequest: RequestHandler = async (e) => {
+  // Only run for /search/[query]
+  if (!e.params.query) return e.next();
+  ///////////////////////////////
+  const decoded = decodeURIComponent(e.params.query);
   const cleaned = decoded.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, "");
+  const key = decoded.toLocaleLowerCase("tr");
+  const cache = await getCacheByKey(e, key);
+  console.log("Cache:", cache);
   const data: SharedMap = {
     query: decoded,
-    lowerCaseQuery: params.query.toLocaleLowerCase("tr"),
+    lowerCaseQuery: e.params.query.toLocaleLowerCase("tr"),
     // remove all + and numbers
     cleanedQuery: cleaned,
     cleanedAndLowerCaseQuery: cleaned.toLocaleLowerCase("tr"),
-    cache: {},
+    cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
   };
-  sharedMap.set("data", data);
-  sharedMap.set("sessionUUID", generateUUID(clientConn));
+  e.sharedMap.set("data", data);
+  e.sharedMap.set("sessionUUID", generateUUID(e.clientConn));
 
-  const red = getRedirect(url, {
-    query: params.query,
+  const red = getRedirect(e.url, {
+    query: e.params.query,
   });
   if (red.shouldRedirect) {
-    throw redirect(red.code, red.to);
+    throw e.redirect(red.code, red.to);
   }
-  await next();
-  console.log("This is done");
-  console.log(sharedMap.get("data"));
+  await e.next();
+  const result = e.sharedMap.get("data").result;
+  const compressed = JSON.stringify(compressJSON.compress(result));
+  // set the caches
+  if (!cache) {
+    await setCache(e, {
+      key,
+      data: compressed,
+    });
+  } else {
+    if (cache.hash !== sha256(compressed)) {
+      await updateCache(e, {
+        key,
+        data: compressed,
+      });
+    }
+  }
 };

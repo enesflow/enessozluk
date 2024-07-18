@@ -3,6 +3,7 @@
   "devDependencies": {
     "@builder.io/qwik": "^1.7.1",
     "@builder.io/qwik-city": "^1.7.1",
+    "@cloudflare/workers-types": "^4.20240712.0",
     "@types/eslint": "^8.56.10",
     "@types/node": "^20.12.7",
     "@typescript-eslint/eslint-plugin": "^7.7.1",
@@ -50,6 +51,7 @@
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
   "type": "module",
   "dependencies": {
+    "compress-json": "^3.1.0",
     "zod": "^3.23.8"
   }
 }

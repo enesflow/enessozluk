@@ -15,7 +15,7 @@ function toUUID(hash: string) {
 // Function to get UUID based on input string and version
 export function getUuid(name: string) {
   const hash = sha256(name);
-  return toUUID(hash ?? "");
+  return toUUID(hash);
 }
 
 export function generateUUID(
