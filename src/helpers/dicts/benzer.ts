@@ -25,6 +25,7 @@ function buildBenzerAPIError(
 ): BenzerResponseError {
   debugAPI(e, `Benzer API Error: ${title}`);
   return {
+    names: [],
     url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
@@ -50,6 +51,7 @@ function parseBenzer(
     ).length;
     if (isCaptcha) {
       return {
+        names: [query],
         url,
         isUnsuccessful: true,
         serverDefinedCaptchaError: true,
@@ -61,6 +63,7 @@ function parseBenzer(
     const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
     if (suggestionBox.length === 0) {
       return {
+        names: [query],
         url,
         isUnsuccessful: true,
       };
@@ -73,6 +76,7 @@ function parseBenzer(
     );
     if (didYouMeanWord) {
       return {
+        names: [query],
         url,
         isUnsuccessful: true,
         serverDefinedErrorText: DID_YOU_MEAN,
@@ -81,6 +85,7 @@ function parseBenzer(
       };
     }
     return {
+      names: [query],
       url,
       isUnsuccessful: true,
       words,
@@ -109,6 +114,7 @@ function parseBenzer(
 
   if (words.size === 0) {
     return {
+      names: [query],
       url,
       isUnsuccessful: true,
       serverDefinedErrorText: NO_RESULT,
