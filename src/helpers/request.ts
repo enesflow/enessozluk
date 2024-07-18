@@ -45,11 +45,38 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
   url: string,
   returnType: T = "json" as T,
   init?: RequestInit,
-): Promise<T extends "json" ? unknown : string> {
-  const res = await fetch(url, init);
-  const error = buildError(res);
-  if (error) throw error;
-  return returnType === "json" ? res.json() : res.text();
+): Promise<
+  | {
+      data: T extends "json" ? unknown : string;
+      success: true;
+      code: number;
+      response: Response;
+    }
+  | {
+      success: false;
+      error: Error;
+      code: number;
+      response: Response;
+    }
+> {
+  const response = await fetch(url, init);
+  const error = buildError(response);
+  if (error) {
+    // throw error
+    return {
+      success: false,
+      code: response.status,
+      error,
+      response,
+    };
+  }
+  /* return returnType === "json" ? res.json() : res.text(); */
+  return {
+    success: true,
+    code: response.status,
+    data: returnType === "json" ? await response.json() : await response.text(),
+    response,
+  };
 }
 
 const Packages: Record<Dicts, ZodSchema> = {

@@ -20,8 +20,16 @@ import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
-  const response = await fetchAPI(url);
-  const data = TDKRecommendationSchema.parse(response);
+  const [error, response] = await to(fetchAPI(url));
+  if (error || !response?.success) {
+    debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
+    return [
+      { madde: "Tekrar" },
+      { madde: "dene-" },
+      { madde: loadSharedMap(e).query as string },
+    ];
+  }
+  const data = TDKRecommendationSchema.parse(response.data);
   return data;
 };
 
@@ -88,15 +96,18 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   const url = buildTDKUrl(e);
   const [error, response] = await to(fetchAPI(url));
   // Returns error if request failed
-  if (error) {
-    debugAPI(e, `TDK API Error: ${error.message}`);
-    return buildTDKAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
+  if (error || !response?.success) {
+    debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
+    return buildTDKAPIError(
+      e,
+      `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
+    );
   }
-  const parsed = TDKResponseSchema.safeParse(response);
+  const parsed = TDKResponseSchema.safeParse(response.data);
   // Error handling
   {
     // Returns recommendations if the response is an error or has no results
-    const error = TDKResponseErrorSchema.safeParse(response);
+    const error = TDKResponseErrorSchema.safeParse(response.data);
     const first = (parsed.data as TDKResponse | undefined)?.[0];
     if (error.success || !first || !("anlamlarListe" in first)) {
       const data: TDKResponseError = {

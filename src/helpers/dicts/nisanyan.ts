@@ -147,8 +147,8 @@ function cleanseNisanyanResponse(
         })) ?? [],
     };
   }
-  data.fiveAfter = data.fiveAfter.map(mapper);
-  data.fiveBefore = data.fiveBefore.map(mapper);
+  data.fiveAfter = data.fiveAfter?.map(mapper);
+  data.fiveBefore = data.fiveBefore?.map(mapper);
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
@@ -175,14 +175,17 @@ const loadNisanyanWord = server$(
     const url = buildNisanyanUrl(e);
     const [error, response] = await to(fetchAPI(url));
     // Returns error if request failed
-    if (error) {
-      return buildNisanyanAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
+    if (error || !response?.success) {
+      return buildNisanyanAPIError(
+        e,
+        `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
+      );
     }
-    const parsed = NisanyanResponseSchema.safeParse(response);
+    const parsed = NisanyanResponseSchema.safeParse(response.data);
     // Error handling
     {
       // Returns recommendations if the response is an error or has no results
-      const error = NisanyanResponseErrorSchema.safeParse(response);
+      const error = NisanyanResponseErrorSchema.safeParse(response.data);
       if (error.success) {
         return setSharedMapResult(e, "nisanyan", error.data);
       }
@@ -202,7 +205,7 @@ const loadNisanyanWord = server$(
 function cleanseNisanyanAffixResponse(
   e: RequestEventBase,
   data: NisanyanAffixPackage,
-): NisanyanAffixPackage {
+): NisanyanWordPackage {
   const words = ((data: any): NisanyanWord[] => {
     //get all the keys
     const keys = Object.keys(data);
@@ -216,19 +219,28 @@ function cleanseNisanyanAffixResponse(
   })(data);
   if ("affix" in data)
     return {
-      affix: data.affix,
       isUnsuccessful: false,
+      serverDefinedIsGeneratedFromAffix: true,
       words: [
         {
           serverDefinedTitleDescription: `${words.length} kelime`,
           _id: data.affix._id,
+          actualTimeUpdated: data.affix.timeUpdated,
+          etymologies: [],
+          id_depr: data.affix.id_depr,
           name: data.affix.name,
-          note: data.affix.note,
-          referenceOf: data.words?.map((word) => ({
-            _id: word._id,
-            name: word.name,
-            histories: word.histories,
+          note: data.affix.description,
+          queries: [],
+          references: [],
+          referenceOf: words.map((word) => ({
+            ...word,
+            similarWords: [],
+            histories: [],
+            referenceOf: [],
+            misspellings: [],
           })),
+          timeCreated: data.affix.timeCreated,
+          timeUpdated: data.affix.timeUpdated,
         },
       ],
     };
@@ -237,8 +249,10 @@ function cleanseNisanyanAffixResponse(
   }
 }
 
+// This returns NisanyanWordPackage instead of NisanyanAffixPackage
+//  because we don't want to rewrite the frontend to handle affixes
 const loadNisanyanAffix = server$(
-  async function (): Promise<NisanyanAffixPackage> {
+  async function (): Promise<NisanyanWordPackage> {
     const e = this;
     // If there is data in cache, return it
     {
@@ -248,18 +262,22 @@ const loadNisanyanAffix = server$(
     const url = buildNisanyanAffixUrl(e);
     const [error, response] = await to(fetchAPI(url));
     // Returns error if request failed
-    if (error) {
-      return buildNisanyanAPIError(e, `${API_FAILED_TEXT}: ${error.message}`);
+    if (error || !response?.success) {
+      /* console.log("no affix"); */
+      try {
+        return loadNisanyanWord.call(e);
+      } catch (error) {
+        return buildNisanyanAPIError(
+          e,
+          `${API_FAILED_TEXT}: ${(error as Error | undefined)?.message || response?.code}`,
+        );
+      }
     }
-    const parsed = NisanyanAffixResponseSchema.safeParse(response);
-    /* console.log(JSON.stringify(parsed.error, null, 2));
-
-    console.log(response);
-    return buildNisanyanAPIError(e, "debug"); */
+    const parsed = NisanyanAffixResponseSchema.safeParse(response.data);
     // Error handling
     {
       // Returns recommendations if the response is an error or has no results
-      const error = NisanyanAffixResponseErrorSchema.safeParse(response);
+      const error = NisanyanAffixResponseErrorSchema.safeParse(response.data);
       if (error.success) {
         return buildNisanyanAPIError(e, NO_RESULT);
       }

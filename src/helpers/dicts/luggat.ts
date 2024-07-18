@@ -33,7 +33,10 @@ function parseLuggat(e: RequestEventBase, response: string): LuggatPackage {
     const words: LuggatResponse["words"] = [];
     const wordElements = $(".arama-sonucu-div");
     if (wordElements.length === 0) {
-      return buildLuggatAPIError(e, NO_RESULT);
+      return {
+        isUnsuccessful: true,
+        serverDefinedErrorText: NO_RESULT,
+      };
     }
     wordElements.each((_, element) => {
       const name = $(element)
@@ -87,18 +90,27 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
     if (cache) return setSharedMapResult(e, "luggat", cache);
   } /////////////////////////////
   const url = buildLuggatUrl(e);
-  const [error, responseHTML] = await to(fetchAPI(url, "html"));
+  const [error, response] = await to(fetchAPI(url, "html"));
   // Returns error if request failed
-  if (error || !responseHTML) {
+  if (error || !response?.success) {
     debugAPI(e, `Luggat API Error: ${error?.message || "No response"}`);
-    return buildLuggatAPIError(e, API_FAILED_TEXT);
+    // return buildLuggatAPIError(e, API_FAILED_TEXT);
+    // if 4xx, return no result
+    if (response?.code && Math.floor(response.code / 100) === 4) {
+      return setSharedMapResult(e, "luggat", {
+        serverDefinedErrorText: NO_RESULT,
+        isUnsuccessful: true,
+      });
+    } else {
+      return buildLuggatAPIError(e, API_FAILED_TEXT);
+    }
   }
-  const response = parseLuggat(e, responseHTML);
-  const parsed = LuggatResponseSchema.safeParse(response);
+  const result = parseLuggat(e, response.data);
+  const parsed = LuggatResponseSchema.safeParse(result);
   // Error handling
   {
     // Returns recommendations if the response is an error or has no results
-    const error = LuggatResponseErrorSchema.safeParse(response);
+    const error = LuggatResponseErrorSchema.safeParse(result);
     if (error.success) {
       const data: LuggatResponseError = {
         serverDefinedErrorText: NO_RESULT,

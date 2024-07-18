@@ -1,7 +1,7 @@
 import type {
   NisanyanEtymology,
-  NisanyanPackage,
   NisanyanResponse,
+  NisanyanWordPackage,
 } from "#/nisanyan";
 import { NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
@@ -172,7 +172,7 @@ function formatRelation(etm: NisanyanEtymology): string {
     const relationOverride = {
       "~?": "bir sözcükten alıntı olabilir; ancak bu kesin değildir.",
     } as Record<string, string>;
-    const _relationOverrid = relationOverride[etm.relation.abbreviation ?? ""];
+    const _relationOverrid = relationOverride[etm.relation.abbreviation];
     const _relation = (_relationOverrid || etm.relation.text).split(" ");
     const relationFirst = _relation.shift();
     const relationRest = " " + _relation.join(" ");
@@ -207,7 +207,7 @@ function getWordTitle(index: number, name: string) {
 }
 
 export const NisanyanView = component$<{
-  data: NisanyanPackage;
+  data: NisanyanWordPackage;
 }>(({ data }) => {
   return (
     <>
@@ -252,10 +252,10 @@ export const NisanyanView = component$<{
                   )}
                 </i>
               </h2>
-              <section class="result-section">
-                <h2 class="result-subtitle">Köken</h2>
-                {(word.etymologies ?? []).length > 0 &&
-                  word.etymologies?.map((etymology, index) => (
+              {!!word.etymologies?.length && (
+                <section class="result-section">
+                  <h2 class="result-subtitle">Köken</h2>
+                  {word.etymologies.map((etymology, index) => (
                     <ul key={index} class="result-list">
                       <li
                         class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
@@ -287,19 +287,25 @@ export const NisanyanView = component$<{
                       </li>
                     </ul>
                   ))}
-                {(word.references ?? []).length > 0 && (
-                  <p class="result-description">
-                    Daha fazla bilgi için{" "}
-                    <WordLinks
-                      words={word.references!.map((ref) => ref.name)}
-                    />{" "}
-                    maddelerine bakınız.
-                  </p>
-                )}
-              </section>
+                  {!!word.references?.length && (
+                    <p class="result-description">
+                      Daha fazla bilgi için{" "}
+                      <WordLinks
+                        words={word.references!.map((ref) => ref.name)}
+                      />{" "}
+                      maddelerine bakınız.
+                    </p>
+                  )}
+                </section>
+              )}
+
               {word.note && (
                 <section class="result-section">
-                  <h2 class="result-subtitle">Ek açıklama</h2>
+                  <h2 class="result-subtitle">
+                    {data.serverDefinedIsGeneratedFromAffix
+                      ? "Açıklama"
+                      : "Ek açıklama"}
+                  </h2>
                   <ul class="result-list">
                     {word.note
                       .split(NISANYAN_NEWLINE_DET_REGEX)
@@ -335,39 +341,40 @@ export const NisanyanView = component$<{
                   <WordLinks words={word.misspellings} />
                 </section>
               )}
-              {!word.histories ? (
-                <p class="result-description">
-                  <i>Henüz tarihçe eklenmemiş.</i>
-                </p>
-              ) : (
-                <section class="result-section">
-                  <h2 class="result-subtitle">
-                    Tarihçe (tespit edilen en eski Türkçe kaynak ve diğer
-                    örnekler)
-                  </h2>
-                  {word.histories.map((history, index) => (
-                    <div key={index} class="result-subitem">
-                      <p>
-                        <strong>{history.language?.name}</strong>
-                        <span>
-                          {" "}
-                          [
-                          {history.source?.book ||
-                            history.source?.name ||
-                            "Bilinmiyor"}
-                          , {convertDate(history.date)}]
+              {!data.serverDefinedIsGeneratedFromAffix &&
+                (!word.histories ? (
+                  <p class="result-description">
+                    <i>Henüz tarihçe eklenmemiş.</i>
+                  </p>
+                ) : (
+                  <section class="result-section">
+                    <h2 class="result-subtitle">
+                      Tarihçe (tespit edilen en eski Türkçe kaynak ve diğer
+                      örnekler)
+                    </h2>
+                    {word.histories.map((history, index) => (
+                      <div key={index} class="result-subitem">
+                        <p>
+                          <strong>{history.language?.name}</strong>
+                          <span>
+                            {" "}
+                            [
+                            {history.source?.book ||
+                              history.source?.name ||
+                              "Bilinmiyor"}
+                            , {convertDate(history.date)}]
+                          </span>
+                        </p>
+                        <span class="result-quote">
+                          <TextWithLinks
+                            regex={NISANYAN_LINK_REGEX}
+                            text={formatSpecialChars(history.quote)}
+                          />
                         </span>
-                      </p>
-                      <span class="result-quote">
-                        <TextWithLinks
-                          regex={NISANYAN_LINK_REGEX}
-                          text={formatSpecialChars(history.quote)}
-                        />
-                      </span>
-                    </div>
-                  ))}
-                </section>
-              )}
+                      </div>
+                    ))}
+                  </section>
+                ))}
             </li>
           ))}
         </ul>

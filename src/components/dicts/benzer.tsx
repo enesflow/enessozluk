@@ -206,7 +206,7 @@ export const BenzerView = component$<{
           <p class="error-message">
             {data.value.serverDefinedErrorText ?? NO_RESULT}
           </p>
-          {(data.value.words ?? []).length > 0 && (
+          {!!data.value.words?.length && (
             <>
               <div class="result-item result-subitem">
                 Öneriler: <Recommendations words={data.value.words!} />

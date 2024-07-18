@@ -44,15 +44,19 @@ export const buildNisanyanUrl = (
   e: RequestEventBase | string,
   lowercase = true,
 ) => {
+  const word = (
+    typeof e === "string"
+      ? e
+      : lowercase
+        ? loadSharedMap(e).lowerCaseQuery
+        : loadSharedMap(e).query
+  ).replaceAll("+", "");
   let s = "";
   if (typeof e === "string") {
-    s = e + `?session=${generateUUID()}`;
+    s = word + `?session=${generateUUID()}`;
   } else {
     const session = e.sharedMap.get("sessionUUID") as string;
-    const sharedMap = loadSharedMap(e);
-    s =
-      (lowercase ? sharedMap.lowerCaseQuery : sharedMap.query) +
-      `?session=${session}`;
+    s = word + `?session=${session}`;
   }
   return baseBuilder(NISANYAN_URL, s, lowercase);
 };
