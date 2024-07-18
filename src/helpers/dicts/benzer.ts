@@ -116,7 +116,7 @@ function parseBenzer(
   }
 
   return {
-    name: query,
+    names: [query],
     url,
     isUnsuccessful: false,
     words: Array.from(words),
@@ -132,7 +132,8 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   if (!sharedMap.forceFetch.benzer) {
     const cache = loadCache(e, "benzer") as BenzerPackage | null;
     if (cache) {
-      if ("name" in cache ? cache.name : "" !== sharedMap.query) {
+      console.log("cache names", (cache as any).names);
+      if (!(sharedMap.query in ("names" in cache ? cache.names : []))) {
         // This means the casing between the query and the cache is different
         // we will refetch the data, append it to the cache and return it
         e.sharedMap.set("data", {
@@ -146,6 +147,10 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
         return setSharedMapResult(e, "benzer", {
           ...cache,
           words: [...(cache.words ?? []), ...(fetched.words ?? [])],
+          names: [
+            ...("names" in cache ? cache.names : []),
+            ...("names" in fetched ? fetched.names : []),
+          ],
           moreWords: {
             ...("moreWords" in cache ? cache.moreWords : {}),
             ...("moreWords" in fetched ? fetched.moreWords : {}),
