@@ -138,8 +138,8 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   if (!sharedMap.forceFetch.benzer) {
     const cache = loadCache(e, "benzer") as BenzerPackage | null;
     if (cache) {
-      console.log("cache names", (cache as any).names);
-      if (!(sharedMap.query in ("names" in cache ? cache.names : []))) {
+      console.log("cache names", sharedMap.cleanedQuery, (cache as any).names);
+      if (!(sharedMap.cleanedQuery in ("names" in cache ? cache.names : []))) {
         // This means the casing between the query and the cache is different
         // we will refetch the data, append it to the cache and return it
         e.sharedMap.set("data", {
@@ -150,17 +150,22 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
           },
         });
         const fetched = await benzerLoader.call(e);
+        const newWords = [...(cache.words ?? []), ...(fetched.words ?? [])];
+        const newNames = [
+          ...("names" in cache ? cache.names : []),
+          ...("names" in fetched ? fetched.names : []),
+        ];
+        const newMoreWords = {
+          ...("moreWords" in cache ? cache.moreWords : {}),
+          ...("moreWords" in fetched ? fetched.moreWords : {}),
+        };
         return setSharedMapResult(e, "benzer", {
           ...cache,
-          words: [...(cache.words ?? []), ...(fetched.words ?? [])],
-          names: [
-            ...("names" in cache ? cache.names : []),
-            ...("names" in fetched ? fetched.names : []),
-          ],
-          moreWords: {
-            ...("moreWords" in cache ? cache.moreWords : {}),
-            ...("moreWords" in fetched ? fetched.moreWords : {}),
-          },
+          isUnsuccessful:
+            newWords.length > 0 || Object.keys(newMoreWords).length > 0,
+          words: newWords,
+          names: newNames,
+          moreWords: newMoreWords,
         });
       }
       return setSharedMapResult(e, "benzer", cache);
@@ -211,11 +216,6 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
         e.sharedMap.set("data", sharedMap);
         return benzerLoader.call(e);
       }
-      /* const data: BenzerResponseError = {
-        serverDefinedErrorText: NO_RESULT,
-        isUnsuccessful: true,
-      };
-      return setSharedMapResult(e, "benzer", data); */
       if (error.data.serverDefinedCaptchaError) return error.data;
       else return setSharedMapResult(e, "benzer", error.data);
     }
