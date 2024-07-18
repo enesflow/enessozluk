@@ -2,8 +2,13 @@ import type { Dicts } from "#/dicts";
 import type { SharedMap } from "#/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import type { ZodSchema, z } from "zod";
+import { BenzerPackageSchema } from "~/types/benzer";
 import { LuggatPackageSchema } from "~/types/luggat";
-import { TDKPackageSchema } from "~/types/tdk";
+import {
+  NisanyanAffixPackageSchema,
+  NisanyanPackageSchema,
+} from "~/types/nisanyan";
+import { TDKPackageSchema, TDKRecommendationSchema } from "~/types/tdk";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -82,10 +87,10 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
 const Packages: Record<Dicts, ZodSchema> = {
   tdk: TDKPackageSchema,
   luggat: LuggatPackageSchema,
-  "nisanyan-affix": TDKPackageSchema, // TODO: change this
-  "tdk-rec": TDKPackageSchema, // TODO: change this
-  benzer: TDKPackageSchema, // TODO: change this
-  nisanyan: TDKPackageSchema, // TODO: change this
+  "nisanyan-affix": NisanyanAffixPackageSchema,
+  "tdk-rec": TDKRecommendationSchema,
+  benzer: BenzerPackageSchema,
+  nisanyan: NisanyanPackageSchema,
 } as const;
 
 // TODO: fix this, the return type is "any"
