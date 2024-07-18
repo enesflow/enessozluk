@@ -13,10 +13,9 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
-import { Recommendations } from "~/components/recommendations";
-import { WordLinks } from "../WordLinks";
-import { BENZER_URL } from "~/helpers/dicts/url";
 import { benzerLoader } from "~/helpers/dicts/benzer";
+import { BENZER_URL } from "~/helpers/dicts/url";
+import { WordLinks } from "../WordLinks";
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
@@ -125,7 +124,7 @@ export const BenzerView = component$<{
           {!!data.value.words?.length && (
             <>
               <div class="result-item result-subitem">
-                Öneriler: <Recommendations words={data.value.words!} />
+                Öneriler: <WordLinks words={data.value.words!} />
               </div>
             </>
           )}

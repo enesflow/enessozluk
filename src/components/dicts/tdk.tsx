@@ -2,7 +2,6 @@ import type { TDKPackage } from "#/tdk";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { LinkR } from "../linkWithRedirect";
-import { Recommendations } from "../recommendations";
 import { WordLinks } from "../WordLinks";
 
 const TDK_LINK_DET = "► " as const;
@@ -57,8 +56,12 @@ export const TDKView = component$<{
             <>
               <div class="result-item result-subitem">
                 Öneriler:{" "}
-                <Recommendations
-                  words={data.recommendations.map((rec) => rec.madde)}
+                <WordLinks
+                  words={data.recommendations
+                    .map((rec) => rec.madde)
+                    .filter(
+                      (value, index, self) => self.indexOf(value) === index,
+                    )}
                 />
               </div>
             </>

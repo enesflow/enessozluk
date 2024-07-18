@@ -6,8 +6,22 @@ import {
   useTask$,
 } from "@builder.io/qwik";
 import { Link, useLocation } from "@builder.io/qwik-city";
-import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "./dicts/nisanyan";
 import { LinkR } from "./linkWithRedirect";
+import { convertToRoman } from "~/helpers/roman";
+
+export function putTheNumbersAtTheEndAsRomanToTheBeginning(
+  text: string,
+): string {
+  // example: a1 -> (I) a
+  console.log("Text", text);
+  const match = text.match(/(\d+)$/);
+  if (match) {
+    const number = match[1];
+    const romanNumber = convertToRoman(parseInt(number));
+    return `(${romanNumber}) ${text.replace(number, "").trim()}`;
+  }
+  return text;
+}
 
 export const WordLinks = component$<{
   words: string[] | undefined;

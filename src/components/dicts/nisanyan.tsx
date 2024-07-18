@@ -7,7 +7,6 @@ import { NO_RESULT } from "#helpers/constants";
 import { convertToRoman } from "#helpers/roman";
 import { removeNumbersAtEnd } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
-import { Recommendations } from "~/components/recommendations";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
@@ -52,19 +51,6 @@ function convertDate(date: string): string {
   }
   return date;
 }
-export function putTheNumbersAtTheEndAsRomanToTheBeginning(
-  text: string,
-): string {
-  // example: a1 -> (I) a
-  const match = text.match(/(\d+)$/);
-  if (match) {
-    const number = match[1];
-    const romanNumber = convertToRoman(parseInt(number));
-    return `(${romanNumber}) ${text.replace(number, "").trim()}`;
-  }
-  return text;
-}
-
 function formatSpecialChars(str: string): string {
   // Handle nested tags by processing them in stages
   const stages = [
@@ -220,7 +206,7 @@ export const NisanyanView = component$<{
             <>
               <div class="result-item result-subitem">
                 Öneriler:{" "}
-                <Recommendations
+                <WordLinks
                   words={Array.from(
                     new Set([
                       ...data.words.map((word) => word.name),
