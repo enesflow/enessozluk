@@ -100,10 +100,8 @@ export function loadCache<T extends Dicts>(
 ): z.infer<(typeof Packages)[T]> | null {
   const sharedMap = loadSharedMap(e);
   const cache = (sharedMap.cache as any)[dict]; // TODO: change this
-  console.log("For", dict, "cache is", cache);
   if (!cache) return null;
   const parsed = Packages[dict].safeParse(cache);
-  console.log("Parsed", parsed);
   return parsed.success ? parsed.data : null;
 }
 

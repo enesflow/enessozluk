@@ -262,7 +262,6 @@ const loadNisanyanAffix = server$(
     const [error, response] = await to(fetchAPI(url));
     // Returns error if request failed
     if (error || !response?.success) {
-      /* console.log("no affix"); */
       try {
         return loadNisanyanWord.call(e);
       } catch (error) {

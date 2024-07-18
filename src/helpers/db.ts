@@ -23,7 +23,6 @@ export function getDB(e: RequestEventBase): D1Database | undefined {
     return e.sharedMap.get("db") as D1Database;
   }
   const DB = e.platform.env?.DB as D1Database;
-  console.log("DB is", DB);
   e.sharedMap.set("db", DB);
   return DB;
 }
@@ -32,13 +31,8 @@ export async function getCacheByKey(
   e: RequestEventBase,
   key: string,
 ): Promise<Cache | null> {
-  console.log("getCacheByKey", key);
   const db = getDB(e);
   if (!db) return null;
-  console.log(
-    "hey",
-    await db.prepare("SELECT * from cache WHERE key = ?").bind(key).all(),
-  );
   const result = await db
     .prepare("SELECT * from cache WHERE key = ?")
     .bind(key)
@@ -55,7 +49,6 @@ export async function setCache(e: RequestEventBase, input: CacheInput) {
     time: Date.now(),
     hash: sha256(input.data),
   };
-  console.log("setCache", cache);
   await db
     .prepare("INSERT INTO cache (key, data, time, hash) VALUES (?, ?, ?, ?)")
     .bind(cache.key, cache.data, cache.time, cache.hash)

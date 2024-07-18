@@ -45,9 +45,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 src={src}
                 onLoad$={async () => {
                   loaded.value++;
-                  console.log("loaded", loaded.value);
                   if (loaded.value === 2) {
-                    console.log("reloading");
                     localStorage.removeItem(LOCAL_STORAGE_ITEM);
                     show.value = false;
                     await callback?.();
