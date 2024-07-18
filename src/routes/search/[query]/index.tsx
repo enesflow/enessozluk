@@ -26,16 +26,11 @@ type URLs = {
   benzer: string;
 };
 
-const test = server$(function (this: RequestEventBase) {
-  console.log("urls", loadSharedMap(this).urls);
-});
-
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
   await e.resolveValue(useTDKLoader);
   await e.resolveValue(useNisanyanLoader);
   await e.resolveValue(useLuggatLoader);
   await e.resolveValue(useBenzerLoader);
-  test();
   const sharedMap = loadSharedMap(e);
   console.log(sharedMap);
   return {
