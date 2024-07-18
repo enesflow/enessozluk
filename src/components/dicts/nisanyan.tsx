@@ -265,7 +265,10 @@ export const NisanyanView = component$<{
                         index !== 0 ? (
                           <span>ve </span>
                         ) : (
-                          index !== 0 && <span>Bu sözcük </span>
+                          index !== 0 &&
+                          etymology.relation.abbreviation !== "/" && (
+                            <span>Bu sözcük </span>
+                          )
                         )}
                         {etymology.languages.every(
                           (language) => language.abbreviation === "?",
