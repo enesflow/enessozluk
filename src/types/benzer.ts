@@ -10,6 +10,7 @@ export const BenzerResponseErrorSchema = z.object({
   isUnsuccessful: z.literal(true),
   serverDefinedErrorText: z.string().optional(),
   serverDefinedCaptchaError: z.boolean().optional(),
+  serverDefinedReFetchWith: z.string().optional(),
   words: z.array(z.string()).optional(),
 });
 

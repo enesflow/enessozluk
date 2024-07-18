@@ -111,11 +111,12 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
     // Returns recommendations if the response is an error or has no results
     const error = LuggatResponseErrorSchema.safeParse(result);
     if (error.success) {
-      const data: LuggatResponseError = {
+      /* const data: LuggatResponseError = {
         serverDefinedErrorText: NO_RESULT,
         isUnsuccessful: true,
       };
-      return setSharedMapResult(e, "luggat", data);
+      return setSharedMapResult(e, "luggat", data); */
+      return setSharedMapResult(e, "luggat", error.data);
     }
     // Returns error if parsing failed
     if (!parsed.success) {

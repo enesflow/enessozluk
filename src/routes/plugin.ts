@@ -11,6 +11,7 @@ export const onRequest: RequestHandler = async ({
   sharedMap,
   clientConn,
 }) => {
+  if (!params.query) return next();
   const data: SharedMap = {
     query: params.query,
     lowerCaseQuery: params.query.toLocaleLowerCase("tr"),

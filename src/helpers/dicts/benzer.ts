@@ -1,16 +1,18 @@
 import type { RequestEventBase } from "@builder.io/qwik-city";
-import { routeLoader$ } from "@builder.io/qwik-city";
+import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { load } from "cheerio";
-import { API_FAILED_TEXT, NO_RESULT } from "~/helpers/constants";
+import { API_FAILED_TEXT, DID_YOU_MEAN, NO_RESULT } from "~/helpers/constants";
 import { buildBenzerUrl } from "~/helpers/dicts/url";
 import { debugAPI } from "~/helpers/log";
-import { fetchAPI, loadCache, setSharedMapResult } from "~/helpers/request";
+import {
+  fetchAPI,
+  getFakeHeaders,
+  loadCache,
+  loadSharedMap,
+  setSharedMapResult,
+} from "~/helpers/request";
 import { to } from "~/helpers/to";
-import type {
-  BenzerPackage,
-  BenzerResponse,
-  BenzerResponseError,
-} from "~/types/benzer";
+import type { BenzerPackage, BenzerResponseError } from "~/types/benzer";
 import {
   BenzerResponseErrorSchema,
   BenzerResponseSchema,
@@ -27,22 +29,129 @@ function buildBenzerAPIError(
   };
 }
 
-function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {}
+function parseBenzer(e: RequestEventBase, response: string): BenzerPackage {
+  const sharedMap = loadSharedMap(e);
+  const query = sharedMap.query;
+  const $ = load(response);
 
-// eslint-disable-next-line qwik/loader-location
-export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
+  // Extract words from the first list
+  const words = new Set<string>();
+  const entryContentMain = $(".entry-content-main ul li a");
+
+  if (entryContentMain.length === 0) {
+    const isCaptcha = $(
+      "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
+    ).length;
+    if (isCaptcha) {
+      return {
+        isUnsuccessful: true,
+        serverDefinedCaptchaError: true,
+        serverDefinedErrorText:
+          "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
+        words: ["Tekrar", "dene-", query],
+      };
+    }
+    const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
+    if (suggestionBox.length === 0) {
+      return {
+        isUnsuccessful: true,
+      };
+    }
+    const words = suggestionBox.toArray().map((element) => $(element).text());
+    const didYouMeanWord = words.find(
+      (word) =>
+        query.toLocaleLowerCase("tr") === word.toLocaleLowerCase("tr") &&
+        word !== query,
+    );
+    if (didYouMeanWord) {
+      return {
+        isUnsuccessful: true,
+        serverDefinedErrorText: DID_YOU_MEAN,
+        serverDefinedReFetchWith: didYouMeanWord,
+        words: [didYouMeanWord],
+      };
+    }
+    return {
+      isUnsuccessful: true,
+      words,
+    };
+  }
+
+  entryContentMain.each((_, element) => {
+    words.add($(element).text());
+  });
+
+  // Extract more words from the second list
+  const moreWords: { [key: string]: string[] } = {};
+  $(".entry-content-sub").each((_, element) => {
+    const category = $(element)
+      .find(".entry-content-sub-title a")
+      .first()
+      .text();
+    const categoryWords = $(element)
+      .find(".entry-content-sub-content ul li a")
+      .toArray()
+      .map((elem) => $(elem).text())
+      .filter((text) => !words.has(text) && text !== query)
+      .sort((a, b) => a.localeCompare(b, "tr"));
+    moreWords[category] = categoryWords;
+  });
+
+  if (words.size === 0) {
+    return {
+      isUnsuccessful: true,
+      serverDefinedErrorText: NO_RESULT,
+    };
+  }
+
+  return {
+    isUnsuccessful: false,
+    words: Array.from(words),
+    moreWords,
+  };
+}
+
+export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
+  const e = this;
+  const sharedMap = loadSharedMap(e);
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "benzer");
     if (cache) return setSharedMapResult(e, "benzer", cache);
   } /////////////////////////////
+
+  // We do some cookie manupulation so that we don't hit the captcha too often
+  const cookieText = Object.entries(e.cookie)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("; ");
+  //////////////////
   const url = buildBenzerUrl(e);
-  const [error, response] = await to(fetchAPI(url, "html"));
+  const [error, response] = await to(
+    fetchAPI(url, "html", {
+      ...e.request,
+      headers: {
+        // disguise as a browser
+        ...e.request.headers,
+        ...getFakeHeaders(),
+        "x-real-ip": e.clientConn.ip,
+        cookie: cookieText,
+      },
+    }),
+  );
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `Benzer API Error: ${error?.message || "No response"}`);
     return buildBenzerAPIError(e, API_FAILED_TEXT);
   }
+  // We set the cookies
+  response.raw.headers
+    .get("set-cookie")
+    ?.split("; ")
+    .forEach((cookieT) => {
+      const [key, value] = cookieT.split("=");
+      key && value && e.cookie.set(key, value, { path: "/" });
+    });
+  /////////////////////
   const result = parseBenzer(e, response.data);
   const parsed = BenzerResponseSchema.safeParse(result);
   // Error handling
@@ -50,11 +159,17 @@ export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
     // Returns recommendations if the response is an error or has no results
     const error = BenzerResponseErrorSchema.safeParse(result);
     if (error.success) {
-      const data: BenzerResponseError = {
+      if (error.data.serverDefinedReFetchWith) {
+        sharedMap.query = error.data.serverDefinedReFetchWith;
+        e.sharedMap.set("data", sharedMap);
+        return benzerLoader.call(e);
+      }
+      /* const data: BenzerResponseError = {
         serverDefinedErrorText: NO_RESULT,
         isUnsuccessful: true,
       };
-      return setSharedMapResult(e, "benzer", data);
+      return setSharedMapResult(e, "benzer", data); */
+      return setSharedMapResult(e, "benzer", error.data);
     }
     // Returns error if parsing failed
     if (!parsed.success) {
@@ -63,4 +178,9 @@ export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
   } /////////////////////////////
   const { data } = parsed;
   return setSharedMapResult(e, "benzer", data);
+});
+
+// eslint-disable-next-line qwik/loader-location
+export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
+  return benzerLoader.call(e);
 });

@@ -1,6 +1,5 @@
 import type {
   NisanyanAffixPackage,
-  NisanyanPackage,
   NisanyanResponse,
   NisanyanResponseError,
   NisanyanWordPackage,
@@ -295,10 +294,12 @@ const loadNisanyanAffix = server$(
 );
 
 // eslint-disable-next-line qwik/loader-location
-export const useNisanyanLoader = routeLoader$<NisanyanPackage>(async (e) => {
-  if (isWord(e.params.query)) {
-    return loadNisanyanWord.call(e);
-  } else {
-    return loadNisanyanAffix.call(e);
-  }
-});
+export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
+  async (e) => {
+    if (isWord(e.params.query)) {
+      return loadNisanyanWord.call(e);
+    } else {
+      return loadNisanyanAffix.call(e);
+    }
+  },
+);

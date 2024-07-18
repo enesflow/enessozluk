@@ -7,9 +7,10 @@ import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
-import { BenzerView, useBenzerLoader } from "../../../components/dicts/benzer";
+import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
+import { useBenzerLoader } from "~/helpers/dicts/benzer";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type Links = {

@@ -50,13 +50,13 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
       data: T extends "json" ? unknown : string;
       success: true;
       code: number;
-      response: Response;
+      raw: Response;
     }
   | {
       success: false;
       error: Error;
       code: number;
-      response: Response;
+      raw: Response;
     }
 > {
   const response = await fetch(url, init);
@@ -67,7 +67,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
       success: false,
       code: response.status,
       error,
-      response,
+      raw: response,
     };
   }
   /* return returnType === "json" ? res.json() : res.text(); */
@@ -75,7 +75,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
     success: true,
     code: response.status,
     data: returnType === "json" ? await response.json() : await response.text(),
-    response,
+    raw: response,
   };
 }
 
@@ -98,4 +98,53 @@ export function loadCache<T extends Dicts>(
   if (!cache) return null;
   const parsed = Packages[dict].safeParse(cache);
   return parsed.success ? parsed.data : null;
+}
+
+export function getFakeHeaders() {
+  const mostPopularUserAgents = [
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.37",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.38",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.39",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.40",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.41",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.42",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.43",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.44",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101 Firefox/45.0",
+    "Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko",
+    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_2) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0.4 Safari/605.1.15",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36",
+  ];
+
+  const acceptLanguages = [
+    "en-US,en;q=0.9",
+    "en-GB,en;q=0.8",
+    "en-US;q=0.7,en;q=0.3",
+  ];
+
+  const acceptEncodings = ["gzip, deflate, br", "gzip, deflate"];
+
+  return {
+    "user-agent":
+      mostPopularUserAgents[
+        Math.floor(Math.random() * mostPopularUserAgents.length)
+      ],
+    "accept-language":
+      acceptLanguages[Math.floor(Math.random() * acceptLanguages.length)],
+    "accept-encoding":
+      acceptEncodings[Math.floor(Math.random() * acceptEncodings.length)],
+    "upgrade-insecure-requests": "1",
+    "sec-fetch-mode": "navigate",
+    "sec-fetch-site": "none",
+    "sec-fetch-user": "?1",
+    "sec-fetch-dest": "document",
+    "cache-control": "max-age=0",
+    accept:
+      "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+  };
 }
