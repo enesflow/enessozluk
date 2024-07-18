@@ -38,6 +38,7 @@ export const onRequest: RequestHandler = async (e) => {
   const compressed = JSON.stringify(compressJSON.compress(result));
   // set the caches
   if (!cache) {
+    console.log("Setting cache");
     await setCache(e, {
       key,
       data: compressed,

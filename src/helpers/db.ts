@@ -54,6 +54,7 @@ export async function setCache(e: RequestEventBase, input: CacheInput) {
     time: Date.now(),
     hash: sha256(input.data),
   };
+  console.log("setCache", cache);
   await db
     .prepare("INSERT INTO cache (key, data, time, hash) VALUES (?, ?, ?, ?)")
     .bind(cache.key, cache.data, cache.time, cache.hash)
