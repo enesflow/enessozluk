@@ -41,7 +41,7 @@ export const onRequest: RequestHandler = async (e) => {
   if (!e.params.query) return e.next();
   ///////////////////////////////
   const decoded = decodeURIComponent(e.params.query);
-  const cleaned = decoded.replace(/[^a-zA-ZğüşöçıİĞÜŞÖÇ\s]/g, "");
+  const cleaned = decoded.replace(/[\d+]/g, "");
   const key = decoded.toLocaleLowerCase("tr");
   const cache = await getCacheByKey(e, key);
   const data: SharedMap = {

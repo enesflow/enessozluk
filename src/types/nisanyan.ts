@@ -88,7 +88,7 @@ export const NisanyanSourceSchema = z.object({
   _id: z.string(),
   name: z.string(),
   book: z.string(),
-  editor: z.string(),
+  editor: z.string().optional(),
   datePublished: z.string(),
   timeCreated: z.string().optional(),
   timeUpdated: z.string().optional(),

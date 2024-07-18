@@ -148,21 +148,28 @@ function formatOrigin(etm: NisanyanEtymology): string {
   return con.join(" veya ");
 }
 
-function formatRelation(etm: NisanyanEtymology): string {
+function formatRelation(
+  etm: NisanyanEtymology,
+  prev: NisanyanEtymology | undefined,
+  next: NisanyanEtymology | undefined,
+): string {
   if (etm.relation.abbreviation == "+") {
     return etm.serverDefinedEndOfJoin ? " sözcüklerinin bileşiğidir." : "";
   } else if (etm.relation.abbreviation == "§") return "";
   else if (etm.languages[0].abbreviation === "onom")
     return " ses yansımalı sözcüğüdür.";
   else {
+    const isOr = etm.relation.abbreviation === "/";
+    const orNext = next?.relation.abbreviation === "/";
     const relationOverride = {
       "~?": "bir sözcükten alıntı olabilir; ancak bu kesin değildir.",
     } as Record<string, string>;
     const _relationOverrid = relationOverride[etm.relation.abbreviation];
-    const _relation = (_relationOverrid || etm.relation.text).split(" ");
+    const _relation =
+      (_relationOverrid || (isOr ? prev : etm)?.relation.text)?.split(" ") ??
+      [];
     const relationFirst = _relation.shift();
-    const relationRest = " " + _relation.join(" ");
-
+    const relationRest = " " + (orNext ? "veya" : _relation.join(" "));
     const wordClass = _relationOverrid
       ? ""
       : ({
@@ -181,10 +188,18 @@ function formatRelation(etm: NisanyanEtymology): string {
     const suffix = etm.affixes?.suffix
       ? ` %l${etm.affixes.suffix.name} ekiyle `
       : "";
-    const dot = relationRest.endsWith(".") ? "" : ".";
-    return (
-      " " + wordClass + relationFirst + prefix + suffix + relationRest + dot
-    );
+    const dot = orNext ? false : true;
+    const base = (
+      " " +
+      wordClass +
+      relationFirst +
+      prefix +
+      suffix +
+      relationRest
+    ).replace(/\.$/, "");
+
+    // if dot, + "." else, remove the dot at the end if it exists with regex
+    return dot ? base + "." : base;
   }
 }
 
@@ -266,7 +281,11 @@ export const NisanyanView = component$<{
                             <span> {formatDefinition(etymology)}</span>
                             <TextWithLinks
                               regex={NISANYAN_LINK_REGEX}
-                              text={formatRelation(etymology)}
+                              text={formatRelation(
+                                etymology,
+                                word.etymologies?.[index - 1],
+                                word.etymologies?.[index + 1],
+                              )}
                             />
                           </>
                         )}

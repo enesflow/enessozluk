@@ -67,13 +67,13 @@ export const buildNisanyanUrl = (
   e: RequestEventBase | string,
   lowercase = true,
 ) => {
-  const word = (
+  const word = encodeURIComponent(
     typeof e === "string"
       ? e
       : lowercase
         ? loadSharedMap(e).lowerCaseQuery
-        : loadSharedMap(e).query
-  ).replaceAll("+", "");
+        : loadSharedMap(e).query,
+  );
   let s = "";
   if (typeof e === "string") {
     s = word + `?session=${generateUUID()}`;
