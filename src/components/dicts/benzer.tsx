@@ -1,8 +1,4 @@
-import type {
-  BenzerPackage,
-  BenzerResponse,
-  BenzerResponseError,
-} from "#/benzer";
+import type { BenzerPackage, BenzerResponseError } from "#/benzer";
 import { NO_RESULT } from "#helpers/constants";
 import type { QRL } from "@builder.io/qwik";
 import {
@@ -13,9 +9,11 @@ import {
   useVisibleTask$,
 } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
-import { benzerLoader } from "~/helpers/dicts/benzer";
 import { BENZER_URL } from "~/helpers/dicts/url";
 import { WordLinks } from "../WordLinks";
+import { benzerLoader } from "~/helpers/dicts/benzer";
+import { ExternalLink } from "~/components/externalLink";
+import { convertToRoman } from "~/helpers/roman";
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
@@ -130,14 +128,37 @@ export const BenzerView = component$<{
           )}
         </>
       ) : (
-        <section class="result-section">
-          <WordLinks
-            words={data.value.words}
-            more={Object.keys(data.value.moreWords).flatMap(
-              (category) => (data.value as BenzerResponse).moreWords[category],
-            )}
-          />
-        </section>
+        <ul class="results-list">
+          {data.value.words.map((word, index) => (
+            <li class="result-item" key={word.url}>
+              <h2 class="result-title">
+                <span class="mr-1">
+                  ({convertToRoman(index + 1)}) {word.name}
+                </span>
+                {data.value.words!.length > 1 && (
+                  <ExternalLink href={word.url} />
+                )}
+              </h2>
+              {
+                <ul class="results-list">
+                  <li class="result-subitem">{word.meaning}</li>
+                </ul>
+              }
+              {word.words.length ? (
+                <WordLinks
+                  words={word.words}
+                  more={Object.keys(word.moreWords).flatMap(
+                    (category) => word.moreWords[category],
+                  )}
+                />
+              ) : (
+                <p class="result-description">
+                  <i>{NO_RESULT}</i>
+                </p>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
     </>
   );

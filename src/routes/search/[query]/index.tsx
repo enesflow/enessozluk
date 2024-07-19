@@ -20,7 +20,7 @@ type URLs = {
   tdk: string;
   nisanyan: string;
   luggat: string;
-  benzer: string;
+  benzer: string[];
 };
 
 export const useURLsLoader = routeLoader$<URLs>(async (e) => {
@@ -32,7 +32,9 @@ export const useURLsLoader = routeLoader$<URLs>(async (e) => {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
     luggat: luggat.url,
-    benzer: benzer.url,
+    benzer: benzer.isUnsuccessful
+      ? [benzer.url]
+      : benzer.words.map((w) => w.url),
   };
 });
 
@@ -62,7 +64,10 @@ export default component$(() => {
         </h1>
         <LuggatView data={luggat.value} />
         <h1 style="results-heading">
-          Benzer Kelimeler Sonuçları: <ExternalLink href={urls.value.benzer} />
+          Benzer Kelimeler Sonuçları:{" "}
+          {urls.value.benzer.length === 1 && (
+            <ExternalLink href={urls.value.benzer[0]} />
+          )}
         </h1>
         <BenzerView data={benzer.value} />
       </div>
