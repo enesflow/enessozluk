@@ -90,6 +90,12 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   },
 );
 
+function makeBold(text: string) {
+  // make the text inside [] bold by using <strong> tag
+  // remove the [] from the text
+  return text.replace(/\[(.*?)\]/g, "<strong>$1</strong>");
+}
+
 export const BenzerView = component$<{
   data: BenzerPackage;
 }>(({ data: _data }) => {
@@ -141,7 +147,10 @@ export const BenzerView = component$<{
               </h2>
               {
                 <ul class="results-list">
-                  <li class="result-subitem">{word.meaning}</li>
+                  <li
+                    class="result-subitem"
+                    dangerouslySetInnerHTML={makeBold(word.meaning)}
+                  ></li>
                 </ul>
               }
               {word.words.length ? (
