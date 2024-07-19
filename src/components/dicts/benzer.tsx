@@ -91,9 +91,9 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
 );
 
 function makeBold(text: string) {
-  // make the text inside [] bold by using <strong> tag
-  // remove the [] from the text
-  return text.replace(/\[(.*?)\]/g, "<strong>$1</strong>");
+  text = text.replaceAll("] [", ", ");
+  text = text.replaceAll("[", "<strong>").replaceAll("]", "</strong>");
+  return text;
 }
 
 export const BenzerView = component$<{
