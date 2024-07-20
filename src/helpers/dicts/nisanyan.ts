@@ -159,11 +159,11 @@ function cleanseNisanyanResponse(
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
-    if (
-      flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
+    if (flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
       sharedMap.query.noAccentLower
     ) {
-      word.serverDefinedTitleDescription = query;
+      word.serverDefinedTitleDescription = //query;
+`${flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr")))} ${sharedMap.query.noAccentLower}`;
       word.serverDefinedIsMisspelling = true;
     }
   });
