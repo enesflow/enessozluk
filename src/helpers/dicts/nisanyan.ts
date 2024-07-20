@@ -161,7 +161,7 @@ function cleanseNisanyanResponse(
   data.words?.forEach((word) => {
     if (
       flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
-      sharedMap.query.noAccent
+      sharedMap.query.noAccentLower
     ) {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
