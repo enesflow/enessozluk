@@ -14,6 +14,7 @@ import { WordLinks } from "../WordLinks";
 
 //const NISANYAN_AFFIX_URL = "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
+  "(a.a.)": "aynı anlamda", // don't add parantheses, check the usage, it adds parantheses for some reason, don't bother
   Fa: "Farsça",
   Ger: "Germence",
   EYun: "Eski Yunanca",
