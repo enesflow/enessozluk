@@ -360,6 +360,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
       });
     });
   const data = cleanseBenzerResponse(e, loaded);
+  if (data.isUnsuccessful && data.serverDefinedCaptchaError) return data;
   return setSharedMapResult(e, "benzer", data);
 });
 
