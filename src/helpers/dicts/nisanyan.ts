@@ -162,8 +162,7 @@ function cleanseNisanyanResponse(
     if (flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
       sharedMap.query.noAccentLower
     ) {
-      word.serverDefinedTitleDescription = //query;
-`${flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr")))} ${sharedMap.query.noAccentLower}`;
+      word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
     }
   });
