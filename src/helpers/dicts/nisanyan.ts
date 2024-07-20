@@ -26,6 +26,7 @@ import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
+import { clearAccent } from "~/routes/plugin";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -53,7 +54,7 @@ function buildNisanyanAPIError(
       },
       {
         _id: "3",
-        name: query,
+        name: query.decoded,
       },
     ],
   };
@@ -127,10 +128,12 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
 }
 
 function cleanseNisanyanResponse(
+  e: RequestEventBase,
   data: NisanyanResponse,
   url: string,
-  query: string,
 ): NisanyanWordPackage {
+  const sharedMap = loadSharedMap(e);
+  const query = sharedMap.query.lower;
   const mapper = (word: any & { name: string }) => ({
     ...word,
     name: removeNumbersInWord(word.name),
@@ -157,8 +160,8 @@ function cleanseNisanyanResponse(
 
   data.words?.forEach((word) => {
     if (
-      word.name.toLocaleLowerCase("tr") !== query.toLocaleLowerCase("tr") &&
-      flattenVerb(word.name) !== query
+      flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
+      sharedMap.query.noAccent
     ) {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
@@ -207,7 +210,7 @@ const loadNisanyanWord = server$(
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanResponse(parsed.data, url.user, e.params.query);
+    const data = cleanseNisanyanResponse(e, parsed.data, url.user);
     return setSharedMapResult(e, "nisanyan", data);
   },
 );
@@ -310,7 +313,8 @@ const loadNisanyanAffix = server$(
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   async (e) => {
-    if (isWord(e.params.query)) {
+    const sharedMap = loadSharedMap(e);
+    if (isWord(sharedMap.query.lower)) {
       return loadNisanyanWord.call(e);
     } else {
       return loadNisanyanAffix.call(e);

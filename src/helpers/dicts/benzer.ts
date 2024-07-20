@@ -2,11 +2,18 @@ import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import type { CheerioAPI } from "cheerio";
 import { load } from "cheerio";
-import { API_FAILED_TEXT, DID_YOU_MEAN, NO_RESULT } from "~/helpers/constants";
-import { buildBenzerUrl } from "~/helpers/dicts/url";
+import { API_FAILED_TEXT, NO_RESULT } from "~/helpers/constants";
+import { buildBenzerAdvancedUrl, buildBenzerUrl } from "~/helpers/dicts/url";
 import { debugAPI } from "~/helpers/log";
-import { fetchAPI, getFakeHeaders, loadSharedMap } from "~/helpers/request";
+import {
+  fetchAPI,
+  getFakeHeaders,
+  loadCache,
+  loadSharedMap,
+  setSharedMapResult,
+} from "~/helpers/request";
 import { to } from "~/helpers/to";
+import { clearAccent } from "~/routes/plugin";
 import type {
   BenzerPackage,
   BenzerResponseError,
@@ -16,6 +23,7 @@ import {
   BenzerResponseErrorSchema,
   BenzerResponseSchema,
 } from "~/types/benzer";
+import { nonNullable } from "../filter";
 
 function buildBenzerAPIError(
   e: RequestEventBase,
@@ -45,30 +53,29 @@ function checkCaptcha($: CheerioAPI, url: string): BenzerResponseError | null {
   return null;
 }
 
-async function getBenzerRecommendations(
-  e: RequestEventBase,
-): Promise<BenzerPackage> {
+// Example: if the user searched for "ama"
+// we will search for all the words in this form: _m_
+// and we will filter them so that without the accents they are equal to "ama"
+// in this case we get "ama" (but) and "âmâ" (blind)
+async function getBenzerWordForms(e: RequestEventBase): Promise<
+  | BenzerResponseError
+  | {
+      isUnsuccessful: false;
+      words: string[];
+    }
+> {
   const sharedMap = loadSharedMap(e);
-  // the word is, only the first and the last letters are uppercased
-  /* const query =
-    sharedMap.lowerCaseQuery[0].toLocaleUpperCase("tr") +
-    sharedMap.lowerCaseQuery.slice(1, -1) +
-    sharedMap.lowerCaseQuery.slice(-1).toLocaleUpperCase("tr"); */
-  // if the query is 2 letters, make the last letter uppercase,
-  // otherwise make the first and the last letters uppercase
-  // examples:
-  //  - su -> sU
-  //  - dikili -> Dikilİ
-  //  - bayındır -> BayındıR
-  //  - ok -> oK
-  const query =
-    (sharedMap.lowerCaseQuery.length > 2
-      ? sharedMap.lowerCaseQuery[0].toLocaleUpperCase("tr")
-      : sharedMap.lowerCaseQuery[0]) +
-    sharedMap.lowerCaseQuery.slice(1, -1) +
-    sharedMap.lowerCaseQuery.slice(-1).toLocaleUpperCase("tr");
-  const url = buildBenzerUrl(query);
-  // this way we don't see the results but we see the recommendations
+  const query = sharedMap.query.lower;
+  if (query.length === 1) {
+    return {
+      /* url: buildBenzerUrl(sharedMap.query.decoded).user,
+      isUnsuccessful: false,
+      words: [query, query.toLocaleUpperCase("tr")], */
+      isUnsuccessful: false,
+      words: [query, query.toLocaleUpperCase("tr")],
+    };
+  }
+  const url = buildBenzerAdvancedUrl(e);
   const [error, response] = await to(
     fetchAPI(url.api, "html", {
       ...e.request,
@@ -84,23 +91,38 @@ async function getBenzerRecommendations(
     return buildBenzerAPIError(e, url.user, API_FAILED_TEXT);
   }
   const $ = load(response.data);
-  const captchaError = checkCaptcha($, url.user);
-  if (captchaError) return captchaError;
-  // this has surely failed, so we will return the recommendations
-  const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
-  if (suggestionBox.length === 0) {
+  const captcha = checkCaptcha($, url.user);
+  if (captcha) return captcha;
+  const results = $(
+    "body > main > div.page > div > div.page-main > div > div.page-content > div.entries.entries-filtered",
+  )
+    .find("ul")
+    .toArray();
+  if (results.length === 0) {
     return {
-      url: buildBenzerUrl(query).user,
-      isUnsuccessful: true,
+      isUnsuccessful: false,
+      words: [sharedMap.query.decoded],
     };
   }
-  const words = suggestionBox.toArray().map((element) => $(element).text());
+  // find all the li a inside all the ul elements and get their text
+  const words = results
+    .map((result) =>
+      $(result)
+        .find("li a")
+        .toArray()
+        .map((element) => $(element).text().trim()),
+    )
+    .flat()
+    .filter(
+      (word) =>
+        word.length === query.length &&
+        clearAccent(word.toLocaleLowerCase("tr")) ===
+          sharedMap.query.noAccentLower,
+    )
+    .sort((a, b) => a.localeCompare(b, "tr"));
   return {
-    isUnsuccessful: true,
-    url: url.user,
-    words: words.filter(
-      (word) => word.toLocaleLowerCase("tr") === sharedMap.lowerCaseQuery,
-    ),
+    isUnsuccessful: false,
+    words: words.length ? words : [sharedMap.query.decoded],
   };
 }
 
@@ -121,47 +143,26 @@ function parseBenzer(
   )
     .text()
     .trim();
-
   if (entryContentMain.length === 0) {
-    const isCaptcha = $(
-      "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button",
-    ).length;
-    if (isCaptcha) {
-      return {
-        url,
-        isUnsuccessful: true,
-        serverDefinedCaptchaError: true,
-        serverDefinedErrorText:
-          "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-        words: ["Tekrar", "dene-", name],
-      };
-    }
+    const captcha = checkCaptcha($, url);
+    if (captcha) return captcha;
     const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
     if (suggestionBox.length === 0) {
       return {
-        meaning,
-        url,
-        isUnsuccessful: true,
+        isUnsuccessful: false,
+        words: [
+          {
+            name,
+            meaning,
+            words: [],
+            moreWords: {},
+            url,
+          },
+        ],
       };
     }
     const words = suggestionBox.toArray().map((element) => $(element).text());
-    const didYouMeanWord = words.find(
-      (word) =>
-        name.toLocaleLowerCase("tr") === word.toLocaleLowerCase("tr") &&
-        word !== name,
-    );
-    if (didYouMeanWord) {
-      return {
-        meaning,
-        url,
-        isUnsuccessful: true,
-        serverDefinedErrorText: DID_YOU_MEAN,
-        serverDefinedReFetchWith: didYouMeanWord,
-        words: [didYouMeanWord],
-      };
-    }
     return {
-      meaning,
       url,
       isUnsuccessful: true,
       words,
@@ -189,29 +190,40 @@ function parseBenzer(
   });
   if (words.size === 0) {
     return {
-      meaning,
-      url,
-      isUnsuccessful: true,
-      serverDefinedErrorText: NO_RESULT,
+      isUnsuccessful: false,
+      words: [
+        {
+          name,
+          meaning,
+          words: [],
+          moreWords,
+          url,
+        },
+      ],
     };
   }
 
   return {
     isUnsuccessful: false,
+    /* meaning,
+    moreWords,
+    name,
+    url,
+    words: Array.from(words), */
     words: [
       {
-        url,
         name,
         meaning,
         words: Array.from(words),
         moreWords,
+        url,
       },
     ],
   };
 }
 
 const loadBenzerWord = server$(async function (word: string): Promise<{
-  word: BenzerWord;
+  data: BenzerPackage;
   cookie: string | undefined;
 } | null> {
   const e = this;
@@ -253,13 +265,7 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
     const error = BenzerResponseErrorSchema.safeParse(result);
     if (error.success) {
       return {
-        word: {
-          name: word,
-          url: error.data.url,
-          meaning: error.data.meaning ?? "...",
-          words: [],
-          moreWords: {},
-        },
+        data: error.data,
         cookie: newCookie,
       };
     }
@@ -270,28 +276,91 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
   } /////////////////////////////∏
   const { data } = parsed;
   return {
-    word: data.words[0],
+    data,
     cookie: newCookie,
   };
 });
 
-export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
-  const rec = await getBenzerRecommendations(this);
-  if (!rec.words?.length || !rec.isUnsuccessful) return rec;
-  const loaded = await Promise.all(
-    rec.words.map((word) => loadBenzerWord.call(this, word)),
+const cleanseBenzerResponse = (
+  e: RequestEventBase,
+  response: Awaited<ReturnType<typeof loadBenzerWord>>[],
+): BenzerPackage => {
+  const sharedMap = loadSharedMap(e);
+  const loaded = response;
+  const atLeastOneOfThemIsSuccessful = loaded.some(
+    (l) => !l?.data.isUnsuccessful,
   );
-  const newCookies = loaded.map((word) => word?.cookie).filter((c) => c);
-  newCookies.forEach((cookie) => {
-    cookie?.split("; ").forEach((cookieT) => {
-      const [key, value] = cookieT.split("=");
-      key && value && this.cookie.set(key, value, { path: "/" });
+  if (atLeastOneOfThemIsSuccessful) {
+    const words = loaded
+      .filter(nonNullable)
+      .map((l) => l!.data)
+      .filter((l) => !l.isUnsuccessful)
+      .map((l) => l.words![0])
+      .filter(nonNullable) as BenzerWord[];
+    return {
+      isUnsuccessful: false,
+      words,
+    };
+  } else {
+    const isCaptcha = loaded.some(
+      (l) => l?.data.isUnsuccessful && l.data.serverDefinedCaptchaError,
+    );
+    if (isCaptcha) {
+      return {
+        isUnsuccessful: true,
+        url: buildBenzerUrl(sharedMap.query.decoded).user,
+        serverDefinedCaptchaError: isCaptcha,
+
+        serverDefinedErrorText:
+          "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
+        words: ["Tekrar", "dene-", sharedMap.query.decoded],
+      };
+    } else {
+      const w = loaded
+        .filter(nonNullable)
+        .map((l) => l!.data)
+        .filter((l) => l.isUnsuccessful)
+        .map((l) => l.words)
+        .filter(nonNullable)
+        .flat();
+      const words = Array.from(new Set(w)) as string[];
+      return {
+        isUnsuccessful: true,
+        url: buildBenzerUrl(sharedMap.query.decoded).user,
+        serverDefinedErrorText: NO_RESULT,
+        words,
+      };
+    }
+  }
+};
+
+export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
+  const e = this;
+  // If there is data in cache, return it
+  {
+    const cache = loadCache(e, "benzer");
+    if (cache) return setSharedMapResult(e, "benzer", cache);
+  } /////////////////////////////
+  const rec = await getBenzerWordForms(e);
+  /* if (!rec.words?.length || !rec.isUnsuccessful) return rec; */
+  if (rec.isUnsuccessful) {
+    return rec;
+  }
+  const loaded = await Promise.all(
+    rec.words.map((word) => loadBenzerWord.call(e, word)),
+  );
+  // Set the new cookies
+  loaded
+    .map((word) => word?.cookie)
+    .filter((c) => c)
+    .forEach((cookie) => {
+      cookie?.split("; ").forEach((cookieT) => {
+        const [key, value] = cookieT.split("=");
+        key && value && e.cookie.set(key, value, { path: "/" });
+      });
     });
-  });
-  return {
-    isUnsuccessful: false,
-    words: loaded.filter((word) => word !== null).map((word) => word!.word),
-  };
+  const data = cleanseBenzerResponse(e, loaded);
+  return setSharedMapResult(e, "benzer", data);
 });
 
 // eslint-disable-next-line qwik/loader-location

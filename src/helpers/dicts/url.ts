@@ -1,6 +1,7 @@
 import { loadSharedMap } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { generateUUID } from "~/helpers/generateUUID";
+import { clearAccent } from "~/routes/plugin";
 
 export const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 export const TDK_USER_URL = "https://www.sozluk.gov.tr/?aranan=" as const;
@@ -18,6 +19,8 @@ export const NISANYAN_AFFIX_USER_URL =
   "https://www.nisanyansozluk.com/ek/" as const;
 export const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 export const BENZER_USER_URL = BENZER_URL;
+export const BENZER_ADVANCED_URL = "https://www.benzerkelimeler.com" as const;
+// "https://www.benzerkelimeler.com/deniz-ile-baslayan-deniz-ile-biten-kelimeler";
 
 const baseBuilder = (
   base: string,
@@ -31,7 +34,7 @@ const baseBuilder = (
     const sharedMap = loadSharedMap(e);
     s =
       base +
-      (lowercase ? sharedMap.cleanedAndLowerCaseQuery : sharedMap.cleanedQuery);
+      (lowercase ? sharedMap.query.cleanedLower : sharedMap.query.cleaned);
   }
   return encode ? encodeURI(s) : s;
 };
@@ -71,8 +74,8 @@ export const buildNisanyanUrl = (
     typeof e === "string"
       ? e
       : lowercase
-        ? loadSharedMap(e).lowerCaseQuery
-        : loadSharedMap(e).query,
+        ? loadSharedMap(e).query.lower
+        : loadSharedMap(e).query.decoded,
   );
   let s = "";
   if (typeof e === "string") {
@@ -99,7 +102,7 @@ export const buildNisanyanAffixUrl = (
     const sharedMap = loadSharedMap(e);
     s =
       encodeURIComponent(
-        lowercase ? sharedMap.lowerCaseQuery : sharedMap.query,
+        lowercase ? sharedMap.query.lower : sharedMap.query.decoded,
       ) + `?session=${session}`;
   }
   return {
@@ -115,5 +118,19 @@ export const buildBenzerUrl = (
   return {
     api: baseBuilder(BENZER_URL, e, lowercase),
     user: baseBuilder(BENZER_USER_URL, e, lowercase),
+  };
+};
+
+export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
+  const s =
+    typeof e === "string"
+      ? clearAccent(e).toLocaleLowerCase("tr")
+      : loadSharedMap(e).query.noAccentLower;
+  // replace a, e, i, ı, o, ö, u, ü with _
+  const replaced = s.replace(/[aeıioöuü]/g, "_");
+  const url = `${BENZER_ADVANCED_URL}/${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;
+  return {
+    api: url,
+    user: url,
   };
 };

@@ -26,7 +26,7 @@ const loadTDKRecommendations = async (e: RequestEventBase) => {
     return [
       { madde: "Tekrar" },
       { madde: "dene-" },
-      { madde: loadSharedMap(e).query as string },
+      { madde: loadSharedMap(e).query.decoded },
     ];
   }
   const data = TDKRecommendationSchema.parse(response.data);
@@ -39,14 +39,14 @@ function buildTDKAPIError(
   title: string,
 ): TDKResponseError {
   debugAPI(e, `TDK API Error: ${title}`);
-  const { query } = loadSharedMap(e);
+  const sharedMap = loadSharedMap(e);
   return {
     url,
     error: title,
     recommendations: [
       { madde: "Tekrar" },
       { madde: "dene-" },
-      { madde: query },
+      { madde: sharedMap.query.decoded },
     ],
   };
 }

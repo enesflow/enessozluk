@@ -5,6 +5,28 @@ import type { RequestHandler } from "@builder.io/qwik-city";
 import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
 import * as compressJSON from "compress-json";
 import { sha256 } from "~/helpers/sha256";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import { isDev } from "@builder.io/qwik/build";
+
+const CACHE_DISABLED = /* false */ isDev as boolean;
+
+export function clearAccent(str: string): string {
+  // other than ı, ü, ö, ç, ş, ğ, İ, Ü, Ö, Ç, Ş, Ğ
+  const accents = {
+    â: "a",
+    Â: "A",
+    î: "i",
+    Î: "I",
+    û: "u",
+    Û: "U",
+    ê: "e",
+    Ê: "E",
+  } as Record<string, string>;
+  for (const accent in accents) {
+    str = str.replace(new RegExp(accent, "g"), accents[accent]);
+  }
+  return str;
+}
 
 function filterForJson(obj: any): any {
   if (obj === null || typeof obj === "undefined") {
@@ -42,14 +64,19 @@ export const onRequest: RequestHandler = async (e) => {
   ///////////////////////////////
   const decoded = decodeURIComponent(e.params.query);
   const cleaned = decoded.replace(/[\d+]/g, "");
+  const noAccent = clearAccent(cleaned);
   const key = decoded.toLocaleLowerCase("tr");
-  const cache = await getCacheByKey(e, key);
+  const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
-    query: decoded,
-    lowerCaseQuery: e.params.query.toLocaleLowerCase("tr"),
-    // remove all + and numbers
-    cleanedQuery: cleaned,
-    cleanedAndLowerCaseQuery: cleaned.toLocaleLowerCase("tr"),
+    query: {
+      raw: e.params.query,
+      decoded,
+      lower: decoded.toLocaleLowerCase("tr"),
+      cleaned,
+      cleanedLower: cleaned.toLocaleLowerCase("tr"),
+      noAccent,
+      noAccentLower: noAccent.toLocaleLowerCase("tr"),
+    },
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
     forceFetch: {},

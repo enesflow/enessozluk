@@ -15,7 +15,6 @@ export const BenzerResponseSchema = z.object({
 
 export const BenzerResponseErrorSchema = z.object({
   url: z.string(),
-  meaning: z.string().optional(),
   isUnsuccessful: z.literal(true),
   serverDefinedErrorText: z.string().optional(),
   serverDefinedCaptchaError: z.boolean().optional(),

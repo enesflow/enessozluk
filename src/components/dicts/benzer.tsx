@@ -1,19 +1,13 @@
 import type { BenzerPackage, BenzerResponseError } from "#/benzer";
 import { NO_RESULT } from "#helpers/constants";
 import type { QRL } from "@builder.io/qwik";
-import {
-  $,
-  component$,
-  useComputed$,
-  useSignal,
-  useVisibleTask$,
-} from "@builder.io/qwik";
+import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
-import { BENZER_URL } from "~/helpers/dicts/url";
-import { WordLinks } from "../WordLinks";
-import { benzerLoader } from "~/helpers/dicts/benzer";
 import { ExternalLink } from "~/components/externalLink";
+import { benzerLoader } from "~/helpers/dicts/benzer";
+import { BENZER_URL } from "~/helpers/dicts/url";
 import { convertToRoman } from "~/helpers/roman";
+import { WordLinks } from "../WordLinks";
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
@@ -21,15 +15,6 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
     const loaded = useSignal(0);
 
     const show = useSignal(false);
-
-    // eslint-disable-next-line qwik/no-use-visible-task
-    useVisibleTask$(() => {
-      // read local storage LOCAL_STORAGE_ITEM
-      const showCaptcha = localStorage.getItem(LOCAL_STORAGE_ITEM);
-      if (showCaptcha) {
-        show.value = true;
-      }
-    });
 
     return (
       <>
@@ -43,7 +28,6 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 onLoad$={async () => {
                   loaded.value++;
                   if (loaded.value === 2) {
-                    localStorage.removeItem(LOCAL_STORAGE_ITEM);
                     show.value = false;
                     await callback?.();
                   }
@@ -61,7 +45,6 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
               <Link
                 preventdefault:click
                 onClick$={() => {
-                  localStorage.removeItem(LOCAL_STORAGE_ITEM);
                   show.value = false;
                 }}
                 class="cursor-pointer"
