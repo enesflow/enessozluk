@@ -4,10 +4,7 @@ import type { RequestEventBase } from "@builder.io/qwik-city";
 import type { z } from "zod";
 import { BenzerPackageSchema } from "~/types/benzer";
 import { LuggatPackageSchema } from "~/types/luggat";
-import {
-  NisanyanAffixPackageSchema,
-  NisanyanPackageSchema,
-} from "~/types/nisanyan";
+import { NisanyanWordPackageSchema } from "~/types/nisanyan";
 import { TDKPackageSchema, TDKRecommendationSchema } from "~/types/tdk";
 import { debugLog } from "./log";
 
@@ -88,10 +85,10 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
 const Packages = {
   tdk: TDKPackageSchema,
   luggat: LuggatPackageSchema,
-  "nisanyan-affix": NisanyanAffixPackageSchema,
+  "nisanyan-affix": NisanyanWordPackageSchema,
   "tdk-rec": TDKRecommendationSchema,
   benzer: BenzerPackageSchema,
-  nisanyan: NisanyanPackageSchema,
+  nisanyan: NisanyanWordPackageSchema,
 } as const;
 
 export function loadCache<T extends Dicts>(
