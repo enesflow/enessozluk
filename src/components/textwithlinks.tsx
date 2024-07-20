@@ -22,16 +22,20 @@ function isALetter(char: string | undefined): boolean {
 export const TextWithLinks = component$<{
   text: string;
   regex: RegExp;
-}>(({ text, regex }) => {
+  makeWordLowercase?: boolean;
+}>(({ text, regex, makeWordLowercase }) => {
   const parts = text.split(regex);
 
   return (
     <>
       {parts.map((part, index) => {
         // If the part contains a space, it is likely a link; otherwise, it's text
-        const [word, ...rest] = part.split(" ");
-        //const word = removeNumbersInWord(rawWord);
-        const remainingText = rest.join(" ");
+        // const [word, ...rest] = part.split(" ");
+        const splitted = part.split(" ");
+        const word = makeWordLowercase
+          ? splitted[0].toLocaleLowerCase("tr")
+          : splitted[0];
+        const remainingText = splitted.slice(1).join(" ");
 
         if (index === 0) {
           // First part is always plain text

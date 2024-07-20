@@ -23,7 +23,11 @@ export const LuggatView = component$<{
               <ul class="results-list">
                 {word.definitions.map((meaning) => (
                   <li key={meaning} class="result-subitem">
-                    <TextWithLinks regex={LUGGAT_LINK_REGEX} text={meaning} />
+                    <TextWithLinks
+                      regex={LUGGAT_LINK_REGEX}
+                      text={meaning}
+                      makeWordLowercase
+                    />
                   </li>
                 ))}
               </ul>
