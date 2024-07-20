@@ -43,6 +43,7 @@ const NISANYAN_ABBREVIATIONS = {
   HAvr: "Hintavrupa Anadili",
   Moğ: "Moğolca",
   Çağ: "Çağatayca",
+  Mac: "Macarca", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
