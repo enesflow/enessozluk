@@ -1,7 +1,7 @@
 import type { Dicts } from "#/dicts";
 import type { SharedMap } from "#/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
-import type { ZodSchema, z } from "zod";
+import type { z } from "zod";
 import { BenzerPackageSchema } from "~/types/benzer";
 import { LuggatPackageSchema } from "~/types/luggat";
 import {
@@ -85,7 +85,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
   };
 }
 
-const Packages: Record<Dicts, ZodSchema> = {
+const Packages = {
   tdk: TDKPackageSchema,
   luggat: LuggatPackageSchema,
   "nisanyan-affix": NisanyanAffixPackageSchema,
@@ -94,7 +94,6 @@ const Packages: Record<Dicts, ZodSchema> = {
   nisanyan: NisanyanPackageSchema,
 } as const;
 
-// TODO: fix this, the return type is "any"
 export function loadCache<T extends Dicts>(
   e: RequestEventBase,
   dict: T,
@@ -106,6 +105,9 @@ export function loadCache<T extends Dicts>(
     if (parsed.success) {
       debugLog("Using cache for", dict);
       return parsed.data;
+    } else {
+      debugLog("Cache parsing failed for", dict);
+      return null;
     }
   } else {
     debugLog("Cache not found for", dict);
