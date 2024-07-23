@@ -21,7 +21,7 @@ import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
 import { flattenVerb } from "~/helpers/redirect";
 import { removeNumbersInWord } from "~/helpers/string";
-import { clearAccent, getQuery } from "~/routes/plugin";
+import { clearAccent } from "~/routes/plugin";
 import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
@@ -139,48 +139,26 @@ async function cleanseNisanyanResponse(
   data.words = data.words?.map(mapper);
   const misspellings = data.words?.map((i) => i.misspellings).flat();
   const names = data.words?.map((i) => i.name).flat();
-  // if our word is a misspelling, we should return error
-  if (misspellings?.includes(query) && !names?.includes(query)) {
-    const x = data.words?.[0]?.name || "asd";
-    const newSharedMap = e.sharedMap;
-    newSharedMap.set("data", {
-      ...sharedMap,
-      query: getQuery(x),
-    });
-    const res = await loadNisanyanWord.call({
-      ...e,
-      sharedMap: newSharedMap,
-    });
-    /*  !res.isUnsuccessful ? res.words?.forEach((word) => {
-      
-    }) : (null) */
-    if (!res.isUnsuccessful) {
-      res.words?.forEach((word) => {
-        word.serverDefinedIsMisspelling = true;
-      });
-    }
-    /* return {
-      url,
-      serverDefinedErrorText: DID_YOU_MEAN,
-      isUnsuccessful: true,
-      words:
-        data.words?.map((i) => ({
-          _id: i._id,
-          name: i.name,
-        })) ?? [],
-    }; */
-  }
   data.fiveAfter = data.fiveAfter?.map(mapper);
   data.fiveBefore = data.fiveBefore?.map(mapper);
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
-    if (flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==   flattenVerb(clearAccent(sharedMap.query.lower))
+    if (
+      flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
+      flattenVerb(clearAccent(sharedMap.query.lower))
     ) {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
     }
   });
+  // if our word is a misspelling, we should set it as misspelling
+  if (misspellings?.includes(query) && !names?.includes(query)) {
+    data.words?.forEach((word) => {
+      word.serverDefinedTitleDescription = query;
+      word.serverDefinedIsMisspelling = true;
+    });
+  }
 
   return fixForJoinedWords(data);
 }
