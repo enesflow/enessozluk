@@ -23,6 +23,8 @@ const NISANYAN_ABBREVIATIONS = {
   Sans: "Sanskritçe",
   Ave: "Avestaca",
   ETü: "Eski Türkçe",
+  OFa: "Orta Farsça",
+  ET: "Eski Türkçe",
   Gürc: "Gürcüce",
   Süry: "Süryanice",
   Erm: "Ermenice",
@@ -43,7 +45,7 @@ const NISANYAN_ABBREVIATIONS = {
   HAvr: "Hintavrupa Anadili",
   Moğ: "Moğolca",
   Çağ: "Çağatayca",
-  Mac: "Macarca", 
+  Mac: "Macarca",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
