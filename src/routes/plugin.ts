@@ -60,7 +60,7 @@ function filterForJson(obj: any): any {
 
 export function getQuery(query: string): SharedMap["query"] {
   const decoded = decodeURIComponent(query); // Decode the url encoded string
-  const cleaned = decoded.replace(/[\d+]/g, ""); // Remove numbers
+  const cleaned = decoded.replace(/[0-9+]/g, "");
   const noAccent = clearAccent(cleaned); // Remove accents (â, î, û, ê)
   return {
     raw: query,

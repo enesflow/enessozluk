@@ -65,12 +65,9 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     }
 > {
   const sharedMap = loadSharedMap(e);
-  const query = sharedMap.query.lower;
+  const query = sharedMap.query.cleaned;
   if (query.length === 1) {
     return {
-      /* url: buildBenzerUrl(sharedMap.query.decoded).user,
-      isUnsuccessful: false,
-      words: [query, query.toLocaleUpperCase("tr")], */
       isUnsuccessful: false,
       words: [query, query.toLocaleUpperCase("tr")],
     };
@@ -101,7 +98,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   if (results.length === 0) {
     return {
       isUnsuccessful: false,
-      words: [sharedMap.query.decoded],
+      words: [sharedMap.query.cleaned],
     };
   }
   // find all the li a inside all the ul elements and get their text
@@ -122,7 +119,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     .sort((a, b) => a.localeCompare(b, "tr"));
   return {
     isUnsuccessful: false,
-    words: words.length ? words : [sharedMap.query.decoded],
+    words: words.length ? words : [sharedMap.query.cleaned],
   };
 }
 
@@ -308,12 +305,12 @@ const cleanseBenzerResponse = (
     if (isCaptcha) {
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.decoded).user,
+        url: buildBenzerUrl(sharedMap.query.cleaned).user,
         serverDefinedCaptchaError: isCaptcha,
 
         serverDefinedErrorText:
           "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-        words: ["Tekrar", "dene-", sharedMap.query.decoded],
+        words: ["Tekrar", "dene-", sharedMap.query.cleaned],
       };
     } else {
       const w = loaded
@@ -326,7 +323,7 @@ const cleanseBenzerResponse = (
       const words = Array.from(new Set(w)) as string[];
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.decoded).user,
+        url: buildBenzerUrl(sharedMap.query.cleaned).user,
         serverDefinedErrorText: NO_RESULT,
         words,
       };
