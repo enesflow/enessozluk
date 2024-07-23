@@ -19,14 +19,13 @@ import {
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
-import { DID_YOU_MEAN } from "~/helpers/constants";
 import { flattenVerb } from "~/helpers/redirect";
 import { removeNumbersInWord } from "~/helpers/string";
+import { clearAccent, getQuery } from "~/routes/plugin";
 import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
-import { clearAccent } from "~/routes/plugin";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -127,11 +126,10 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
   return data;
 }
 
-function cleanseNisanyanResponse(
+async function cleanseNisanyanResponse(
   e: RequestEventBase,
   data: NisanyanResponse,
-  url: string,
-): NisanyanWordPackage {
+): Promise<NisanyanWordPackage> {
   const sharedMap = loadSharedMap(e);
   const query = sharedMap.query.lower;
   const mapper = (word: any & { name: string }) => ({
@@ -143,7 +141,25 @@ function cleanseNisanyanResponse(
   const names = data.words?.map((i) => i.name).flat();
   // if our word is a misspelling, we should return error
   if (misspellings?.includes(query) && !names?.includes(query)) {
-    return {
+    const x = data.words?.[0]?.name || "asd";
+    const newSharedMap = e.sharedMap;
+    newSharedMap.set("data", {
+      ...sharedMap,
+      query: getQuery(x),
+    });
+    const res = await loadNisanyanWord.call({
+      ...e,
+      sharedMap: newSharedMap,
+    });
+    /*  !res.isUnsuccessful ? res.words?.forEach((word) => {
+      
+    }) : (null) */
+    if (!res.isUnsuccessful) {
+      res.words?.forEach((word) => {
+        word.serverDefinedIsMisspelling = true;
+      });
+    }
+    /* return {
       url,
       serverDefinedErrorText: DID_YOU_MEAN,
       isUnsuccessful: true,
@@ -152,7 +168,7 @@ function cleanseNisanyanResponse(
           _id: i._id,
           name: i.name,
         })) ?? [],
-    };
+    }; */
   }
   data.fiveAfter = data.fiveAfter?.map(mapper);
   data.fiveBefore = data.fiveBefore?.map(mapper);
@@ -210,7 +226,7 @@ const loadNisanyanWord = server$(
         );
       }
     } /////////////////////////////
-    const data = cleanseNisanyanResponse(e, parsed.data, url.user);
+    const data = await cleanseNisanyanResponse(e, parsed.data);
     return setSharedMapResult(e, "nisanyan", data);
   },
 );

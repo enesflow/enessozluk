@@ -58,25 +58,30 @@ function filterForJson(obj: any): any {
   return obj;
 }
 
+export function getQuery(query: string): SharedMap["query"] {
+  const decoded = decodeURIComponent(query); // Decode the url encoded string
+  const cleaned = decoded.replace(/[\d+]/g, ""); // Remove numbers
+  const noAccent = clearAccent(cleaned); // Remove accents (â, î, û, ê)
+  return {
+    raw: query,
+    decoded,
+    lower: decoded.toLocaleLowerCase("tr"),
+    cleaned,
+    cleanedLower: cleaned.toLocaleLowerCase("tr"),
+    noAccent,
+    noAccentLower: noAccent.toLocaleLowerCase("tr"),
+  };
+}
+
 export const onRequest: RequestHandler = async (e) => {
   // Only run for /search/[query]
   if (!e.params.query) return e.next();
   ///////////////////////////////
   const decoded = decodeURIComponent(e.params.query);
-  const cleaned = decoded.replace(/[\d+]/g, "");
-  const noAccent = clearAccent(cleaned);
   const key = decoded.toLocaleLowerCase("tr");
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
-    query: {
-      raw: e.params.query,
-      decoded,
-      lower: decoded.toLocaleLowerCase("tr"),
-      cleaned,
-      cleanedLower: cleaned.toLocaleLowerCase("tr"),
-      noAccent,
-      noAccentLower: noAccent.toLocaleLowerCase("tr"),
-    },
+    query: getQuery(e.params.query),
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
     forceFetch: {},
