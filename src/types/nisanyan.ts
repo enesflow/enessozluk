@@ -20,7 +20,7 @@ export const NisanyanRelationSchema = z.object({
 
 export const NisanyanGrammarCaseSchema = z.object({
   _id: z.string(),
-  order: z.number(),
+  order: z.number().optional(),
   name: z.string(),
   description: z.string(),
   tooltip: z.string(),
