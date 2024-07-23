@@ -86,7 +86,7 @@ export const NisanyanEtymologySchema = z.object({
 
 export const NisanyanSourceSchema = z.object({
   _id: z.string(),
-  name: z.string(),
+  name: z.string().optional(),
   book: z.string(),
   editor: z.string().optional(),
   datePublished: z.string(),
