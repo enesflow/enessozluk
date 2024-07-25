@@ -26,23 +26,26 @@ const baseBuilder = (
   base: string,
   e: RequestEventBase | string,
   lowercase = true,
-  encode = false,
+  encode = true,
 ) => {
+  const encoder = encode ? encodeURIComponent : (e: string) => e;
   let s = "";
-  if (typeof e === "string") s = base + e;
+  if (typeof e === "string") s = base + encoder(e);
   else {
     const sharedMap = loadSharedMap(e);
     s =
       base +
-      (lowercase ? sharedMap.query.noAccentLower : sharedMap.query.noAccent);
+      encoder(
+        lowercase ? sharedMap.query.noAccentLower : sharedMap.query.noAccent,
+      );
   }
-  return encode ? encodeURI(s) : s;
+  return s;
 };
 
 export const buildTDKUrl = (e: RequestEventBase | string, lowercase = true) => {
   return {
     api: baseBuilder(TDK_URL, e, lowercase),
-    user: baseBuilder(TDK_USER_URL, e, lowercase),
+    user: baseBuilder(TDK_USER_URL, e, lowercase, false),
   };
 };
 
@@ -85,8 +88,8 @@ export const buildNisanyanUrl = (
     s = word + `?session=${session}`;
   }
   return {
-    api: baseBuilder(NISANYAN_URL, s, lowercase, true),
-    user: baseBuilder(NISANYAN_USER_URL, word, lowercase),
+    api: baseBuilder(NISANYAN_URL, s, lowercase, false),
+    user: baseBuilder(NISANYAN_USER_URL, word, lowercase, false),
   };
 };
 
@@ -106,7 +109,7 @@ export const buildNisanyanAffixUrl = (
       ) + `?session=${session}`;
   }
   return {
-    api: baseBuilder(NISANYAN_AFFIX_URL, s, lowercase, true),
+    api: baseBuilder(NISANYAN_AFFIX_URL, s, lowercase),
     user: baseBuilder(NISANYAN_AFFIX_USER_URL, s, lowercase),
   };
 };
@@ -127,7 +130,7 @@ export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
       ? clearAccent(e).toLocaleLowerCase("tr")
       : loadSharedMap(e).query.noAccentLower;
   // replace a, e, i, ı, o, ö, u, ü with _
-  const replaced = s.replace(/[aeıioöuü]/g, "_");
+  const replaced = encodeURIComponent(s.replace(/[aeıioöuü]/g, "_"));
   const url = `${BENZER_ADVANCED_URL}/${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;
   return {
     api: url,

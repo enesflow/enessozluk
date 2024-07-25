@@ -76,9 +76,9 @@ export function getQuery(query: string): SharedMap["query"] {
 export const onRequest: RequestHandler = async (e) => {
   // Only run for /search/[query]
   if (!e.params.query) return e.next();
+  const query = getQuery(e.params.query);
   ///////////////////////////////
-  const decoded = decodeURIComponent(e.params.query);
-  const key = decoded.toLocaleLowerCase("tr");
+  const key = query.decoded.toLocaleLowerCase("tr");
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),

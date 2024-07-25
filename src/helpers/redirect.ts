@@ -87,8 +87,12 @@ export function getLink(href: string | undefined): string {
   const red = getRedirect(url, {
     query: href.split("/").pop() || "",
   });
-  if (red.shouldRedirect) {
-    return red.to;
+  const res = red.shouldRedirect ? red.to : href;
+  // make the last item (splitted by /) encodeURIComponent
+  const splitted = res.split("/");
+  const last = splitted.pop();
+  if (last) {
+    splitted.push(encodeURIComponent(last));
   }
-  return href;
+  return splitted.join("/");
 }
