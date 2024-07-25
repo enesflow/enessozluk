@@ -47,6 +47,7 @@ const NISANYAN_ABBREVIATIONS = {
   Çağ: "Çağatayca",
   Mac: "Macarca",
   Kürd: "Kürtçe (Kurmanci)",
+  İr: "Proto-İranca (Ana-İranca)", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
