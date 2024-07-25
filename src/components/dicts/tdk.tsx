@@ -1,14 +1,13 @@
 import type { TDKPackage } from "#/tdk";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
-import { LinkR } from "../linkWithRedirect";
 import { WordLinks } from "../WordLinks";
 
 const TDK_LINK_DET = "► " as const;
 
 export function isOutLink(word: string): {
   outLink: boolean;
-  cleanWord: string;
+  cleanWords: string[];
 } {
   function romanToFront(word: string): string {
     // example:
@@ -27,20 +26,20 @@ export function isOutLink(word: string): {
   if (word.startsWith(TDK_LINK_DET)) {
     return {
       outLink: true,
-      cleanWord: romanToFront(word.slice(TDK_LINK_DET.length)),
+      cleanWords: word.slice(TDK_LINK_DET.length).split(", ").map(romanToFront),
     };
   }
   // To make sense of this check, check queries "server" and "z kuşağı" on TDK
   if (word.startsWith("343 ")) {
     return {
       outLink: true,
-      cleanWord: romanToFront(word.slice(4)),
+      cleanWords: word.slice(4).split(", ").map(romanToFront),
     };
   }
 
   return {
     outLink: false,
-    cleanWord: romanToFront(word),
+    cleanWords: [],
   };
 }
 
@@ -89,18 +88,13 @@ export const TDKView = component$<{
                     >
                       <strong>{meaning.serverDefinedPreText} </strong>
                       {isOutLink(meaning.anlam).outLink ? (
-                        <LinkR
-                          href={`/search/${isOutLink(meaning.anlam)
-                            .cleanWord.split(" ")
-                            .filter((word) => !word.startsWith("("))
-                            .join(" ")}`}
-                          class="result-description"
-                        >
-                          {isOutLink(meaning.anlam).cleanWord}
-                        </LinkR>
+                        <WordLinks
+                          words={isOutLink(meaning.anlam).cleanWords}
+                        />
                       ) : (
                         meaning.anlam
                       )}
+
                       <ul>
                         {meaning.orneklerListe?.map((example) => (
                           <li key={example.ornek_id} class="result-quote">

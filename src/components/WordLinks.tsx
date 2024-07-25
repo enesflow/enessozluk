@@ -22,6 +22,11 @@ export function putTheNumbersAtTheEndAsRomanToTheBeginning(
   return text;
 }
 
+function cleanWordFromRom(word: string): string {
+  // remove any text in parenthesis (with the parenthesis)
+  return word.replace(/\(.*\)/, "").trim();
+}
+
 export const WordLinks = component$<{
   words: string[] | undefined;
   more?: string[];
@@ -48,7 +53,9 @@ export const WordLinks = component$<{
         // if showMore then join words and more, else just words
         entries.value.map((word, index) => (
           <span key={word} class="result-description">
-            <LinkR href={`/search/${removeNumbersAtEnd(word)}`}>
+            <LinkR
+              href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word))}`}
+            >
               {putTheNumbersAtTheEndAsRomanToTheBeginning(word)}
             </LinkR>
             {index < entries.value.length - 1 && ", "}
