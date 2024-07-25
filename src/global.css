@@ -74,7 +74,7 @@ body {
 }
 
 .result-double-subitem {
-  @apply ml-6 border-l-2 border-red-300 pl-2;
+  @apply ml-4 border-l-2 border-red-300 pl-2;
 }
 
 .result-title {
