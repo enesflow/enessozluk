@@ -172,6 +172,7 @@ function parseBenzer(
     words.add($(element).text());
   });
   const wordsArray = Array.from(words);
+  words.add(name);
 
   // Extract more words from the second list
   const moreWords: { [key: string]: string[] } = {};

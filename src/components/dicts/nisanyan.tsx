@@ -53,6 +53,7 @@ const NISANYAN_ABBREVIATIONS = {
   Uyg: "Uygurca",
   Kzk: "Kazakça",
   Tat: "Tatarca",
+  Sogd: "Soğdca", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -375,7 +376,7 @@ export const NisanyanView = component$<{
                   <WordLinks words={word.referenceOf.map((ref) => ref.name)} />
                 </section>
               )}
-              {word.misspellings && (
+              {!!word.misspellings?.length && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Yanlış yazımlar</h2>
                   <WordLinks words={word.misspellings} />
