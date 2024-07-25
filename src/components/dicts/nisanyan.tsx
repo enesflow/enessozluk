@@ -11,6 +11,7 @@ import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "~/components/WordLin
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
+import { joinTurkish } from "~/helpers/parser";
 
 //const NISANYAN_AFFIX_URL = "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -307,9 +308,9 @@ export const NisanyanView = component$<{
                               )
                             )}
                             <strong>
-                              {etymology.languages
-                                .map((lang) => lang.name)
-                                .join(", ")}
+                              {joinTurkish(
+                                etymology.languages.map((lang) => lang.name),
+                              )}
                             </strong>
                             <span> {formatDefinition(etymology)}</span>
                             <TextWithLinks
