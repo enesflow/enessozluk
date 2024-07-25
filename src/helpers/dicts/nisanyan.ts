@@ -70,6 +70,13 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
     let detectedTemp = false;
     for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
       const etm = word.etymologies[etmIndex];
+      /// This is added some time after the initial implementation
+      if (etm.relation.abbreviation === "≈") {
+        data.words[wordIndex].etymologies![
+          etmIndex
+        ].serverDefinedMoreIndentation = true;
+      }
+      /////////////////////////////
       if (detected) {
         if (finished) {
           data.words[wordIndex].etymologies![

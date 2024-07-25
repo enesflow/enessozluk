@@ -297,7 +297,13 @@ export const NisanyanView = component$<{
                             ) : (
                               index !== 0 &&
                               etymology.relation.abbreviation !== "/" && (
-                                <span>Bu sözcük </span>
+                                <span>
+                                  {etymology.serverDefinedMoreIndentation &&
+                                    !word.etymologies?.[index - 1]
+                                      .serverDefinedMoreIndentation &&
+                                    "Not: "}
+                                  Bu sözcük{" "}
+                                </span>
                               )
                             )}
                             <strong>
