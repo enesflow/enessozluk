@@ -13,7 +13,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
   ({ src, callback }) => {
     const LOCAL_STORAGE_ITEM = "show-captcha" as const;
     const loaded = useSignal(0);
-
+    const showForceReload = useSignal(false);
     const show = useSignal(false);
 
     return (
@@ -27,6 +27,9 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 src={src}
                 onLoad$={async () => {
                   loaded.value++;
+                  if (loaded.value === 1) {
+                    showForceReload.value = true;
+                  }
                   if (loaded.value === 2) {
                     show.value = false;
                     await callback?.();
@@ -41,16 +44,32 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 </div>
               )}
             </div>
-            <div>
+            <div class="">
               <Link
                 preventdefault:click
                 onClick$={() => {
                   show.value = false;
+                  showForceReload.value = false;
                 }}
                 class="cursor-pointer"
               >
                 Güvenlik doğrulamasını kapat
               </Link>
+              {showForceReload.value && (
+                <>
+                  ,{" "}
+                  <Link
+                    preventdefault:click
+                    onClick$={async () => {
+                      show.value = false;
+                      await callback?.();
+                    }}
+                    class="cursor-pointer"
+                  >
+                    Yeniden yükle
+                  </Link>
+                </>
+              )}
             </div>
           </>
         ) : (

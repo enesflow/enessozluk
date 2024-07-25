@@ -25,6 +25,9 @@ import {
 } from "~/types/benzer";
 import { nonNullable } from "../filter";
 
+export const CAPTCHA_PATH =
+  "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button";
+
 function buildBenzerAPIError(
   e: RequestEventBase,
   url: string,
@@ -39,8 +42,7 @@ function buildBenzerAPIError(
 }
 
 function checkCaptcha($: CheerioAPI, url: string): BenzerResponseError | null {
-  const path =
-    "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button";
+  const path = CAPTCHA_PATH;
   const isCaptcha = $(path).length;
   if (isCaptcha) {
     return {
