@@ -285,21 +285,21 @@ export const NisanyanView = component$<{
                       <li
                         class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
                       >
-                        {etymology.relation.abbreviation === "+" &&
-                        index !== 0 ? (
-                          <span>ve </span>
-                        ) : (
-                          index !== 0 &&
-                          etymology.relation.abbreviation !== "/" && (
-                            <span>Bu sözcük </span>
-                          )
-                        )}
                         {etymology.languages.every(
                           (language) => language.abbreviation === "?",
                         ) ? (
                           <span> Bu sözcüğün kökeni belirsizdir.</span>
                         ) : (
                           <>
+                            {etymology.relation.abbreviation === "+" &&
+                            index !== 0 ? (
+                              <span>ve </span>
+                            ) : (
+                              index !== 0 &&
+                              etymology.relation.abbreviation !== "/" && (
+                                <span>Bu sözcük </span>
+                              )
+                            )}
                             <strong>
                               {etymology.languages
                                 .map((lang) => lang.name)
