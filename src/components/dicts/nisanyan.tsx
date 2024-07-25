@@ -185,6 +185,7 @@ function formatRelation(
           b: "biçimi",
           d: "deyimi",
           k: "kökü",
+          p: "edatı",
         }[etm.wordClass.abbreviation] ?? etm.wordClass.name) +
         (etm.relation.text.startsWith(" ") ? "" : "n");
 
