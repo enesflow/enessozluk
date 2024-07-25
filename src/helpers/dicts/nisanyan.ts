@@ -175,11 +175,19 @@ const loadNisanyanWord = server$(
     const [error, response] = await to(fetchAPI(url.api));
     // Returns error if request failed
     if (error || !response?.success) {
-      return buildNisanyanAPIError(
-        e,
-        url.user,
-        `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
-      );
+      if (response?.code && Math.floor(response.code / 100) === 4) {
+        return setSharedMapResult(e, "nisanyan", {
+          url: url.user,
+          serverDefinedErrorText: NO_RESULT,
+          isUnsuccessful: true,
+        });
+      } else {
+        return buildNisanyanAPIError(
+          e,
+          url.user,
+          `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
+        );
+      }
     }
     response.data = {
       ...response.data,
