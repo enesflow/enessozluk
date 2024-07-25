@@ -374,7 +374,7 @@ export const NisanyanView = component$<{
                   <WordLinks words={word.referenceOf.map((ref) => ref.name)} />
                 </section>
               )}
-              {!!word.Misspellings?.length && (
+              {!!word.misspellings?.length && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Yanlış yazımlar</h2>
                   <WordLinks words={word.misspellings} />
