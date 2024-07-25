@@ -3,6 +3,7 @@ import type { RequestEventBase } from "@builder.io/qwik-city";
 import { generateUUID } from "~/helpers/generateUUID";
 import { clearAccent } from "~/routes/plugin";
 
+export const TDK_TTS_URL = "https://sozluk.gov.tr/ses/" as const;
 export const TDK_URL = "https://sozluk.gov.tr/gts?ara=" as const;
 export const TDK_USER_URL = "https://www.sozluk.gov.tr/?aranan=" as const;
 export const TDK_RECOMMENDATIONS_URL =

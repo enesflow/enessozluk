@@ -1,8 +1,10 @@
 import type { TDKPackage } from "#/tdk";
 import { convertToRoman } from "#helpers/roman";
-import { component$ } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
 import { WordLinks } from "../WordLinks";
 import { nonNullable } from "~/helpers/filter";
+import { TDK_TTS_URL } from "~/helpers/dicts/url";
+import Speaker from "../speaker";
 
 const TDK_LINK_DET = "► " as const;
 
@@ -44,6 +46,23 @@ export function isOutLink(word: string): {
   };
 }
 
+const Play = component$<{ id: string | null | undefined }>(({ id }) => {
+  const audio = useSignal<HTMLAudioElement>();
+  return id ? (
+    <button
+      class="sesGetir"
+      onClick$={() => {
+        audio.value?.play();
+      }}
+    >
+      <audio src={TDK_TTS_URL + id + ".wav"} ref={audio}></audio>
+      <Speaker />
+    </button>
+  ) : (
+    <></>
+  );
+});
+
 export const TDKView = component$<{
   data: TDKPackage;
 }>(({ data }) => {
@@ -79,7 +98,8 @@ export const TDKView = component$<{
                   <i class="result-title-description">
                     {result.telaffuz && <> {result.telaffuz}</>}
                     {result.lisan && <> ({result.lisan})</>}
-                  </i>
+                  </i>{" "}
+                  <Play id={data.tts} />
                 </h2>
                 <ul class="results-list">
                   {result.anlamlarListe?.map((meaning) => (

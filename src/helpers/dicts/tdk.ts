@@ -90,6 +90,17 @@ const cleanseTDKResponse = (data: TDKResponse) => {
   return data;
 };
 
+const loadTTSId = async (data: TDKResponse) => {
+  // https://sozluk.gov.tr/yazim?ara={word}
+  // response : [{"yazim_id":"30886","sozu":"herkes","ekler":"","seskod":"h1574"}]
+  // we need to return the "seskod"
+  // if there is an error: {"error":"Sonuç bulunamadı"} is the response of the fetch
+  const url = `https://sozluk.gov.tr/yazim?ara=${data.meanings[0].madde}`;
+  const [error, response] = await to(fetchAPI(url));
+  if (error || !response?.success) return undefined;
+  return ((response.data as any)[0] as { seskod: string } | undefined)?.seskod;
+};
+
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   // If there is data in cache, return it
@@ -135,6 +146,9 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
       );
     }
   } /////////////////////////////
-  const data = cleanseTDKResponse(parsed.data);
+  const data = {
+    ...cleanseTDKResponse(parsed.data),
+    tts: await loadTTSId(parsed.data),
+  };
   return setSharedMapResult(e, "tdk", data);
 });
