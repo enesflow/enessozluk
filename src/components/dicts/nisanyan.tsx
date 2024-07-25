@@ -46,6 +46,8 @@ const NISANYAN_ABBREVIATIONS = {
   Moğ: "Moğolca",
   Çağ: "Çağatayca",
   Mac: "Macarca",
+  Kürd: "Kürtçe (Kurmanci)",
+  İr: "Proto-İranca (Ana-İranca)", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -184,6 +186,7 @@ function formatRelation(
           b: "biçimi",
           d: "deyimi",
           k: "kökü",
+          p: "edatı",
         }[etm.wordClass.abbreviation] ?? etm.wordClass.name) +
         (etm.relation.text.startsWith(" ") ? "" : "n");
 
