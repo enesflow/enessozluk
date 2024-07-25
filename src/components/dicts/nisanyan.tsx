@@ -53,6 +53,7 @@ const NISANYAN_ABBREVIATIONS = {
   Uyg: "Uygurca",
   Kzk: "Kazakça",
   Tat: "Tatarca",
+  Sogd: "Soğdca", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
