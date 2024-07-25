@@ -278,64 +278,66 @@ export const NisanyanView = component$<{
                   )}
                 </i>
               </h2>
-              <section class="result-section">
-                <h2 class="result-subtitle">Köken</h2>
-                {!!word.etymologies?.length &&
-                  word.etymologies.map((etymology, index) => (
-                    <ul key={index} class="result-list">
-                      <li
-                        class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
-                      >
-                        {etymology.languages.every(
-                          (language) => language.abbreviation === "?",
-                        ) ? (
-                          <span> Bu sözcüğün kökeni belirsizdir.</span>
-                        ) : (
-                          <>
-                            {etymology.relation.abbreviation === "+" &&
-                            index !== 0 ? (
-                              <span>ve </span>
-                            ) : (
-                              index !== 0 &&
-                              etymology.relation.abbreviation !== "/" && (
-                                <span>
-                                  {etymology.serverDefinedMoreIndentation &&
-                                    !word.etymologies?.[index - 1]
-                                      .serverDefinedMoreIndentation &&
-                                    "Not: "}
-                                  Bu sözcük{" "}
-                                </span>
-                              )
-                            )}
-                            <strong>
-                              {joinTurkish(
-                                etymology.languages.map((lang) => lang.name),
+              {(!!word.etymologies?.length || !!word.references?.length) && (
+                <section class="result-section">
+                  <h2 class="result-subtitle">Köken</h2>
+                  {!!word.etymologies?.length &&
+                    word.etymologies.map((etymology, index) => (
+                      <ul key={index} class="result-list">
+                        <li
+                          class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
+                        >
+                          {etymology.languages.every(
+                            (language) => language.abbreviation === "?",
+                          ) ? (
+                            <span> Bu sözcüğün kökeni belirsizdir.</span>
+                          ) : (
+                            <>
+                              {etymology.relation.abbreviation === "+" &&
+                              index !== 0 ? (
+                                <span>ve </span>
+                              ) : (
+                                index !== 0 &&
+                                etymology.relation.abbreviation !== "/" && (
+                                  <span>
+                                    {etymology.serverDefinedMoreIndentation &&
+                                      !word.etymologies?.[index - 1]
+                                        .serverDefinedMoreIndentation &&
+                                      "Not: "}
+                                    Bu sözcük{" "}
+                                  </span>
+                                )
                               )}
-                            </strong>
-                            <span> {formatDefinition(etymology)}</span>
-                            <TextWithLinks
-                              regex={NISANYAN_LINK_REGEX}
-                              text={formatRelation(
-                                etymology,
-                                word.etymologies?.[index - 1],
-                                word.etymologies?.[index + 1],
-                              )}
-                            />
-                          </>
-                        )}
-                      </li>
-                    </ul>
-                  ))}
-                {!!word.references?.length && (
-                  <p class="result-description">
-                    Daha fazla bilgi için{" "}
-                    <WordLinks
-                      words={word.references!.map((ref) => ref.name)}
-                    />{" "}
-                    maddelerine bakınız.
-                  </p>
-                )}
-              </section>
+                              <strong>
+                                {joinTurkish(
+                                  etymology.languages.map((lang) => lang.name),
+                                )}
+                              </strong>
+                              <span> {formatDefinition(etymology)}</span>
+                              <TextWithLinks
+                                regex={NISANYAN_LINK_REGEX}
+                                text={formatRelation(
+                                  etymology,
+                                  word.etymologies?.[index - 1],
+                                  word.etymologies?.[index + 1],
+                                )}
+                              />
+                            </>
+                          )}
+                        </li>
+                      </ul>
+                    ))}
+                  {!!word.references?.length && (
+                    <p class="result-description">
+                      Daha fazla bilgi için{" "}
+                      <WordLinks
+                        words={word.references!.map((ref) => ref.name)}
+                      />{" "}
+                      maddelerine bakınız.
+                    </p>
+                  )}
+                </section>
+              )}
 
               {word.note && (
                 <section class="result-section">

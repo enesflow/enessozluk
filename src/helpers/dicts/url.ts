@@ -110,8 +110,8 @@ export const buildNisanyanAffixUrl = (
       ) + `?session=${session}`;
   }
   return {
-    api: baseBuilder(NISANYAN_AFFIX_URL, s, lowercase),
-    user: baseBuilder(NISANYAN_AFFIX_USER_URL, s, lowercase),
+    api: baseBuilder(NISANYAN_AFFIX_URL, s, lowercase, false),
+    user: baseBuilder(NISANYAN_AFFIX_USER_URL, s, lowercase, false),
   };
 };
 
