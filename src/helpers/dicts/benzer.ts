@@ -171,6 +171,7 @@ function parseBenzer(
   entryContentMain.each((_, element) => {
     words.add($(element).text());
   });
+  const wordsArray = Array.from(words);
 
   // Extract more words from the second list
   const moreWords: { [key: string]: string[] } = {};
@@ -183,7 +184,14 @@ function parseBenzer(
       .find(".entry-content-sub-content ul li a")
       .toArray()
       .map((elem) => $(elem).text())
-      .filter((text) => !words.has(text) && text !== name)
+      // .filter((text) => !words.has(text) && text !== name)
+      // also add to words if not already in
+      // but if already in, don't add
+      .filter((text) => {
+        if (words.has(text)) return false;
+        words.add(text);
+        return true;
+      })
       .sort((a, b) => a.localeCompare(b, "tr"));
     moreWords[category] = categoryWords;
   });
@@ -204,16 +212,11 @@ function parseBenzer(
 
   return {
     isUnsuccessful: false,
-    /* meaning,
-    moreWords,
-    name,
-    url,
-    words: Array.from(words), */
     words: [
       {
         name,
         meaning,
-        words: Array.from(words),
+        words: wordsArray,
         moreWords,
         url,
       },
