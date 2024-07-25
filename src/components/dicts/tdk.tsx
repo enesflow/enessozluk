@@ -2,6 +2,7 @@ import type { TDKPackage } from "#/tdk";
 import { convertToRoman } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { WordLinks } from "../WordLinks";
+import { nonNullable } from "~/helpers/filter";
 
 const TDK_LINK_DET = "► " as const;
 
@@ -99,12 +100,28 @@ export const TDKView = component$<{
                         {meaning.orneklerListe?.map((example) => (
                           <li key={example.ornek_id} class="result-quote">
                             <p>
-                              "{example.ornek}"{" "}
-                              <em>
-                                {example.yazar
-                                  ?.map((yazar) => yazar.tam_adi)
-                                  .join(", ")}
-                              </em>
+                              {/*  "{example.ornek}"{" "} */}
+                              {/* split example.ornek into multiple lines by "/" */}
+                              "
+                              {example.ornek?.split("/").map((line, index) => (
+                                <>
+                                  {line}
+                                  {index <
+                                    (example.ornek?.split("/").length ?? 0) -
+                                      1 && <br />}
+                                </>
+                              ))}
+                              "
+                              <br />
+                              {!!example.yazar
+                                ?.map((a) => a.tam_adi)
+                                .filter(nonNullable).length && (
+                                <em class="ml-4">
+                                  {example.yazar
+                                    .map((yazar) => yazar.tam_adi)
+                                    .join(", ")}
+                                </em>
+                              )}
                             </p>
                           </li>
                         ))}
