@@ -277,10 +277,10 @@ export const NisanyanView = component$<{
                   )}
                 </i>
               </h2>
-              {!!word.etymologies?.length && (
-                <section class="result-section">
-                  <h2 class="result-subtitle">Köken</h2>
-                  {word.etymologies.map((etymology, index) => (
+              <section class="result-section">
+                <h2 class="result-subtitle">Köken</h2>
+                {!!word.etymologies?.length &&
+                  word.etymologies.map((etymology, index) => (
                     <ul key={index} class="result-list">
                       <li
                         class={`${index !== 0 ? "list-none" : " "} ${"result-subitem"} ${etymology.serverDefinedMoreIndentation ? "result-double-subitem" : ""}`}
@@ -319,17 +319,16 @@ export const NisanyanView = component$<{
                       </li>
                     </ul>
                   ))}
-                  {!!word.references?.length && (
-                    <p class="result-description">
-                      Daha fazla bilgi için{" "}
-                      <WordLinks
-                        words={word.references!.map((ref) => ref.name)}
-                      />{" "}
-                      maddelerine bakınız.
-                    </p>
-                  )}
-                </section>
-              )}
+                {!!word.references?.length && (
+                  <p class="result-description">
+                    Daha fazla bilgi için{" "}
+                    <WordLinks
+                      words={word.references!.map((ref) => ref.name)}
+                    />{" "}
+                    maddelerine bakınız.
+                  </p>
+                )}
+              </section>
 
               {word.note && (
                 <section class="result-section">
