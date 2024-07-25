@@ -188,7 +188,6 @@ function formatRelation(
     ]
       ? _relation.shift() && ("dan" as string | null) // 👍 Yes this is clean code
       : _relation.shift();
-    console.log("relation first is", relationFirst);
     const relationRest = " " + (orNext ? "veya" : _relation.join(" "));
     const wordClass = _relationOverrid
       ? ""
