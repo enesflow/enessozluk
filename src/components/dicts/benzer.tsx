@@ -1,8 +1,14 @@
 import type { BenzerPackage, BenzerResponseError } from "#/benzer";
 import { NO_RESULT } from "#helpers/constants";
 import type { QRL } from "@builder.io/qwik";
-import { $, component$, useComputed$, useSignal } from "@builder.io/qwik";
-import { Link } from "@builder.io/qwik-city";
+import {
+  $,
+  component$,
+  useComputed$,
+  useSignal,
+  useTask$,
+} from "@builder.io/qwik";
+import { Link, useLocation } from "@builder.io/qwik-city";
 import { ExternalLink } from "~/components/externalLink";
 import { benzerLoader } from "~/helpers/dicts/benzer";
 import { BENZER_URL } from "~/helpers/dicts/url";
@@ -15,7 +21,14 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
     const loaded = useSignal(0);
     const showForceReload = useSignal(false);
     const show = useSignal(false);
-
+    const loc = useLocation();
+    useTask$(({ track }) => {
+      track(() => loc.isNavigating);
+      if (loc.isNavigating) {
+        show.value = false;
+        showForceReload.value = false;
+      }
+    });
     return (
       <>
         {show.value ? (
