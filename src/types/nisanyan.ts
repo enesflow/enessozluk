@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { weakString } from "./shared";
 
 export const NisanyanLanguageSchema = z.object({
   _id: z.string(),
-  name: z.string().optional(),
-  description: z.string().optional(),
-  description2: z.string().optional(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
-  abbreviation: z.string().optional(),
+  name: weakString(),
+  description: weakString(),
+  description2: weakString(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
+  abbreviation: weakString(),
   id_depr: z.number().optional(),
 });
 
@@ -22,31 +23,31 @@ export const NisanyanGrammarCaseSchema = z.object({
   _id: z.string(),
   order: z.number().optional(),
   name: z.string(),
-  description: z.string(),
-  tooltip: z.string(),
+  description: weakString(),
+  tooltip: weakString(),
 });
 
 export const NisanyanSemiticFormSchema = z.object({
   _id: z.string(),
   id_depr: z.number().optional(),
-  name: z.string(),
-  description: z.string(),
+  name: weakString(),
+  description: weakString(),
   language: NisanyanLanguageSchema,
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
 });
 
 export const NisanyanGrammarSchema = z.object({
-  grammaticalCase: z.string().optional(),
+  grammaticalCase: weakString(),
   case: z.array(NisanyanGrammarCaseSchema).optional(),
-  semiticRoot: z.string().optional(),
+  semiticRoot: weakString(),
   semiticForm: NisanyanSemiticFormSchema.optional(),
 });
 
 export const NisanyanWordClassSchema = z.object({
   _id: z.string(),
   name: z.string(),
-  description: z.string(),
+  description: weakString(),
   abbreviation: z.string(),
 });
 
@@ -55,8 +56,8 @@ export const NisanyanAffixSchema = z.object({
   name: z.string(),
   description: z.string(),
   language: NisanyanLanguageSchema,
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   id_depr: z.number().optional(),
 });
 
@@ -70,44 +71,44 @@ export const NisanyanEtymologySchema = z.object({
   serverDefinedEndOfJoin: z.boolean().optional(),
   _id: z.string(),
   id_depr: z.number().optional(),
-  paranthesis: z.string(),
+  paranthesis: weakString(),
   relation: NisanyanRelationSchema,
   languages: z.array(NisanyanLanguageSchema),
   originalText: z.string(),
   romanizedText: z.string(),
   grammar: NisanyanGrammarSchema,
   definition: z.string(),
-  neologism: z.string(),
+  neologism: weakString(),
   wordClass: NisanyanWordClassSchema,
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   affixes: NisanyanAffixesSchema.optional(),
 });
 
 export const NisanyanSourceSchema = z.object({
   _id: z.string(),
-  name: z.string(),
-  book: z.string(),
-  editor: z.string().optional(),
-  datePublished: z.string(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  name: weakString(),
+  book: weakString(),
+  editor: weakString(),
+  datePublished: weakString(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   id_depr: z.number().optional(),
-  abbreviation: z.string(),
-  date: z.string(),
+  abbreviation: weakString(),
+  date: weakString(),
 });
 
 export const NisanyanHistorySchema = z.object({
   _id: z.string(),
   id_depr: z.number().optional(),
-  excerpt: z.string(),
-  definition: z.string(),
+  excerpt: weakString(),
+  definition: weakString(),
   source: NisanyanSourceSchema.optional(),
   date: z.string(),
   dateSortable: z.number(),
   quote: z.string(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   language: NisanyanLanguageSchema.optional(),
 });
 
@@ -120,9 +121,9 @@ export const NisanyanWordReferenceSchema = z.object({
   _id: z.string(),
   id_depr: z.number().optional(),
   name: z.string(),
-  note: z.string().optional(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  note: weakString(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   queries: z.array(z.string()).optional(),
   similarWords: z.array(z.string()).optional(),
   references: z
@@ -163,7 +164,7 @@ export const NisanyanResponseErrorSchema = z.object({
   fiveBefore: z.array(NisanyanelatedWordSchema).optional(),
   fiveAfter: z.array(NisanyanelatedWordSchema).optional(),
   randomWord: NisanyanelatedWordSchema.optional(),
-  serverDefinedErrorText: z.string().optional(),
+  serverDefinedErrorText: weakString(),
 });
 
 export const NisanyanAffixResponseErrorSchema = z.object({
@@ -174,9 +175,9 @@ export const NisanyanReferenceSchema = z.object({
   _id: z.string(),
   id_depr: z.number().optional(),
   name: z.string(),
-  note: z.string().optional(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
+  note: weakString(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
   queries: z.array(z.string()).optional(),
   similarWords: z.array(z.string()).optional(),
   references: z
@@ -205,7 +206,7 @@ export const NisanyanReferenceSchema = z.object({
 
 export const NisanyanWordSchema = z.object({
   serverDefinedLastJoinedIndex: z.number().optional(),
-  serverDefinedTitleDescription: z.string().optional(),
+  serverDefinedTitleDescription: weakString(),
   serverDefinedIsMisspelling: z.boolean().optional(),
   _id: z.string(),
   etymologies: z.array(NisanyanEtymologySchema).optional(),
@@ -213,14 +214,14 @@ export const NisanyanWordSchema = z.object({
   id_depr: z.number().optional(),
   misspellings: z.array(z.string()).optional().nullable(),
   name: z.string(),
-  note: z.string().optional(),
+  note: weakString(),
   queries: z.array(z.string()).optional(),
   references: z.array(NisanyanReferenceSchema).optional(),
   referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
   similarWords: z.array(z.string()).optional().nullable(),
-  timeCreated: z.string().optional(),
-  timeUpdated: z.string().optional(),
-  actualTimeUpdated: z.string().optional(),
+  timeCreated: weakString(),
+  timeUpdated: weakString(),
+  actualTimeUpdated: weakString(),
 });
 
 export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
