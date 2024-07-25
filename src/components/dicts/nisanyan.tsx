@@ -47,7 +47,11 @@ const NISANYAN_ABBREVIATIONS = {
   Çağ: "Çağatayca",
   Mac: "Macarca",
   Kürd: "Kürtçe (Kurmanci)",
-  İr: "Proto-İranca (Ana-İranca)", 
+  İr: "Proto-İranca (Ana-İranca)",
+  ÇTü: "Çağatayca",
+  Uyg: "Uygurca",
+  Kzk: "Kazakça",
+  Tat: "Tatarca",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -160,6 +164,9 @@ function formatRelation(
   prev: NisanyanEtymology | undefined,
   next: NisanyanEtymology | undefined,
 ): string {
+  const doesWordClassRequireABackVowel = {
+    p: true,
+  } as Record<string, boolean>;
   if (etm.relation.abbreviation == "+") {
     return etm.serverDefinedEndOfJoin ? " sözcüklerinin bileşiğidir." : "";
   } else if (etm.relation.abbreviation == "§") return "";
@@ -175,7 +182,13 @@ function formatRelation(
     const _relation =
       (_relationOverrid || (isOr ? prev : etm)?.relation.text)?.split(" ") ??
       [];
-    const relationFirst = _relation.shift();
+    // const relationFirst = _relation.shift();
+    const relationFirst = doesWordClassRequireABackVowel[
+      etm.wordClass.abbreviation
+    ]
+      ? _relation.shift() && ("dan" as string | null) // 👍 Yes this is clean code
+      : _relation.shift();
+    console.log("relation first is", relationFirst);
     const relationRest = " " + (orNext ? "veya" : _relation.join(" "));
     const wordClass = _relationOverrid
       ? ""
