@@ -1,78 +1,79 @@
 import { z } from "zod";
+import { weakString } from "./shared";
 
 export const TDKAuthorSchema = z.object({
-  yazar_id: z.string(),
+  yazar_id: weakString(),
   tam_adi: z.string(),
-  kisa_adi: z.string(),
-  ekno: z.string(),
+  kisa_adi: weakString(),
+  ekno: weakString(),
 });
 
 export const TDKAttributeSchema = z.object({
-  ozellik_id: z.string(),
-  tur: z.string(),
-  tam_adi: z.string(),
-  kisa_adi: z.string(),
-  ekno: z.string(),
+  ozellik_id: weakString(),
+  tur: weakString(),
+  tam_adi: weakString(),
+  kisa_adi: weakString(),
+  ekno: weakString(),
 });
 
 export const TDKExampleSchema = z.object({
-  ornek_id: z.string(),
-  anlam_id: z.string(),
-  ornek_sira: z.string(),
-  ornek: z.string(),
-  kac: z.string(),
-  yazar_id: z.string(),
-  yazar_vd: z.string(),
+  ornek_id: weakString(),
+  anlam_id: weakString(),
+  ornek_sira: weakString(),
+  ornek: weakString(),
+  kac: weakString(),
+  yazar_id: weakString(),
+  yazar_vd: weakString(),
   yazar: TDKAuthorSchema.array().optional(),
 });
 
 export const TDKMeaningSchema = z.object({
   serverDefinedPreText: z.string().optional(),
-  anlam_id: z.string(),
-  madde_id: z.string(),
-  anlam_sira: z.string(),
-  fiil: z.string(),
-  tipkes: z.string(),
+  anlam_id: weakString(),
+  madde_id: weakString(),
+  anlam_sira: weakString(),
+  fiil: weakString(),
+  tipkes: weakString(),
   anlam: z.string(),
-  anlam_html: z.string().nullable().optional(),
-  gos: z.string(),
-  gos_kelime: z.string(),
-  gos_kultur: z.string(),
+  anlam_html: weakString(),
+  gos: weakString(),
+  gos_kelime: weakString(),
+  gos_kultur: weakString(),
   orneklerListe: TDKExampleSchema.array().optional(),
   ozelliklerListe: TDKAttributeSchema.array().optional(),
 });
 
 export const TDKProverbSchema = z.object({
-  madde_id: z.string(),
-  madde: z.string(),
-  on_taki: z.string().nullable().optional(),
+  madde_id: weakString(),
+  madde: weakString(),
+  on_taki: weakString(),
 });
 
 export const TDKResultSchema = z.object({
-  madde_id: z.string(),
-  kac: z.string(),
-  kelime_no: z.string(),
-  cesit: z.string(),
-  anlam_gor: z.string(),
-  on_taki: z.string().nullable().optional(),
-  on_taki_html: z.string().nullable().optional(),
-  madde: z.string(),
-  madde_html: z.string().nullable().optional(),
-  cesit_say: z.string(),
-  anlam_say: z.string(),
-  taki: z.string().nullable().optional(),
-  cogul_mu: z.string().nullable().optional(),
-  ozel_mi: z.string().nullable().optional(),
-  egik_mi: z.string().nullable().optional(),
-  lisan_kodu: z.string().nullable().optional(),
-  lisan: z.string().nullable().optional(),
-  telaffuz_html: z.string().nullable().optional(),
-  lisan_html: z.string().nullable(),
-  telaffuz: z.string().nullable().optional(),
-  birlesikler: z.string().nullable(),
-  font: z.string().nullable().optional(),
-  madde_duz: z.string(),
-  gosterim_tarihi: z.string().nullable().optional(),
+  madde_id: weakString(),
+  kac: weakString(),
+  kelime_no: weakString(),
+  cesit: weakString(),
+  anlam_gor: weakString(),
+  on_taki: weakString(),
+  on_taki_html: weakString(),
+  madde: weakString(),
+  madde_html: weakString(),
+  cesit_say: weakString(),
+  anlam_say: weakString(),
+  taki: weakString(),
+  cogul_mu: weakString(),
+  ozel_mi: weakString(),
+  egik_mi: weakString(),
+  lisan_kodu: weakString(),
+  lisan: weakString(),
+  telaffuz_html: weakString(),
+  lisan_html: weakString(),
+  telaffuz: weakString(),
+  birlesikler: weakString(),
+  font: weakString(),
+  madde_duz: weakString(),
+  gosterim_tarihi: weakString(),
   anlamlarListe: TDKMeaningSchema.array().optional(),
   atasozu: TDKProverbSchema.array().optional(),
 });
@@ -86,12 +87,12 @@ export const TDKRecommendationSchema = z.array(
 export const TDKResponseErrorSchema = z.object({
   error: z.string(),
   recommendations: TDKRecommendationSchema,
-  url: z.string(),
+  url: weakString(),
 });
 
 export const TDKResponseSchema = z.object({
   meanings: TDKResultSchema.array(),
-  url: z.string(),
+  url: weakString(),
 });
 
 export const TDKPackageSchema = TDKResponseSchema.or(TDKResponseErrorSchema);
