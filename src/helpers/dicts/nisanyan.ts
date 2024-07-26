@@ -80,7 +80,7 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
         data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
       }
       if (etm.paranthesis === "(") isIn=true;
-      if (isIn) data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
+      if (isIn || etm.paranthesis === "()") data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
       if (etm.paranthesis === ")") isIn=false;
 
       if (detected) {
