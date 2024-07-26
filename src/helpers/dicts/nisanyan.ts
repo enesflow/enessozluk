@@ -112,6 +112,7 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
   return data;
 } 
 
+// @ts-expect-error
 function _fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
   if (data.isUnsuccessful) return data;
   if (!data.words) return data;
