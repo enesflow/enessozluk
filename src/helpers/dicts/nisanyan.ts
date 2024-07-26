@@ -59,7 +59,60 @@ function buildNisanyanAPIError(
   };
 }
 
+//The function below is written by chatgpt, I couldn't check it. I will revert it in case of an error. 
 function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
+  if (data.isUnsuccessful) return data;
+  if (!data.words) return data;
+
+  for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
+    const word = data.words[wordIndex];
+    if (!word.etymologies) continue;
+
+    let detected = false;
+    let detectedTemp = false;
+    let lastPlusIndex = -1;
+
+    for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
+      const etm = word.etymologies[etmIndex];
+      // Set serverDefinedMoreIndentation for relations with abbreviation "≈"
+      if (etm.relation.abbreviation === "≈") {
+        data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
+      }
+
+      if (detected) {
+        // Mark indentation for non "+" and non-"§" relations after detection
+        if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§") {
+          data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
+        }
+
+        // Mark the end of the joined word if the relation abbreviation is not "+" or "§"
+        if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§" && detectedTemp) {
+          detectedTemp = false;
+          data.words[wordIndex].etymologies![etmIndex - 1].serverDefinedEndOfJoin = true;
+        }
+      } else {
+        if (etm.relation.abbreviation === "+" || etm.relation.abbreviation === "§") {
+          detected = true;
+          detectedTemp = true;
+        }
+      }
+
+      // Track the index of the last "+" abbreviation
+      if (etm.relation.abbreviation === "+") {
+        lastPlusIndex = etmIndex;
+      }
+    }
+
+    // Set serverDefinedEndOfJoin for the last "+" abbreviation
+    if (lastPlusIndex !== -1) {
+      data.words[wordIndex].etymologies![lastPlusIndex].serverDefinedEndOfJoin = true;
+    }
+  }
+
+  return data;
+} 
+
+function _fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
   if (data.isUnsuccessful) return data;
   if (!data.words) return data;
   for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
