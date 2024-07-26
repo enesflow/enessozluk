@@ -71,6 +71,7 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
     let detected = false;
     let detectedTemp = false;
     let lastPlusIndex = -1;
+    let isIn = false;
 
     for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
       const etm = word.etymologies[etmIndex];
@@ -78,13 +79,11 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
       if (etm.relation.abbreviation === "≈") {
         data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
       }
+      if (etm.paranthesis === "(") isIn=true;
+      if (isIn) data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
+      if (etm.paranthesis === ")") isIn=false;
 
       if (detected) {
-        // Mark indentation for non "+" and non-"§" relations after detection
-        //if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§")
-       {
-          data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
-        }
 
         // Mark the end of the joined word if the relation abbreviation is not "+" or "§"
         if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§" && detectedTemp) {
