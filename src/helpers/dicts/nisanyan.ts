@@ -81,7 +81,8 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
 
       if (detected) {
         // Mark indentation for non "+" and non-"§" relations after detection
-        if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§") {
+        //if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§")
+       {
           data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
         }
 
