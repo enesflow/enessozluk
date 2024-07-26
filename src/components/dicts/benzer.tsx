@@ -38,7 +38,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 title="Benzer Kelimeler"
                 class="h-[30rem] w-full"
                 src={src}
-                onLoad$={async () => {
+                beforeUnload$={async () => {
                   loaded.value++;
                   if (loaded.value === 1) {
                     showForceReload.value = true;
