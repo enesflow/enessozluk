@@ -55,7 +55,7 @@ export const NisanyanAffixSchema = z.object({
   _id: z.string(),
   name: z.string(),
   description: weakString(),
-  language: NisanyanLanguageSchema,
+  language: NisanyanLanguageSchema.optional(),
   timeCreated: weakString(),
   timeUpdated: weakString(),
   id_depr: z.number().optional(),
