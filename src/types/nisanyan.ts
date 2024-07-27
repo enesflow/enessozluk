@@ -54,7 +54,7 @@ export const NisanyanWordClassSchema = z.object({
 export const NisanyanAffixSchema = z.object({
   _id: z.string(),
   name: z.string(),
-  description: z.string(),
+  description: weakString(),
   language: NisanyanLanguageSchema,
   timeCreated: weakString(),
   timeUpdated: weakString(),
