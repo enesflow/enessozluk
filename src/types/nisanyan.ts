@@ -32,7 +32,7 @@ export const NisanyanSemiticFormSchema = z.object({
   id_depr: z.number().optional(),
   name: weakString(),
   description: weakString(),
-  language: NisanyanLanguageSchema,
+  language: NisanyanLanguageSchema.optional(),
   timeCreated: weakString(),
   timeUpdated: weakString(),
 });
