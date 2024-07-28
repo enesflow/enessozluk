@@ -79,7 +79,7 @@ export const buildNisanyanUrl = (
       ? e
       : lowercase
         ? loadSharedMap(e).query.lower
-        : loadSharedMap(e).query.decoded).replace(/[()]/g, '');
+        : loadSharedMap(e).query.decoded).replace(/[()]/g, '')
   )
   
   let s = "";
