@@ -37,7 +37,9 @@ const baseBuilder = (
     s =
       base +
       encoder(
-        lowercase ? sharedMap.query.noAccentLower : sharedMap.query.noAccent,
+        lowercase
+          ? sharedMap.query.noNumPlusParenAccL
+          : sharedMap.query.noNumPlusParenAcc,
       );
   }
   return s;
@@ -75,13 +77,13 @@ export const buildNisanyanUrl = (
   lowercase = true,
 ) => {
   const word = encodeURIComponent(
-    (typeof e === "string"
+    typeof e === "string"
       ? e
       : lowercase
-        ? loadSharedMap(e).query.lower
-        : loadSharedMap(e).query.decoded).replace(/[()]/g, '')
-  )
-  
+        ? loadSharedMap(e).query.noNumPlusParenAccL
+        : loadSharedMap(e).query.noNumPlusParenAcc,
+  );
+
   let s = "";
   if (typeof e === "string") {
     s = word + `?session=${generateUUID()}`;
@@ -107,7 +109,7 @@ export const buildNisanyanAffixUrl = (
     const sharedMap = loadSharedMap(e);
     s =
       encodeURIComponent(
-        lowercase ? sharedMap.query.lower : sharedMap.query.decoded,
+        lowercase ? sharedMap.query.noNumL : sharedMap.query.noNum,
       ) + `?session=${session}`;
   }
   return {
@@ -130,7 +132,7 @@ export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
   const s =
     typeof e === "string"
       ? clearAccent(e).toLocaleLowerCase("tr")
-      : loadSharedMap(e).query.noAccentLower;
+      : loadSharedMap(e).query.noNumPlusParenAccL;
   // replace a, e, i, ı, o, ö, u, ü with _
   const replaced = encodeURIComponent(s.replace(/[aeıioöuü]/g, "_"));
   const url = `${BENZER_ADVANCED_URL}/${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;

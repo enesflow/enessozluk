@@ -6,7 +6,7 @@ import { BenzerPackageSchema } from "~/types/benzer";
 import { LuggatPackageSchema } from "~/types/luggat";
 import { NisanyanWordPackageSchema } from "~/types/nisanyan";
 import { TDKPackageSchema, TDKRecommendationSchema } from "~/types/tdk";
-import { debugLog } from "./log";
+import { debugAPI, debugLog } from "./log";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -62,6 +62,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
       raw: Response;
     }
 > {
+  debugLog("Fetching", decodeURI(url));
   const response = await fetch(url, init);
   const error = buildError(response);
   if (error) {
@@ -107,7 +108,7 @@ export function loadCache<T extends Dicts>(
       return null;
     }
   } else {
-    debugLog("Cache not found for", dict);
+    debugAPI(e, "Cache not found for", dict);
     return null;
   }
 }

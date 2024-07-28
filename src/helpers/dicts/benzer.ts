@@ -67,7 +67,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     }
 > {
   const sharedMap = loadSharedMap(e);
-  const query = sharedMap.query.cleaned;
+  const query = sharedMap.query.noNumPlusParenAcc;
   if (query.length === 1) {
     return {
       isUnsuccessful: false,
@@ -90,7 +90,10 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     return buildBenzerAPIError(e, url.user, API_FAILED_TEXT);
   }
   const $ = load(response.data);
-  const captcha = checkCaptcha($, url.user);
+  const captcha = checkCaptcha(
+    $,
+    buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
+  );
   if (captcha) return captcha;
   const results = $(
     "body > main > div.page > div > div.page-main > div > div.page-content > div.entries.entries-filtered",
@@ -100,7 +103,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   if (results.length === 0) {
     return {
       isUnsuccessful: false,
-      words: [sharedMap.query.cleaned],
+      words: [sharedMap.query.noNumPlusParenL],
     };
   }
   // find all the li a inside all the ul elements and get their text
@@ -116,12 +119,12 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
       (word) =>
         word.length === query.length &&
         clearAccent(word.toLocaleLowerCase("tr")) ===
-          sharedMap.query.noAccentLower,
+          sharedMap.query.noNumPlusParenAccL,
     )
     .sort((a, b) => a.localeCompare(b, "tr"));
   return {
     isUnsuccessful: false,
-    words: words.length ? words : [sharedMap.query.cleaned],
+    words: words.length ? words : [sharedMap.query.noNumPlusParenAcc],
   };
 }
 
@@ -311,12 +314,12 @@ const cleanseBenzerResponse = (
     if (isCaptcha) {
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.cleaned).user,
+        url: buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
         serverDefinedCaptchaError: isCaptcha,
 
         serverDefinedErrorText:
           "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-        words: ["Tekrar", "dene-", sharedMap.query.cleaned],
+        words: ["Tekrar", "dene-", sharedMap.query.noNumPlusParen],
       };
     } else {
       const w = loaded
@@ -329,7 +332,7 @@ const cleanseBenzerResponse = (
       const words = Array.from(new Set(w)) as string[];
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.cleaned).user,
+        url: buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
         serverDefinedErrorText: NO_RESULT,
         words,
       };

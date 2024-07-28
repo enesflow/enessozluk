@@ -1,6 +1,6 @@
-import type { SharedMap } from "#/request";
+import type { AddL, QueryType, SharedMap } from "#/request";
 import { generateUUID } from "#helpers/generateUUID";
-import { getRedirect } from "#helpers/redirect";
+import { flattenVerb, getRedirect } from "#helpers/redirect";
 import type { RequestHandler } from "@builder.io/qwik-city";
 import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
 import * as compressJSON from "compress-json";
@@ -58,19 +58,42 @@ function filterForJson(obj: any): any {
   return obj;
 }
 
+export function fullyCleanWord(word: string): string {
+  // remove numbers, +, (, ), and accent characters and flatten verb
+  return flattenVerb(
+    clearAccent(
+      word
+        .trim()
+        .toLocaleLowerCase("tr")
+        .replace(/[0-9+()]/g, ""),
+    ),
+  );
+}
+
 export function getQuery(query: string): SharedMap["query"] {
-  const decoded = decodeURIComponent(query); // Decode the url encoded string
-  const cleaned = decoded.replace(/[0-9+]/g, "");
-  const noAccent = clearAccent(cleaned); // Remove accents (â, î, û, ê)
-  return {
+  function addLowercaseKeys(obj: QueryType): AddL<QueryType> {
+    // add "..."L keys to object with "...".toLocaleLowerCase("tr")
+    const keys = Object.keys(obj);
+    const newObj = {} as any;
+    for (const key of keys) {
+      newObj[key] = (obj as any)[key];
+      newObj[`${key}L`] = (obj as any)[key].toLocaleLowerCase("tr");
+    }
+    return newObj;
+  }
+  const rawDecoded = decodeURIComponent(query); // Decode the url encoded string
+  const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
+  const noNumPlus = noNum.replace(/[+]/g, ""); // Remove +
+  const noNumPlusParen = noNumPlus.replace(/[()]/g, ""); // Remove ()
+  const noNumPlusParenAcc = clearAccent(noNumPlusParen); // Remove accents (â, î, û, ê)
+  return addLowercaseKeys({
     raw: query,
-    decoded,
-    lower: decoded.toLocaleLowerCase("tr"),
-    cleaned,
-    cleanedLower: cleaned.toLocaleLowerCase("tr"),
-    noAccent,
-    noAccentLower: noAccent.toLocaleLowerCase("tr"),
-  };
+    rawDecoded,
+    noNum,
+    noNumPlus,
+    noNumPlusParen,
+    noNumPlusParenAcc,
+  });
 }
 
 export const onRequest: RequestHandler = async (e) => {
@@ -78,7 +101,7 @@ export const onRequest: RequestHandler = async (e) => {
   if (!e.params.query) return e.next();
   const query = getQuery(e.params.query);
   ///////////////////////////////
-  const key = query.decoded.toLocaleLowerCase("tr");
+  const key = query.rawDecodedL;
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),

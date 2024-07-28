@@ -19,9 +19,8 @@ import {
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
-import { flattenVerb } from "~/helpers/redirect";
 import { removeNumbersInWord } from "~/helpers/string";
-import { clearAccent } from "~/routes/plugin";
+import { fullyCleanWord } from "~/routes/plugin";
 import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
@@ -53,13 +52,13 @@ function buildNisanyanAPIError(
       },
       {
         _id: "3",
-        name: query.decoded,
+        name: query.rawDecoded,
       },
     ],
   };
 }
 
-//The function below is written by chatgpt, I couldn't check it. I will revert it in case of an error. 
+//The function below is written by chatgpt, I couldn't check it. I will revert it in case of an error.
 function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
   if (data.isUnsuccessful) return data;
   if (!data.words) return data;
@@ -77,21 +76,34 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
       const etm = word.etymologies[etmIndex];
       // Set serverDefinedMoreIndentation for relations with abbreviation "≈"
       if (etm.relation.abbreviation === "≈") {
-        data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
+        data.words[wordIndex].etymologies![
+          etmIndex
+        ].serverDefinedMoreIndentation = true;
       }
-      if (etm.paranthesis === "(") isIn=true;
-      if (isIn || etm.paranthesis === "()") data.words[wordIndex].etymologies![etmIndex].serverDefinedMoreIndentation = true;
-      if (etm.paranthesis === ")") isIn=false;
+      if (etm.paranthesis === "(") isIn = true;
+      if (isIn || etm.paranthesis === "()")
+        data.words[wordIndex].etymologies![
+          etmIndex
+        ].serverDefinedMoreIndentation = true;
+      if (etm.paranthesis === ")") isIn = false;
 
       if (detected) {
-
         // Mark the end of the joined word if the relation abbreviation is not "+" or "§"
-        if (etm.relation.abbreviation !== "+" && etm.relation.abbreviation !== "§" && detectedTemp) {
+        if (
+          etm.relation.abbreviation !== "+" &&
+          etm.relation.abbreviation !== "§" &&
+          detectedTemp
+        ) {
           detectedTemp = false;
-          data.words[wordIndex].etymologies![etmIndex - 1].serverDefinedEndOfJoin = true;
+          data.words[wordIndex].etymologies![
+            etmIndex - 1
+          ].serverDefinedEndOfJoin = true;
         }
       } else {
-        if (etm.relation.abbreviation === "+" || etm.relation.abbreviation === "§") {
+        if (
+          etm.relation.abbreviation === "+" ||
+          etm.relation.abbreviation === "§"
+        ) {
           detected = true;
           detectedTemp = true;
         }
@@ -105,85 +117,11 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
 
     // Set serverDefinedEndOfJoin for the last "+" abbreviation
     if (lastPlusIndex !== -1) {
-      data.words[wordIndex].etymologies![lastPlusIndex].serverDefinedEndOfJoin = true;
+      data.words[wordIndex].etymologies![lastPlusIndex].serverDefinedEndOfJoin =
+        true;
     }
   }
 
-  return data;
-} 
-
-// @ts-expect-error
-function _fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
-  if (data.isUnsuccessful) return data;
-  if (!data.words) return data;
-  for (let wordIndex = 0; wordIndex < data.words.length; wordIndex++) {
-    const word = data.words[wordIndex];
-    if (!word.etymologies) continue;
-    let detected = false;
-    let finished = false;
-    let detectedTemp = false;
-    for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
-      const etm = word.etymologies[etmIndex];
-      /// This is added some time after the initial implementation
-      if (etm.relation.abbreviation === "≈") {
-        data.words[wordIndex].etymologies![
-          etmIndex
-        ].serverDefinedMoreIndentation = true;
-      }
-      /////////////////////////////
-      if (detected) {
-        if (finished) {
-          data.words[wordIndex].etymologies![
-            etmIndex
-          ].serverDefinedMoreIndentation = true;
-        }
-        if (etm.relation.abbreviation === "+") {
-          finished = true;
-        }
-        if (
-          !(
-            etm.relation.abbreviation === "+" ||
-            etm.relation.abbreviation === "§"
-          )
-        ) {
-          data.words[wordIndex].etymologies![
-            etmIndex
-          ].serverDefinedMoreIndentation = true;
-        }
-      } else {
-        if (
-          etm.relation.abbreviation === "+" ||
-          etm.relation.abbreviation === "§"
-        ) {
-          detected = true;
-          detectedTemp = true;
-        }
-      }
-
-      if (
-        !(
-          etm.relation.abbreviation === "+" || etm.relation.abbreviation === "§"
-        ) &&
-        detectedTemp
-      ) {
-        detectedTemp = false;
-        data.words[wordIndex].etymologies![
-          etmIndex - 1
-        ].serverDefinedEndOfJoin = true;
-      }
-    }
-    // make the last one serverDefinedEndOfJoin if the abbreviation is +
-
-    if (data.words[wordIndex].etymologies) {
-      const len = data.words[wordIndex].etymologies!.length;
-      if (
-        data.words[wordIndex].etymologies![len - 1].relation.abbreviation == "+"
-      ) {
-        data.words[wordIndex].etymologies![len - 1].serverDefinedEndOfJoin =
-          true;
-      }
-    }
-  }
   return data;
 }
 
@@ -192,34 +130,30 @@ async function cleanseNisanyanResponse(
   data: NisanyanResponse,
 ): Promise<NisanyanWordPackage> {
   const sharedMap = loadSharedMap(e);
-  const query = sharedMap.query.lower;
   const mapper = (word: any & { name: string }) => ({
     ...word,
     name: removeNumbersInWord(word.name),
   });
   data.words = data.words?.map(mapper);
-  const misspellings = data.words?.map((i) => i.misspellings).flat();
-  const names = data.words?.map((i) => i.name).flat();
   data.fiveAfter = data.fiveAfter?.map(mapper);
   data.fiveBefore = data.fiveBefore?.map(mapper);
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
-    if (
-      flattenVerb(clearAccent(word.name.toLocaleLowerCase("tr"))) !==
-      flattenVerb(clearAccent(sharedMap.query.lower))
-    ) {
-      word.serverDefinedTitleDescription = query;
+    if (fullyCleanWord(word.name) !== sharedMap.query.noNumPlusParenAccL) {
+      console.log(word.name, "is not", sharedMap.query.rawDecoded);
+      word.serverDefinedTitleDescription = sharedMap.query.rawDecodedL;
       word.serverDefinedIsMisspelling = true;
     }
   });
   // if our word is a misspelling, we should set it as misspelling
-  if (misspellings?.includes(query) && !names?.includes(query)) {
+  // I don't think we need this check
+  /* if (misspellings?.includes(query) && !names?.includes(query)) {
     data.words?.forEach((word) => {
       word.serverDefinedTitleDescription = query;
       word.serverDefinedIsMisspelling = true;
     });
-  }
+  } */
 
   return fixForJoinedWords(data);
 }
@@ -375,7 +309,7 @@ const loadNisanyanAffix = server$(
 export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   async (e) => {
     const sharedMap = loadSharedMap(e);
-    if (isWord(sharedMap.query.lower)) {
+    if (isWord(sharedMap.query.rawDecoded)) {
       return loadNisanyanWord.call(e);
     } else {
       return loadNisanyanAffix.call(e);

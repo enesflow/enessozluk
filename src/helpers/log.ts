@@ -7,7 +7,6 @@ export const debugLog = (...args: any[]) => {
   console.log("🛠️ DEBUG:", ...args);
 };
 
-export const debugAPI = (e: RequestEventBase, title: string) => {
-  const { query } = loadSharedMap(e);
-  debugLog(`[${query}] ${title}`);
+export const debugAPI = (e: RequestEventBase, ...args: any[]) => {
+  debugLog(`[${loadSharedMap(e).query.rawDecoded}]`, ...args);
 };

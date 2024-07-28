@@ -22,12 +22,17 @@ const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
   const [error, response] = await to(fetchAPI(url.api));
   if (error || !response?.success) {
-    debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
+    /* debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
     return [
       { madde: "Tekrar" },
       { madde: "dene-" },
-      { madde: loadSharedMap(e).query.decoded },
-    ];
+      { madde: loadSharedMap(e).query.noNumPlusParen },
+    ]; */
+    return buildTDKAPIError(
+      e,
+      url.user,
+      `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
+    ).recommendations;
   }
   const data = TDKRecommendationSchema.parse(response.data);
   return data;
@@ -46,7 +51,7 @@ function buildTDKAPIError(
     recommendations: [
       { madde: "Tekrar" },
       { madde: "dene-" },
-      { madde: sharedMap.query.decoded },
+      { madde: sharedMap.query.noNumPlusParen },
     ],
   };
 }
