@@ -79,10 +79,12 @@ export function getQuery(query: string): SharedMap["query"] {
     }
     return newObj;
   }
-  const rawDecoded = decodeURIComponent(query); // Decode the url encoded string
+  const rawDecoded = decodeURIComponent(query).trim(); // Decode the url encoded string
   const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
   const noNumPlus = noNum.replace(/[+]/g, ""); // Remove +
-  const noNumPlusParen = noNumPlus.replace(/[()]/g, ""); // Remove ()
+  const noNumPlusParen = noNumPlus.includes(" ")
+    ? noNumPlus
+    : noNumPlus.replace(/[()]/g, ""); // Remove ()
   const noNumPlusParenAcc = clearAccent(noNumPlusParen); // Remove accents (â, î, û, ê)
   return addLowercaseKeys({
     raw: query,
