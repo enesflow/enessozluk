@@ -227,7 +227,9 @@ function cleanseNisanyanAffixResponse(
       serverDefinedIsGeneratedFromAffix: true,
       words: [
         {
-          serverDefinedTitleDescription: `${words.length} kelime`,
+          serverDefinedTitleDescription: words.length
+            ? `${words.length} kelime`
+            : undefined,
           _id: data.affix._id,
           actualTimeUpdated: data.affix.timeUpdated,
           etymologies: [],

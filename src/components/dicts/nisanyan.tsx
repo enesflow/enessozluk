@@ -54,7 +54,7 @@ const NISANYAN_ABBREVIATIONS = {
   Kzk: "Kazakça",
   Tat: "Tatarca",
   Sogd: "Soğdca",
-  Fen: "Fenike dili", 
+  Fen: "Fenike dili",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -371,7 +371,7 @@ export const NisanyanView = component$<{
                   <WordLinks words={word.similarWords} />
                 </section>
               )}
-              {word.referenceOf && (
+              {!!word.referenceOf?.length && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Bu maddeye gönderenler</h2>
                   <WordLinks words={word.referenceOf.map((ref) => ref.name)} />
