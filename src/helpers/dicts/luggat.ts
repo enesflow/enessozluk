@@ -15,6 +15,7 @@ import {
   LuggatResponseErrorSchema,
   LuggatResponseSchema,
 } from "~/types/luggat";
+import { unq } from "../array";
 
 function buildLuggatAPIError(
   e: RequestEventBase,
@@ -80,7 +81,7 @@ function parseLuggat(
           result.set(key, [...(result.get(key) || []), ...word.definitions]);
         });
         return Array.from(result, ([name, definitions]) => ({
-          name,
+          name: unq(name.split(" / ")).join(" / "),
           definitions: Array.from(new Set(definitions.map((d) => d.trim()))),
         }));
       })(words),
