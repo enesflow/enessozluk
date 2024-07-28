@@ -25,6 +25,7 @@ import type { NisanyanWord } from "~/types/nisanyan";
 import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
+import { flattenVerb } from "../redirect";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -140,20 +141,13 @@ async function cleanseNisanyanResponse(
   data.randomWord = mapper(data.randomWord);
 
   data.words?.forEach((word) => {
+    word.name = flattenVerb(word.name);
     if (fullyCleanWord(word.name) !== sharedMap.query.noNumPlusParenAccL) {
       console.log(word.name, "is not", sharedMap.query.rawDecoded);
       word.serverDefinedTitleDescription = sharedMap.query.rawDecodedL;
       word.serverDefinedIsMisspelling = true;
     }
   });
-  // if our word is a misspelling, we should set it as misspelling
-  // I don't think we need this check
-  /* if (misspellings?.includes(query) && !names?.includes(query)) {
-    data.words?.forEach((word) => {
-      word.serverDefinedTitleDescription = query;
-      word.serverDefinedIsMisspelling = true;
-    });
-  } */
 
   return fixForJoinedWords(data);
 }

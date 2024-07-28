@@ -8,6 +8,7 @@ import {
 import { Link, useLocation } from "@builder.io/qwik-city";
 import { LinkR } from "./linkWithRedirect";
 import { convertToRoman } from "~/helpers/roman";
+import { flattenVerb } from "~/helpers/redirect";
 
 export function putTheNumbersAtTheEndAsRomanToTheBeginning(
   text: string,
@@ -23,9 +24,9 @@ export function putTheNumbersAtTheEndAsRomanToTheBeginning(
 }
 
 function cleanWordFromRom(word: string): string {
-  if (word.trim().includes(" ")) 
-  // remove any text in parenthesis (with the parenthesis)
-  return word.replace(/\(.*\)/, "").trim();
+  if (word.trim().includes(" "))
+    // remove any text in parenthesis (with the parenthesis)
+    return word.replace(/\(.*\)/, "").trim();
   else return word;
 }
 
@@ -58,7 +59,7 @@ export const WordLinks = component$<{
             <LinkR
               href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word))}`}
             >
-              {putTheNumbersAtTheEndAsRomanToTheBeginning(word)}
+              {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(word))}
             </LinkR>
             {index < entries.value.length - 1 && ", "}
           </span>

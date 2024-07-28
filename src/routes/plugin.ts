@@ -1,9 +1,9 @@
 import type { AddL, QueryType, SharedMap } from "#/request";
 import { generateUUID } from "#helpers/generateUUID";
-import { flattenVerb, getRedirect } from "#helpers/redirect";
+import { getRedirect } from "#helpers/redirect";
 import type { RequestHandler } from "@builder.io/qwik-city";
-import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
 import * as compressJSON from "compress-json";
+import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
 import { sha256 } from "~/helpers/sha256";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isDev } from "@builder.io/qwik/build";
@@ -60,13 +60,11 @@ function filterForJson(obj: any): any {
 
 export function fullyCleanWord(word: string): string {
   // remove numbers, +, (, ), and accent characters and flatten verb
-  return flattenVerb(
-    clearAccent(
-      word
-        .trim()
-        .toLocaleLowerCase("tr")
-        .replace(/[0-9+()]/g, ""),
-    ),
+  return clearAccent(
+    word
+      .trim()
+      .toLocaleLowerCase("tr")
+      .replace(/[0-9+()]/g, ""),
   );
 }
 

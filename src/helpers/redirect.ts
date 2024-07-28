@@ -4,20 +4,20 @@ export function flattenVerb(verb: string): string {
   // if hyphen then add mak or mek
   if (verb.endsWith("-")) {
     //const lower = verb.toLocaleLowerCase("tr");
-    const lastVowel = verb.match(/[aeıioöuüAEIİOÖUÜ]/gi)?.slice(-1);
+    const lastVowel = verb.match(/[aeıioöuüAEIİOÖUÜâêîôûÂÊÎÔÛ]/gi)?.slice(-1);
     // if it's a back vowel, add "mak" to the end
     // if it's a front vowel, add "mek" to the end
     if (lastVowel) {
       const [vowel] = lastVowel;
       const noHyphen = verb.slice(0, -1);
       let toAdd = "";
-      if ("eiüö".includes(vowel)) {
+      if ("eiüöêî".includes(vowel)) {
         toAdd = "mek";
-      } else if ("aıou".includes(vowel)) {
+      } else if ("aıouâôû".includes(vowel)) {
         toAdd = "mak";
-      } else if ("EİÜÖ".includes(vowel)) {
+      } else if ("EİÜÖÊÎ".includes(vowel)) {
         toAdd = "MEK";
-      } else if ("AIOU".includes(vowel)) {
+      } else if ("AIOUÂÔÛ".includes(vowel)) {
         toAdd = "MAK";
       } else {
         console.error(
