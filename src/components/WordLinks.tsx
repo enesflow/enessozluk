@@ -23,8 +23,10 @@ export function putTheNumbersAtTheEndAsRomanToTheBeginning(
 }
 
 function cleanWordFromRom(word: string): string {
+  if (word.trim().includes(" ")
   // remove any text in parenthesis (with the parenthesis)
   return word.replace(/\(.*\)/, "").trim();
+  else return word;
 }
 
 export const WordLinks = component$<{
