@@ -75,12 +75,13 @@ export const buildNisanyanUrl = (
   lowercase = true,
 ) => {
   const word = encodeURIComponent(
-    typeof e === "string"
+    (typeof e === "string"
       ? e
       : lowercase
         ? loadSharedMap(e).query.lower
-        : loadSharedMap(e).query.decoded,
-  );
+        : loadSharedMap(e).query.decoded).replace(/[()]/g, '');
+  )
+  
   let s = "";
   if (typeof e === "string") {
     s = word + `?session=${generateUUID()}`;
