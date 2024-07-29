@@ -72,7 +72,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   if (query.length === 1) {
     return {
       isUnsuccessful: false,
-      words: [query.toLocaleLowerCase("tr)), query.toLocaleUpperCase("tr")],
+      words: [query.toLocaleLowerCase("tr"), query.toLocaleUpperCase("tr")],
     };
   }
   const url = buildBenzerAdvancedUrl(e);
