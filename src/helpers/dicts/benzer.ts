@@ -24,6 +24,7 @@ import {
   BenzerResponseSchema,
 } from "~/types/benzer";
 import { nonNullable } from "../filter";
+import { unq } from "../array";
 
 export const CAPTCHA_PATH =
   "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button";
@@ -71,7 +72,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   if (query.length === 1) {
     return {
       isUnsuccessful: false,
-      words: [query, query.toLocaleUpperCase("tr")],
+      words: [query.toLocaleLowerCase("tr)), query.toLocaleUpperCase("tr")],
     };
   }
   const url = buildBenzerAdvancedUrl(e);
