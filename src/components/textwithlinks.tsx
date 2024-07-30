@@ -5,8 +5,8 @@ import { flattenVerb } from "~/helpers/redirect";
 
 function isALetter(char: string | undefined): boolean {
   return !(
-    // a comma
     (
+      // a comma
       char === "," ||
       // a dot
       char === "." ||
@@ -15,7 +15,9 @@ function isALetter(char: string | undefined): boolean {
       // a semicolon
       char === ";" ||
       // a question mark
-      char === "?"
+      char === "?" ||
+      // a closing paren 
+      char === ")"
     )
   );
 }
