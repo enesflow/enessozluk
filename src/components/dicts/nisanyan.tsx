@@ -300,15 +300,15 @@ export const NisanyanView = component$<{
                                 <span>ve </span>
                               ) : (
                                 
-                                  <span>
-                                    {etymology.serverDefinedMoreIndentation &&
-                                      !word.etymologies?.[index - 1]
-                                        ?.serverDefinedMoreIndentation &&
-                                      "Not: "}{index !== 0 ||
-                                  word.etymologies?.length === 1) &&
-                                etymology.relation.abbreviation !== "/" && (
-                                    "Bu sözcük "} 
-                                  </span>
+                                   <span>
+  {etymology.serverDefinedMoreIndentation &&
+    !word.etymologies?.[index - 1]?.serverDefinedMoreIndentation &&
+    "Not: "}
+  {index !== 0 || word.etymologies?.length === 1) &&
+    etymology.relation.abbreviation !== "/" && (
+    "Bu sözcük "
+  )}
+</span>
                                 
                               )
                               <strong>
