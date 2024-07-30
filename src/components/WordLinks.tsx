@@ -24,12 +24,8 @@ export function putTheNumbersAtTheEndAsRomanToTheBeginning(
 }
 
 function cleanWordFromRom(word: string): string {
-  // IMPORTANT: why did I make this change I don't remember!! Fixing hopefully
-  //if (word.trim().includes(" "))
-    // remove any text in parenthesis (with the parenthesis)
-    //return word.replace(/\(.*\)/, "").trim();
-  //else 
-  return word;
+  // Remove Roman numerals in parentheses from the start of the text
+  return word.replace(/^\(\s*(?:[IVXLCDM]+)\s*\)\s*/, "").trim();
 }
 
 export const WordLinks = component$<{
