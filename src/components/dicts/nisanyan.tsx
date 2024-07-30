@@ -310,7 +310,7 @@ export const NisanyanView = component$<{
                                     "Bu sözcük "} 
                                   </span>
                                 
-                              )}
+                              )
                               <strong>
                                 {joinTurkish(
                                   etymology.languages.map((lang) => lang.name),
