@@ -309,13 +309,6 @@ export const NisanyanView = component$<{
     "Bu sözcük "
   )}
 </span>
-    !word.etymologies?.[index - 1]?.serverDefinedMoreIndentation &&
-    "Not: "}
-  {index !== 0 || word.etymologies?.length === 1) &&
-    etymology.relation.abbreviation !== "/" && (
-    "Bu sözcük "
-  )}
-</span>
                                 
                               )
                               <strong>
