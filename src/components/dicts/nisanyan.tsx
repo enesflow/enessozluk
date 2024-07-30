@@ -299,17 +299,17 @@ export const NisanyanView = component$<{
                               index !== 0 ? (
                                 <span>ve </span>
                               ) : (
-                                (index !== 0 ||
-                                  word.etymologies?.length === 1) &&
-                                etymology.relation.abbreviation !== "/" && (
+                                
                                   <span>
                                     {etymology.serverDefinedMoreIndentation &&
                                       !word.etymologies?.[index - 1]
                                         ?.serverDefinedMoreIndentation &&
-                                      "Not: "}
-                                    Bu sözcük{" "}
+                                      "Not: "}(index !== 0 ||
+                                  word.etymologies?.length === 1) &&
+                                etymology.relation.abbreviation !== "/" && (
+                                    Bu sözcük{" "}) 
                                   </span>
-                                )
+                                
                               )}
                               <strong>
                                 {joinTurkish(
