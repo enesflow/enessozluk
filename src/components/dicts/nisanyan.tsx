@@ -54,7 +54,8 @@ const NISANYAN_ABBREVIATIONS = {
   Kzk: "Kazakça",
   Tat: "Tatarca",
   Sogd: "Soğdca",
-  Fen: "Fenike dili",
+  Fen: "Fenike dili", 
+  Osm: "Osmanlıca", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
