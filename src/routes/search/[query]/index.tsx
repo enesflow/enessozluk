@@ -26,6 +26,7 @@ type SearchPageData = {
 
 export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
   const s = new Date().getTime();
+  console.log("date is", s, new Date());
   const tdk = await e.resolveValue(useTDKLoader);
   const nisanyan = await e.resolveValue(useNisanyanLoader);
   const luggat = await e.resolveValue(useLuggatLoader);
