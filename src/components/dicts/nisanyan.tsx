@@ -79,7 +79,7 @@ function formatSpecialChars(str: string): string {
   ];
 
   for (const stage of stages) {
-    str = str.replace(stage.pattern, stage?.replacement);
+    str = str.replace(stage.pattern, stage.replacement);
   }
 
   // Handle combination of tags explicitly if necessary
