@@ -54,7 +54,8 @@ const NISANYAN_ABBREVIATIONS = {
   Kzk: "Kazakça",
   Tat: "Tatarca",
   Sogd: "Soğdca",
-  Fen: "Fenike dili",
+  Fen: "Fenike dili", 
+  Osm: "Osmanlıca", 
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -299,18 +300,18 @@ export const NisanyanView = component$<{
                               index !== 0 ? (
                                 <span>ve </span>
                               ) : (
-                                (index !== 0 ||
-                                  word.etymologies?.length === 1) &&
-                                etymology.relation.abbreviation !== "/" && (
-                                  <span>
-                                    {etymology.serverDefinedMoreIndentation &&
-                                      !word.etymologies?.[index - 1]
-                                        ?.serverDefinedMoreIndentation &&
-                                      "Not: "}
-                                    Bu sözcük{" "}
-                                  </span>
-                                )
-                              )}
+                                
+                                   <span>
+  {etymology.serverDefinedMoreIndentation &&
+    !word.etymologies?.[index - 1]?.serverDefinedMoreIndentation &&
+    "Not: "}
+  {(index !== 0 || word.etymologies?.length === 1) && // <-- Corrected parenthesis
+    etymology.relation.abbreviation !== "/" && (
+    "Bu sözcük "
+  )}
+</span>
+                                
+                              )} 
                               <strong>
                                 {joinTurkish(
                                   etymology.languages.map((lang) => lang.name),

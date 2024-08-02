@@ -107,7 +107,7 @@ export const NisanyanHistorySchema = z.object({
   definition: weakString(),
   source: NisanyanSourceSchema.optional(),
   date: z.string(),
-  dateSortable: z.number(),
+  dateSortable: z.number().optional().nullable(),
   quote: z.string(),
   timeCreated: weakString(),
   timeUpdated: weakString(),
