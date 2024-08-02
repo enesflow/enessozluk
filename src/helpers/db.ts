@@ -47,7 +47,7 @@ export async function setCache(e: RequestEventBase, input: CacheInput) {
   const cache: Cache = {
     ...input,
     time: Date.now(),
-    hash: sha256(input.data),
+    hash: await sha256(input.data),
   };
   await db
     .prepare("INSERT INTO cache (key, data, time, hash) VALUES (?, ?, ?, ?)")
@@ -61,7 +61,7 @@ export async function updateCache(e: RequestEventBase, input: CacheInput) {
   const cache: Cache = {
     ...input,
     time: Date.now(),
-    hash: sha256(input.data),
+    hash: await sha256(input.data),
   };
   await db
     .prepare("UPDATE cache SET data = ?, time = ?, hash = ? WHERE key = ?")

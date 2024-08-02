@@ -13,15 +13,15 @@ function toUUID(hash: string) {
 }
 
 // Function to get UUID based on input string and version
-export function getUuid(name: string) {
-  const hash = sha256(name);
+export async function getUuid(name: string) {
+  const hash = await sha256(name);
   return toUUID(hash);
 }
 
-export function generateUUID(
+export async function generateUUID(
   clientConn?: RequestEvent<QwikCityPlatform>["clientConn"] | undefined,
-): string {
+): Promise<string> {
   const ip = clientConn?.ip;
   const uuid = getUuid(ip || Math.random().toString());
-  return uuid;
+  return await uuid;
 }

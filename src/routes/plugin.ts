@@ -113,7 +113,7 @@ export const onRequest: RequestHandler = async (e) => {
     cacheTook: new Date().getTime() - s,
   };
   e.sharedMap.set("data", data);
-  e.sharedMap.set("sessionUUID", generateUUID(e.clientConn));
+  e.sharedMap.set("sessionUUID", await generateUUID(e.clientConn));
 
   const red = getRedirect(e.url, {
     query: e.params.query,
@@ -134,7 +134,7 @@ export const onRequest: RequestHandler = async (e) => {
       data: compressed,
     });
   } else {
-    if (cache.hash !== sha256(compressed)) {
+    if (cache.hash !== (await sha256(compressed))) {
       console.log("Updating caches");
       await updateCache(e, {
         key,
