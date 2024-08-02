@@ -298,6 +298,13 @@ const loadNisanyanAffix = server$(
         );
       }
     }
+    response.data = {
+      ...(response.data as {
+        affix: any;
+      }),
+      version: NISANYAN_VERSION,
+      perf: perf(e),
+    } satisfies NisanyanAffixPackage;
     const parsed = NisanyanAffixResponseSchema.safeParse(response.data);
     // Error handling
     {
