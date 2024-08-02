@@ -1,10 +1,10 @@
 import type { TDKPackage } from "#/tdk";
-import { convertToRoman } from "#helpers/roman";
+import { romanOptional } from "#helpers/roman";
 import { component$, useSignal } from "@builder.io/qwik";
-import { WordLinks } from "../WordLinks";
-import { nonNullable } from "~/helpers/filter";
 import { TDK_TTS_URL } from "~/helpers/dicts/url";
+import { nonNullable } from "~/helpers/filter";
 import Speaker from "../speaker";
+import { WordLinks } from "../WordLinks";
 
 const TDK_LINK_DET = "► " as const;
 
@@ -93,8 +93,8 @@ export const TDKView = component$<{
             {data.meanings.map((result, index) => (
               <li key={result.madde_id} class="result-item">
                 <h2 class="result-title">
-                  ({convertToRoman(index + 1)}) {result.madde}{" "}
-                  {result.taki ? `-${result.taki}` : ""}
+                  {romanOptional(index, data.meanings.length)}
+                  {result.madde} {result.taki ? `-${result.taki}` : ""}
                   <i class="result-title-description">
                     {result.telaffuz && <> {result.telaffuz}</>}
                     {result.lisan && <> ({result.lisan})</>}

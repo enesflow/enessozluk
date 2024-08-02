@@ -1,6 +1,6 @@
 import type { LuggatPackage } from "#/luggat";
 import { NO_RESULT } from "#helpers/constants";
-import { convertToRoman } from "#helpers/roman";
+import { romanOptional } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { TextWithLinks } from "../textwithlinks";
 
@@ -18,7 +18,8 @@ export const LuggatView = component$<{
           {data.words.map((word, index) => (
             <li key={word.name} class="result-item">
               <h2 class="result-title">
-                ({convertToRoman(index + 1)}) {word.name}
+                {romanOptional(index, data.words.length)}
+                {word.name}
               </h2>
               <ul class="results-list">
                 {word.definitions.map((meaning) => (

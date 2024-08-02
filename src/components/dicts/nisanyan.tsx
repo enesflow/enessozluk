@@ -4,14 +4,14 @@ import type {
   NisanyanWordPackage,
 } from "#/nisanyan";
 import { NO_RESULT } from "#helpers/constants";
-import { convertToRoman } from "#helpers/roman";
+import { romanOptional } from "#helpers/roman";
 import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import { component$ } from "@builder.io/qwik";
 import { putTheNumbersAtTheEndAsRomanToTheBeginning } from "~/components/WordLinks";
+import { joinTurkish } from "~/helpers/parser";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
-import { joinTurkish } from "~/helpers/parser";
 
 //const NISANYAN_AFFIX_URL = "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 const NISANYAN_ABBREVIATIONS = {
@@ -79,7 +79,7 @@ function formatSpecialChars(str: string): string {
   ];
 
   for (const stage of stages) {
-    str = str.replace(stage.pattern, stage.replacement);
+    str = str.replace(stage.pattern, stage?.replacement);
   }
 
   // Handle combination of tags explicitly if necessary
@@ -227,11 +227,11 @@ function formatRelation(
   }
 }
 
-function getWordTitle(index: number, name: string) {
+function getWordTitle(index: number, length: number, name: string) {
   if (/\d$/.test(name)) {
     return `${putTheNumbersAtTheEndAsRomanToTheBeginning(name)}`;
   } else {
-    return `(${convertToRoman(index + 1)}) ${removeNumbersInWord(name)}`;
+    return `${romanOptional(index, length)}${removeNumbersInWord(name)}`;
   }
 }
 
@@ -270,10 +270,10 @@ export const NisanyanView = component$<{
                 {/* */}
                 {word.serverDefinedIsMisspelling ? (
                   <LinkR href={`/search/${word.name}`}>
-                    {getWordTitle(index, word.name)}
+                    {getWordTitle(index, data.words!.length, word.name)}
                   </LinkR>
                 ) : (
-                  <>{getWordTitle(index, word.name)}</>
+                  <>{getWordTitle(index, data.words!.length, word.name)}</>
                 )}
                 <i class="result-title-description">
                   {word.serverDefinedTitleDescription && (

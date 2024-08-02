@@ -29,3 +29,9 @@ export function convertToRoman(num: number): string {
 
   return roman;
 }
+
+export function romanOptional(index: number, length: number): string {
+  // q: whats the character when i press alt+7
+  // a: a dot: •
+  return length > 1 ? `(${convertToRoman(index + 1)}) ` : "• ";
+}

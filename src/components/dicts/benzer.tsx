@@ -12,7 +12,7 @@ import { Link, useLocation } from "@builder.io/qwik-city";
 import { ExternalLink } from "~/components/externalLink";
 import { benzerLoader } from "~/helpers/dicts/benzer";
 import { BENZER_URL } from "~/helpers/dicts/url";
-import { convertToRoman } from "~/helpers/roman";
+import { romanOptional } from "~/helpers/roman";
 import { WordLinks } from "../WordLinks";
 
 export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
@@ -154,7 +154,8 @@ export const BenzerView = component$<{
             <li class="result-item" key={word.url}>
               <h2 class="result-title">
                 <span class="mr-1">
-                  ({convertToRoman(index + 1)}) {word.name}
+                  {romanOptional(index, data.value.words!.length)}
+                  {word.name}
                 </span>
                 {data.value.words!.length > 1 && (
                   <ExternalLink href={word.url} />
