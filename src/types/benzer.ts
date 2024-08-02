@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema } from "./shared";
 
-export const BENZER_VERSION = "1.0.1" as const;
+export const BENZER_VERSION = "1.0.2" as const;
 
 export const BenzerWordSchema = z.object({
   url: z.string(),

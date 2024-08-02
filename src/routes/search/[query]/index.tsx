@@ -15,6 +15,7 @@ import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { loadSharedMap } from "~/helpers/request";
+import { Check } from "~/components/svgs/check";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type SearchPageData = {
@@ -61,6 +62,10 @@ function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
 }
 
+const CacheIndicator = component$<{ show: boolean }>(({ show }) => {
+  return <>{show && <Check />}</>;
+});
+
 export default component$(() => {
   const loc = useLocation();
   const tdk = useTDKLoader();
@@ -78,12 +83,14 @@ export default component$(() => {
         <SearchBar value={loc.params.query} />
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">
+            <CacheIndicator show={tdk.value.perf.cached} />
             TDK Sonuçları: <ExternalLink href={urls.value.tdk} />
           </h1>
           <TDKView data={tdk.value} />
         </div>
         <div data-version={nisanyan.value.version} data-dict="nisanyan">
-          <h1 style="results-heading">
+          <h1 style="results-heading align-middle">
+            <CacheIndicator show={nisanyan.value.perf.cached} />
             Nişanyan Sözlük Sonuçları:{" "}
             <ExternalLink href={urls.value.nisanyan} />
           </h1>
@@ -91,12 +98,14 @@ export default component$(() => {
         </div>
         <div data-version={luggat.value.version} data-dict="luggat">
           <h1 style="results-heading" data-version={luggat.value.version}>
+            <CacheIndicator show={luggat.value.perf.cached} />
             Luggat Sonuçları: <ExternalLink href={urls.value.luggat} />
           </h1>
           <LuggatView data={luggat.value} />
         </div>
         <div data-version={benzer.value.version} data-dict="benzer">
           <h1 style="results-heading">
+            <CacheIndicator show={benzer.value.perf.cached} />
             Benzer Kelimeler Sonuçları:{" "}
             {urls.value.benzer.length === 1 && (
               <ExternalLink href={urls.value.benzer[0]} />

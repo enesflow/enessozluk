@@ -103,6 +103,7 @@ export function loadCache<T extends Dicts>(
       debugLog("Using cache for", dict);
       parsed.data.perf = {
         took: 0,
+        cached: true,
       };
       return parsed.data;
     } else {

@@ -9,7 +9,7 @@ export const ExternalLink = component$<{ href: string | undefined }>(
           viewBox="0 0 24 24"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          class="inline h-5 w-auto align-middle"
+          class="m-auto mb-0.5 inline h-5 w-auto align-middle"
         >
           <g id="Interface / External_Link">
             <path

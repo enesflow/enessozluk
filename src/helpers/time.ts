@@ -15,5 +15,5 @@ export function time(start: StartTimeTypes): number {
 }
 
 export function perf(start: StartTimeTypes): Performance {
-  return { took: time(start) };
+  return { took: time(start), cached: false };
 }
