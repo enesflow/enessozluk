@@ -118,7 +118,7 @@ a {
 }
 
 li {
-  @apply list-disc;
+  @apply list-none;
 }
 
 body {
