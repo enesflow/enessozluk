@@ -151,6 +151,12 @@ async function cleanseNisanyanResponse(
     }
   });
 
+  // filter history
+
+  data.words?.forEach((word) => {
+    word.histories = word.histories?.filter((h) => h.dateSortable);
+  });
+
   return fixForJoinedWords(data);
 }
 

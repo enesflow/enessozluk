@@ -54,8 +54,8 @@ const NISANYAN_ABBREVIATIONS = {
   Kzk: "Kazakça",
   Tat: "Tatarca",
   Sogd: "Soğdca",
-  Fen: "Fenike dili", 
-  Osm: "Osmanlıca", 
+  Fen: "Fenike dili",
+  Osm: "Osmanlıca",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -300,18 +300,17 @@ export const NisanyanView = component$<{
                               index !== 0 ? (
                                 <span>ve </span>
                               ) : (
-                                
-                                   <span>
-  {etymology.serverDefinedMoreIndentation &&
-    !word.etymologies?.[index - 1]?.serverDefinedMoreIndentation &&
-    "Not: "}
-  {(index !== 0 || word.etymologies?.length === 1) && // <-- Corrected parenthesis
-    etymology.relation.abbreviation !== "/" && (
-    "Bu sözcük "
-  )}
-</span>
-                                
-                              )} 
+                                <span>
+                                  {etymology.serverDefinedMoreIndentation &&
+                                    !word.etymologies?.[index - 1]
+                                      ?.serverDefinedMoreIndentation &&
+                                    "Not: "}
+                                  {(index !== 0 ||
+                                    word.etymologies?.length === 1) && // <-- Corrected parenthesis
+                                    etymology.relation.abbreviation !== "/" &&
+                                    "Bu sözcük "}
+                                </span>
+                              )}
                               <strong>
                                 {joinTurkish(
                                   etymology.languages.map((lang) => lang.name),
@@ -386,7 +385,7 @@ export const NisanyanView = component$<{
                 </section>
               )}
               {!data.serverDefinedIsGeneratedFromAffix &&
-                (!word.histories ? (
+                (!word.histories?.length ? (
                   <p class="result-description">
                     <i>Henüz tarihçe eklenmemiş.</i>
                   </p>
