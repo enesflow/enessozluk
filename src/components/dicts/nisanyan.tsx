@@ -375,7 +375,12 @@ export const NisanyanView = component$<{
               {!!word.referenceOf?.length && (
                 <section class="result-section">
                   <h2 class="result-subtitle">Bu maddeye gönderenler</h2>
-                  <WordLinks words={word.referenceOf.map((ref) => ref.name)} />
+                  <WordLinks
+                    words={word.referenceOf.map((ref) => ({
+                      word: ref.name,
+                      recursive: ref.referenceOf?.[0]?.name,
+                    }))}
+                  />
                 </section>
               )}
               {!!word.misspellings?.length && (

@@ -171,9 +171,10 @@ export const BenzerView = component$<{
               {word.words.length ? (
                 <WordLinks
                   words={word.words}
-                  more={Object.keys(word.moreWords).flatMap(
-                    (category) => word.moreWords[category],
-                  )}
+                  more={Object.keys(word.moreWords).map((category) => ({
+                    title: category,
+                    words: word.moreWords[category],
+                  }))}
                 />
               ) : (
                 <p class="result-description">

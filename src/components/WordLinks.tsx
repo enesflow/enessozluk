@@ -28,21 +28,57 @@ function cleanWordFromRom(word: string): string {
   return word.replace(/^\(\s*(?:[IVXLCDM]+)\s*\)\s*/, "").trim();
 }
 
+type Word = {
+  word: string;
+  recursive?: string;
+};
+
+type More = {
+  title: string;
+  words: Word[] | string[];
+};
+
+function toWords(words: string[] | Word[] | undefined): Word[] | undefined {
+  if (!words) return;
+  if (typeof words[0] === "string") {
+    return (words as string[]).map((word) => ({ word }));
+  }
+  return words as Word[];
+}
+
+const WordLink = component$<{ word: Word }>(({ word }) => {
+  return (
+    <>
+      <LinkR
+        href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word.word))}`}
+      >
+        {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(word.word))}
+      </LinkR>
+      {word.recursive && (
+        <>
+          {" "}
+          (<WordLink word={{ word: word.recursive }} />)
+        </>
+      )}
+    </>
+  );
+});
+
 export const WordLinks = component$<{
-  words: string[] | undefined;
-  more?: string[];
+  words: Word[] | string[] | undefined;
+  more?: More[];
 }>(({ words, more }) => {
   const loc = useLocation();
   const showMore = useSignal(false);
+  const words_ = toWords(words);
   const entries = useComputed$(() => {
     showMore.value;
     // if you remove the random code above, you get error
     // Internal assert, this is likely caused by a bug in Qwik: resume: index is out of bounds
-
-    if (more && showMore.value && words) {
-      return words.concat(more);
+    if (more && showMore.value && words_) {
+      return words_.concat(more.flatMap((m) => toWords(m.words) ?? []));
     }
-    return words ?? [];
+    return words_ ?? [];
   });
   useTask$(({ track }) => {
     track(() => loc.isNavigating);
@@ -53,12 +89,16 @@ export const WordLinks = component$<{
       {
         // if showMore then join words and more, else just words
         entries.value.map((word, index) => (
-          <span key={word} class="result-description">
-            <LinkR
-              href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word))}`}
+          <span key={word.word} class="result-description">
+            {/* <LinkR
+              href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word.word))}`}
             >
-              {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(word))}
-            </LinkR>
+              {flattenVerb(
+                putTheNumbersAtTheEndAsRomanToTheBeginning(word.word),
+              )}
+            </LinkR> */}
+            <WordLink word={word} />
+
             {index < entries.value.length - 1 && ", "}
           </span>
         ))
