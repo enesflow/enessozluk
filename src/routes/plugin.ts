@@ -128,16 +128,20 @@ export const onRequest: RequestHandler = async (e) => {
   );
   // set the caches
   if (!cache) {
+    console.log("Setting caches for the first time");
     await setCache(e, {
       key,
       data: compressed,
     });
   } else {
     if (cache.hash !== sha256(compressed)) {
+      console.log("Updating caches");
       await updateCache(e, {
         key,
         data: compressed,
       });
+    } else {
+      console.log("Caches are up-to-date");
     }
   }
 };

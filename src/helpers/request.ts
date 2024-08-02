@@ -107,7 +107,7 @@ export function loadCache<T extends Dicts>(
       };
       return parsed.data;
     } else {
-      debugLog("Cache parsing failed for", dict);
+      debugLog("Cache parsing failed for", dict, parsed.error);
       return null;
     }
   } else {
