@@ -18,6 +18,7 @@ import { routeLoader$ } from "@builder.io/qwik-city";
 import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
+import { perf } from "../time";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
@@ -55,6 +56,7 @@ function buildTDKAPIError(
       { madde: sharedMap.query.noNumPlusParen },
     ],
     version: TDK_VERSION,
+    perf: perf(e),
   };
 }
 
@@ -136,6 +138,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     meanings: response.data as any,
     url: url.user,
     version: TDK_VERSION,
+    perf: perf(e),
   } satisfies TDKResponse;
   const parsed = TDKResponseSchema.safeParse(response.data);
   // Error handling
@@ -149,6 +152,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
         recommendations,
         url: url.user,
         version: TDK_VERSION,
+        perf: perf(e),
       };
       return setSharedMapResult(e, "tdk", data);
     }

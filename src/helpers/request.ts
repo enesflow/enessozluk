@@ -5,7 +5,7 @@ import type { z } from "zod";
 import { BenzerPackageSchema } from "~/types/benzer";
 import { LuggatPackageSchema } from "~/types/luggat";
 import { NisanyanWordPackageSchema } from "~/types/nisanyan";
-import { TDKPackageSchema, TDKRecommendationSchema } from "~/types/tdk";
+import { TDKPackageSchema } from "~/types/tdk";
 import { debugAPI, debugLog } from "./log";
 
 export function loadSharedMap(e: RequestEventBase) {
@@ -87,7 +87,6 @@ const Packages = {
   tdk: TDKPackageSchema,
   luggat: LuggatPackageSchema,
   "nisanyan-affix": NisanyanWordPackageSchema,
-  "tdk-rec": TDKRecommendationSchema,
   benzer: BenzerPackageSchema,
   nisanyan: NisanyanWordPackageSchema,
 } as const;
@@ -102,6 +101,9 @@ export function loadCache<T extends Dicts>(
     const parsed = Packages[dict].safeParse(cache);
     if (parsed.success) {
       debugLog("Using cache for", dict);
+      parsed.data.perf = {
+        took: 0,
+      };
       return parsed.data;
     } else {
       debugLog("Cache parsing failed for", dict);

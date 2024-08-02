@@ -33,4 +33,6 @@ export type SharedMap = {
   forceFetch: {
     benzer?: boolean;
   };
+  startTime: number;
+  cacheTook: number;
 };

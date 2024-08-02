@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { weakString } from "./shared";
+import { PerformanceSchema, weakString } from "./shared";
 
 export const NISANYAN_VERSION = "1.0.3" as const;
 
@@ -157,6 +157,7 @@ export const NisanyanGeneralResponseSchema = z.object({
   fiveAfter: z.array(NisanyanelatedWordSchema).optional(),
   randomWord: NisanyanelatedWordSchema.optional(),
   version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const NisanyanResponseErrorSchema = z.object({
@@ -169,11 +170,13 @@ export const NisanyanResponseErrorSchema = z.object({
   randomWord: NisanyanelatedWordSchema.optional(),
   serverDefinedErrorText: weakString(),
   version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const NisanyanAffixResponseErrorSchema = z.object({
   error: z.object({}),
   version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const NisanyanReferenceSchema = z.object({
@@ -236,6 +239,7 @@ export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
     isUnsuccessful: z.literal(false),
     words: z.array(NisanyanWordSchema).optional(),
     version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
+    perf: PerformanceSchema,
   }),
 );
 
@@ -244,6 +248,7 @@ export const NisanyanAffixResponseSchema = z
     affix: NisanyanAffixSchema,
     words: z.array(NisanyanWordSchema).optional(),
     version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
+    perf: PerformanceSchema,
   })
   .catchall(z.unknown());
 

@@ -166,7 +166,8 @@ export const TDKView = component$<{
                     .map((result) =>
                       result.birlesikler
                         ?.split(", ")
-                        .map((word) => word.trim()),
+                        // remove all text inside < > brackets
+                        .map((word) => word.replace(/<[^>]*>/g, "").trim()),
                     )
                     .flat()
                     .filter(Boolean) as string[]

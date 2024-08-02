@@ -25,6 +25,7 @@ import {
   BenzerResponseSchema,
 } from "~/types/benzer";
 import { nonNullable } from "../filter";
+import { perf } from "../time";
 //import { unq } from "../array";
 
 export const CAPTCHA_PATH =
@@ -41,10 +42,15 @@ function buildBenzerAPIError(
     serverDefinedErrorText: title,
     isUnsuccessful: true,
     version: BENZER_VERSION,
+    perf: perf(e),
   };
 }
 
-function checkCaptcha($: CheerioAPI, url: string): BenzerResponseError | null {
+function checkCaptcha(
+  $: CheerioAPI,
+  url: string,
+  e: RequestEventBase,
+): BenzerResponseError | null {
   const path = CAPTCHA_PATH;
   const isCaptcha = $(path).length;
   if (isCaptcha) {
@@ -54,6 +60,7 @@ function checkCaptcha($: CheerioAPI, url: string): BenzerResponseError | null {
       serverDefinedErrorText: "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
       isUnsuccessful: true,
       version: BENZER_VERSION,
+      perf: perf(e),
     };
   }
   return null;
@@ -97,6 +104,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   const captcha = checkCaptcha(
     $,
     buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
+    e,
   );
   if (captcha) return captcha;
   const results = $(
@@ -150,7 +158,7 @@ function parseBenzer(
     .text()
     .trim();
   if (entryContentMain.length === 0) {
-    const captcha = checkCaptcha($, url);
+    const captcha = checkCaptcha($, url, e);
     if (captcha) return captcha;
     const suggestionBox = $(".suggestion-box > ul:nth-child(2) li a");
     if (suggestionBox.length === 0) {
@@ -166,6 +174,7 @@ function parseBenzer(
           },
         ],
         version: BENZER_VERSION,
+        perf: perf(e),
       };
     }
     const words = suggestionBox.toArray().map((element) => $(element).text());
@@ -174,6 +183,7 @@ function parseBenzer(
       isUnsuccessful: true,
       words,
       version: BENZER_VERSION,
+      perf: perf(e),
     };
   }
 
@@ -218,6 +228,7 @@ function parseBenzer(
         },
       ],
       version: BENZER_VERSION,
+      perf: perf(e),
     };
   }
 
@@ -233,6 +244,7 @@ function parseBenzer(
       },
     ],
     version: BENZER_VERSION,
+    perf: perf(e),
   };
 }
 
@@ -315,6 +327,7 @@ const cleanseBenzerResponse = (
       isUnsuccessful: false,
       words,
       version: BENZER_VERSION,
+      perf: perf(e),
     };
   } else {
     const isCaptcha = loaded.some(
@@ -330,6 +343,7 @@ const cleanseBenzerResponse = (
           "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
         words: ["Tekrar", "dene-", sharedMap.query.noNumPlusParen],
         version: BENZER_VERSION,
+        perf: perf(e),
       };
     } else {
       const w = loaded
@@ -346,6 +360,7 @@ const cleanseBenzerResponse = (
         serverDefinedErrorText: NO_RESULT,
         words,
         version: BENZER_VERSION,
+        perf: perf(e),
       };
     }
   }

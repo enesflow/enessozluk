@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PerformanceSchema } from "./shared";
 
 export const BENZER_VERSION = "1.0.0" as const;
 
@@ -14,6 +15,7 @@ export const BenzerResponseSchema = z.object({
   isUnsuccessful: z.literal(false),
   words: z.array(BenzerWordSchema),
   version: z.literal(BENZER_VERSION).default(BENZER_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const BenzerResponseErrorSchema = z.object({
@@ -24,6 +26,7 @@ export const BenzerResponseErrorSchema = z.object({
   serverDefinedReFetchWith: z.string().optional(),
   words: z.array(z.string()).optional(),
   version: z.literal(BENZER_VERSION).default(BENZER_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const BenzerPackageSchema = BenzerResponseSchema.or(

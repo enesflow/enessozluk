@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PerformanceSchema } from "./shared";
 
 export const LUGGAT_VERSION = "1.0.0" as const;
 
@@ -12,6 +13,7 @@ export const LuggatResponseSchema = z.object({
   isUnsuccessful: z.literal(false),
   words: LuggatWordSchema.array(),
   version: z.literal(LUGGAT_VERSION).default(LUGGAT_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const LuggatResponseErrorSchema = z.object({
@@ -19,6 +21,7 @@ export const LuggatResponseErrorSchema = z.object({
   isUnsuccessful: z.literal(true),
   serverDefinedErrorText: z.string().optional(),
   version: z.literal(LUGGAT_VERSION).default(LUGGAT_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const LuggatPackageSchema = LuggatResponseSchema.or(

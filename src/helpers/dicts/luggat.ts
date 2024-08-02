@@ -17,6 +17,7 @@ import {
   LuggatResponseSchema,
 } from "~/types/luggat";
 import { unq } from "../array";
+import { perf } from "../time";
 
 function buildLuggatAPIError(
   e: RequestEventBase,
@@ -29,6 +30,7 @@ function buildLuggatAPIError(
     serverDefinedErrorText: title,
     isUnsuccessful: true,
     version: LUGGAT_VERSION,
+    perf: perf(e),
   };
 }
 
@@ -47,6 +49,7 @@ function parseLuggat(
         isUnsuccessful: true,
         serverDefinedErrorText: NO_RESULT,
         version: LUGGAT_VERSION,
+        perf: perf(e),
       };
     }
     wordElements.each((_, element) => {
@@ -89,6 +92,7 @@ function parseLuggat(
         }));
       })(words),
       version: LUGGAT_VERSION,
+      perf: perf(e),
     };
   } catch (error) {
     return buildLuggatAPIError(e, url, API_FAILED_TEXT);
@@ -114,7 +118,8 @@ export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
         serverDefinedErrorText: NO_RESULT,
         isUnsuccessful: true,
         version: LUGGAT_VERSION,
-      });
+        perf: perf(e),
+      } satisfies LuggatPackage);
     } else {
       return buildLuggatAPIError(e, url.user, API_FAILED_TEXT);
     }

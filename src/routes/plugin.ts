@@ -101,6 +101,7 @@ export const onRequest: RequestHandler = async (e) => {
   if (!e.params.query) return e.next();
   const query = getQuery(e.params.query);
   ///////////////////////////////
+  const s = new Date().getTime();
   const key = query.rawDecodedL;
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
@@ -108,6 +109,8 @@ export const onRequest: RequestHandler = async (e) => {
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
     forceFetch: {},
+    startTime: s,
+    cacheTook: new Date().getTime() - s,
   };
   e.sharedMap.set("data", data);
   e.sharedMap.set("sessionUUID", generateUUID(e.clientConn));

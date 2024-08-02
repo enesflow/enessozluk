@@ -14,6 +14,7 @@ import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
+import { loadSharedMap } from "~/helpers/request";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type SearchPageData = {
@@ -21,16 +22,23 @@ type SearchPageData = {
   nisanyan: string;
   luggat: string;
   benzer: string[];
-  // took: number;
+  took: number;
 };
 
 export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
   // const s = new Date().getTime();
+  const sharedMap = loadSharedMap(e);
   const tdk = await e.resolveValue(useTDKLoader);
   const nisanyan = await e.resolveValue(useNisanyanLoader);
   const luggat = await e.resolveValue(useLuggatLoader);
   const benzer = await e.resolveValue(useBenzerLoader);
-  // const took = new Date().getTime() - s; // this date does not change on cloudflare
+  console.log(
+    sharedMap.cacheTook,
+    tdk.perf,
+    nisanyan.perf,
+    luggat.perf,
+    benzer.perf,
+  );
   return {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
@@ -38,13 +46,20 @@ export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
     benzer: benzer.isUnsuccessful
       ? [benzer.url]
       : benzer.words.map((w) => w.url),
-    // took,
+    took:
+      sharedMap.cacheTook +
+      Math.max(
+        tdk.perf.took,
+        nisanyan.perf.took,
+        luggat.perf.took,
+        benzer.perf.took,
+      ),
   };
 });
 
-/* function formatTime(ms: number) {
+function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
-} */
+}
 
 export default component$(() => {
   const loc = useLocation();
@@ -52,15 +67,14 @@ export default component$(() => {
   const nisanyan = useNisanyanLoader();
   const luggat = useLuggatLoader();
   const benzer = useBenzerLoader();
-  // const links = useComputed$(() => getLinks(loc.params.query));
   const urls = useURLsLoader();
   return (
     <>
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
-        {/* <div class="result-title-took text-center">
+        <div class="result-title-took text-center">
           ({formatTime(urls.value.took)})
-        </div> */}
+        </div>
         <SearchBar value={loc.params.query} />
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">

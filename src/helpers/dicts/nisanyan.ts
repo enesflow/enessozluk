@@ -27,6 +27,7 @@ import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
 import { flattenVerb } from "../redirect";
+import { perf } from "../time";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -58,6 +59,7 @@ function buildNisanyanAPIError(
       },
     ],
     version: NISANYAN_VERSION,
+    perf: perf(e),
   };
 }
 
@@ -178,6 +180,7 @@ const loadNisanyanWord = server$(
           serverDefinedErrorText: NO_RESULT,
           isUnsuccessful: true,
           version: NISANYAN_VERSION,
+          perf: perf(e),
         });
       } else {
         return buildNisanyanAPIError(
@@ -194,7 +197,8 @@ const loadNisanyanWord = server$(
       }),
       url: url.user,
       version: NISANYAN_VERSION,
-    } as NisanyanResponse;
+      perf: perf(e),
+    } satisfies NisanyanResponse;
     const parsed = NisanyanResponseSchema.safeParse(response.data);
     // Error handling
     {
@@ -264,6 +268,7 @@ function cleanseNisanyanAffixResponse(
         },
       ],
       version: NISANYAN_VERSION,
+      perf: perf(e),
     };
   else {
     return buildNisanyanAPIError(e, url, "Invalid query");

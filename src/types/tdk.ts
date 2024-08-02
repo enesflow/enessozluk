@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { weakString } from "./shared";
+import { PerformanceSchema, weakString } from "./shared";
 
 export const TDK_VERSION = "1.0.0" as const;
 
@@ -91,6 +91,7 @@ export const TDKResponseErrorSchema = z.object({
   recommendations: TDKRecommendationSchema,
   url: z.string(),
   version: z.literal(TDK_VERSION).default(TDK_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const TDKResponseSchema = z.object({
@@ -98,6 +99,7 @@ export const TDKResponseSchema = z.object({
   url: z.string(),
   tts: weakString(),
   version: z.literal(TDK_VERSION).default(TDK_VERSION),
+  perf: PerformanceSchema,
 });
 
 export const TDKPackageSchema = TDKResponseSchema.or(TDKResponseErrorSchema);
