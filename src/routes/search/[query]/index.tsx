@@ -16,18 +16,21 @@ import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
-type URLs = {
+type SearchPageData = {
   tdk: string;
   nisanyan: string;
   luggat: string;
   benzer: string[];
+  took: number;
 };
 
-export const useURLsLoader = routeLoader$<URLs>(async (e) => {
+export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
+  const s = new Date().getTime();
   const tdk = await e.resolveValue(useTDKLoader);
   const nisanyan = await e.resolveValue(useNisanyanLoader);
   const luggat = await e.resolveValue(useLuggatLoader);
   const benzer = await e.resolveValue(useBenzerLoader);
+  const took = new Date().getTime() - s;
   return {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
@@ -35,8 +38,13 @@ export const useURLsLoader = routeLoader$<URLs>(async (e) => {
     benzer: benzer.isUnsuccessful
       ? [benzer.url]
       : benzer.words.map((w) => w.url),
+    took,
   };
 });
+
+function formatTime(ms: number) {
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+}
 
 export default component$(() => {
   const loc = useLocation();
@@ -50,6 +58,9 @@ export default component$(() => {
     <>
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
+        <div class="result-title-took text-center">
+          ({formatTime(urls.value.took)})
+        </div>
         <SearchBar value={loc.params.query} />
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">

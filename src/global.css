@@ -38,7 +38,7 @@ body {
 }
 
 .header {
-  @apply mb-4 text-center text-4xl font-bold;
+  @apply mb-2 text-center text-4xl font-bold;
 }
 
 .search-form {
@@ -83,6 +83,10 @@ body {
 
 .result-title-description {
   @apply italic text-gray-700;
+}
+
+.result-title-took {
+  @apply text-xs italic text-gray-700;
 }
 
 .result-subtitle {
