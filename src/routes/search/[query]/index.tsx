@@ -83,30 +83,29 @@ export default component$(() => {
         <SearchBar value={loc.params.query} />
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">
-            <CacheIndicator show={tdk.value.perf.cached} />
-            TDK Sonuçları: <ExternalLink href={urls.value.tdk} />
+            <CacheIndicator show={tdk.value.perf.cached} /> TDK Sonuçları:{" "}
+            <ExternalLink href={urls.value.tdk} />
           </h1>
           <TDKView data={tdk.value} />
         </div>
         <div data-version={nisanyan.value.version} data-dict="nisanyan">
           <h1 style="results-heading align-middle">
-            <CacheIndicator show={nisanyan.value.perf.cached} />
-            Nişanyan Sözlük Sonuçları:{" "}
-            <ExternalLink href={urls.value.nisanyan} />
+            <CacheIndicator show={nisanyan.value.perf.cached} /> Nişanyan Sözlük
+            Sonuçları: <ExternalLink href={urls.value.nisanyan} />
           </h1>
           <NisanyanView data={nisanyan.value} />
         </div>
         <div data-version={luggat.value.version} data-dict="luggat">
           <h1 style="results-heading" data-version={luggat.value.version}>
-            <CacheIndicator show={luggat.value.perf.cached} />
-            Luggat Sonuçları: <ExternalLink href={urls.value.luggat} />
+            <CacheIndicator show={luggat.value.perf.cached} /> Luggat Sonuçları:{" "}
+            <ExternalLink href={urls.value.luggat} />
           </h1>
           <LuggatView data={luggat.value} />
         </div>
         <div data-version={benzer.value.version} data-dict="benzer">
           <h1 style="results-heading">
-            <CacheIndicator show={benzer.value.perf.cached} />
-            Benzer Kelimeler Sonuçları:{" "}
+            <CacheIndicator show={benzer.value.perf.cached} /> Benzer Kelimeler
+            Sonuçları:{" "}
             {urls.value.benzer.length === 1 && (
               <ExternalLink href={urls.value.benzer[0]} />
             )}
