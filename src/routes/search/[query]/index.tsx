@@ -8,14 +8,14 @@ import { LuggatView } from "~/components/dicts/luggat";
 import { TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
+import { Check } from "~/components/svgs/check";
 import { useBenzerLoader } from "~/helpers/dicts/benzer";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
+import { loadSharedMap } from "~/helpers/request";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
-import { loadSharedMap } from "~/helpers/request";
-import { Check } from "~/components/svgs/check";
 export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
 
 type SearchPageData = {
@@ -24,9 +24,10 @@ type SearchPageData = {
   luggat: string;
   benzer: string[];
   took: number;
+  allFailed: boolean;
 };
 
-export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
+export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   // const s = new Date().getTime();
   const sharedMap = loadSharedMap(e);
   const tdk = await e.resolveValue(useTDKLoader);
@@ -55,11 +56,20 @@ export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
         luggat.perf.took,
         benzer.perf.took,
       ),
+    allFailed:
+      "error" in tdk &&
+      nisanyan.isUnsuccessful &&
+      luggat.isUnsuccessful &&
+      benzer.isUnsuccessful,
   };
 });
 
 function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
+}
+
+function getGoogleQuery(query: string) {
+  return `${query} ne demek?`;
 }
 
 const CacheIndicator = component$<{ show: boolean }>(({ show }) => {
@@ -72,33 +82,43 @@ export default component$(() => {
   const nisanyan = useNisanyanLoader();
   const luggat = useLuggatLoader();
   const benzer = useBenzerLoader();
-  const urls = useURLsLoader();
+  const data = useDataLoader();
   return (
     <>
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
         <div class="result-title-took text-center">
-          ({formatTime(urls.value.took)})
+          ({formatTime(data.value.took)})
         </div>
         <SearchBar value={loc.params.query} />
+        {data.value.allFailed && (
+          <p class="result-item">
+            Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
+            <ExternalLink
+              href={`https://www.google.com/search?q=${encodeURIComponent(
+                getGoogleQuery(loc.params.query),
+              )}`}
+            />
+          </p>
+        )}
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">
             <CacheIndicator show={tdk.value.perf.cached} /> TDK Sonuçları:{" "}
-            <ExternalLink href={urls.value.tdk} />
+            <ExternalLink href={data.value.tdk} />
           </h1>
           <TDKView data={tdk.value} />
         </div>
         <div data-version={nisanyan.value.version} data-dict="nisanyan">
           <h1 style="results-heading align-middle">
             <CacheIndicator show={nisanyan.value.perf.cached} /> Nişanyan Sözlük
-            Sonuçları: <ExternalLink href={urls.value.nisanyan} />
+            Sonuçları: <ExternalLink href={data.value.nisanyan} />
           </h1>
           <NisanyanView data={nisanyan.value} />
         </div>
         <div data-version={luggat.value.version} data-dict="luggat">
           <h1 style="results-heading" data-version={luggat.value.version}>
             <CacheIndicator show={luggat.value.perf.cached} /> Luggat Sonuçları:{" "}
-            <ExternalLink href={urls.value.luggat} />
+            <ExternalLink href={data.value.luggat} />
           </h1>
           <LuggatView data={luggat.value} />
         </div>
@@ -106,8 +126,8 @@ export default component$(() => {
           <h1 style="results-heading">
             <CacheIndicator show={benzer.value.perf.cached} /> Benzer Kelimeler
             Sonuçları:{" "}
-            {urls.value.benzer.length === 1 && (
-              <ExternalLink href={urls.value.benzer[0]} />
+            {data.value.benzer.length === 1 && (
+              <ExternalLink href={data.value.benzer[0]} />
             )}
           </h1>
           <BenzerView data={benzer.value} />
