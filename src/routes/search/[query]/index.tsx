@@ -58,7 +58,7 @@ export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
 });
 
 function formatTime(ms: number) {
-  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
+  return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
 }
 
 export default component$(() => {
