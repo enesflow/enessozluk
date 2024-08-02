@@ -285,11 +285,14 @@ const loadNisanyanAffix = server$(
       if (cache) return setSharedMapResult(e, "nisanyan-affix", cache);
     } /////////////////////////////
     const url = buildNisanyanAffixUrl(e);
-    const [error, response] = await to(fetchAPI(url.api));
+    const [word, [error, response]] = await Promise.all([
+      loadNisanyanWord.call(e),
+      to(fetchAPI(url.api)),
+    ]);
     // Returns error if request failed
     if (error || !response?.success) {
       try {
-        return loadNisanyanWord.call(e);
+        return word;
       } catch (error) {
         return buildNisanyanAPIError(
           e,
