@@ -306,9 +306,9 @@ export const NisanyanView = component$<{
                                       ?.serverDefinedMoreIndentation &&
                                     "Not: "}
                                   {(index !== 0 ||
-                                    word.etymologies?.length === 1) && // <-- Corrected parenthesis
+                                    word.etymologies?.length === 1) &&
                                     etymology.relation.abbreviation !== "/" &&
-                                    "Bu sözcük "}
+                                    `Bu ${word.etymologies?.[index - 1]?.wordClass.name ?? "sözcük"} `}
                                 </span>
                               )}
                               <strong>
