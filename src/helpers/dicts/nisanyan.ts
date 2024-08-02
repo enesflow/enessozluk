@@ -78,11 +78,11 @@ function fixForJoinedWords(data: NisanyanWordPackage): NisanyanWordPackage {
     for (let etmIndex = 0; etmIndex < word.etymologies.length; etmIndex++) {
       const etm = word.etymologies[etmIndex];
       // Set serverDefinedMoreIndentation for relations with abbreviation "≈"
-      if (etm.relation.abbreviation === "≈" && word.etymologies.length !== 1) {
+      /* if (etm.relation.abbreviation === "≈" && word.etymologies.length !== 1) {
         data.words[wordIndex].etymologies![
           etmIndex
         ].serverDefinedMoreIndentation = true;
-      }
+      } */
       if (etm.paranthesis === "(") isIn = true;
       if (isIn || etm.paranthesis === "()")
         data.words[wordIndex].etymologies![

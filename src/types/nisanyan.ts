@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { weakString } from "./shared";
 
-export const NISANYAN_VERSION = "1.0.1" as const;
+export const NISANYAN_VERSION = "1.0.2" as const;
 
 export const NisanyanLanguageSchema = z.object({
   _id: z.string(),
