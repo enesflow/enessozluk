@@ -243,6 +243,7 @@ function cleanseNisanyanAffixResponse(
           serverDefinedTitleDescription: words.length
             ? `${words.length} kelime`
             : undefined,
+          serverDefinedAffixLanguage: data.affix.language,
           _id: data.affix._id,
           actualTimeUpdated: data.affix.timeUpdated,
           etymologies: [],

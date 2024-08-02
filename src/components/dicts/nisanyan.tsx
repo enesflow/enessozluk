@@ -281,7 +281,7 @@ export const NisanyanView = component$<{
                   )}
                 </i>
               </h2>
-              {(!!word.etymologies?.length || !!word.references?.length) && (
+              {!!word.etymologies?.length || !!word.references?.length ? (
                 <section class="result-section">
                   <h2 class="result-subtitle">Köken</h2>
                   {!!word.etymologies?.length &&
@@ -340,6 +340,12 @@ export const NisanyanView = component$<{
                     </p>
                   )}
                 </section>
+              ) : (
+                word.serverDefinedAffixLanguage?.name && (
+                  <p class="result-description result-subitem">
+                    <strong>Dil:</strong> {word.serverDefinedAffixLanguage.name}
+                  </p>
+                )
               )}
 
               {word.note && (
