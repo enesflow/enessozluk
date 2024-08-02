@@ -21,17 +21,16 @@ type SearchPageData = {
   nisanyan: string;
   luggat: string;
   benzer: string[];
-  took: number;
+  // took: number;
 };
 
 export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
-  const s = new Date().getTime();
-  console.log("date is", s, new Date());
+  // const s = new Date().getTime();
   const tdk = await e.resolveValue(useTDKLoader);
   const nisanyan = await e.resolveValue(useNisanyanLoader);
   const luggat = await e.resolveValue(useLuggatLoader);
   const benzer = await e.resolveValue(useBenzerLoader);
-  const took = new Date().getTime() - s;
+  // const took = new Date().getTime() - s; // this date does not change on cloudflare
   return {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
@@ -39,13 +38,13 @@ export const useURLsLoader = routeLoader$<SearchPageData>(async (e) => {
     benzer: benzer.isUnsuccessful
       ? [benzer.url]
       : benzer.words.map((w) => w.url),
-    took,
+    // took,
   };
 });
 
-function formatTime(ms: number) {
+/* function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`;
-}
+} */
 
 export default component$(() => {
   const loc = useLocation();
@@ -59,9 +58,9 @@ export default component$(() => {
     <>
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
-        <div class="result-title-took text-center">
+        {/* <div class="result-title-took text-center">
           ({formatTime(urls.value.took)})
-        </div>
+        </div> */}
         <SearchBar value={loc.params.query} />
         <div data-version={tdk.value.version} data-dict="tdk">
           <h1 style="results-heading">
