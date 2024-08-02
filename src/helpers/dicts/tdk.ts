@@ -97,12 +97,12 @@ const cleanseTDKResponse = (data: TDKResponse) => {
   return data;
 };
 
-const loadTTSId = async (data: TDKResponse) => {
+const loadTTSId = async (data: TDKResponse | string) => {
   // https://sozluk.gov.tr/yazim?ara={word}
   // response : [{"yazim_id":"30886","sozu":"herkes","ekler":"","seskod":"h1574"}]
   // we need to return the "seskod"
   // if there is an error: {"error":"Sonuç bulunamadı"} is the response of the fetch
-  const url = `https://sozluk.gov.tr/yazim?ara=${data.meanings[0].madde}`;
+  const url = `https://sozluk.gov.tr/yazim?ara=${typeof data === "string" ? data : data.meanings[0].madde}`;
   const [error, response] = await to(fetchAPI(url));
   if (error || !response?.success) return undefined;
   return ((response.data as any)[0] as { seskod: string } | undefined)?.seskod;
@@ -115,8 +115,14 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     const cache = loadCache(e, "tdk");
     if (cache) return setSharedMapResult(e, "tdk", cache);
   } /////////////////////////////
+  const sharedMap = loadSharedMap(e);
   const url = buildTDKUrl(e);
-  const [error, response] = await to(fetchAPI(url.api));
+  /* const [error, response] = await to(fetchAPI(url.api)); */
+  const [[error, response], ttsId, recommendations] = await Promise.all([
+    to(fetchAPI(url.api)),
+    loadTTSId(sharedMap.query.noNumPlusL),
+    loadTDKRecommendations(e),
+  ]);
   // Returns error if request failed
   if (error || !response?.success) {
     debugAPI(e, `TDK API Error: ${error?.message || response?.code}`);
@@ -140,7 +146,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     if (error.success || !first || !("anlamlarListe" in first)) {
       const data: TDKResponseError = {
         error: error.data?.error || NO_RESULT,
-        recommendations: await loadTDKRecommendations(e),
+        recommendations,
         url: url.user,
         version: TDK_VERSION,
       };
@@ -157,7 +163,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   } /////////////////////////////
   const data = {
     ...cleanseTDKResponse(parsed.data),
-    tts: await loadTTSId(parsed.data),
+    tts: ttsId ?? (await loadTTSId(parsed.data)),
   };
   return setSharedMapResult(e, "tdk", data);
 });
