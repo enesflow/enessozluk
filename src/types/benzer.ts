@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+export const BENZER_VERSION = "1.0.0" as const;
+
 export const BenzerWordSchema = z.object({
   url: z.string(),
   name: z.string(),
@@ -11,6 +13,7 @@ export const BenzerWordSchema = z.object({
 export const BenzerResponseSchema = z.object({
   isUnsuccessful: z.literal(false),
   words: z.array(BenzerWordSchema),
+  version: z.literal(BENZER_VERSION).default(BENZER_VERSION),
 });
 
 export const BenzerResponseErrorSchema = z.object({
@@ -20,6 +23,7 @@ export const BenzerResponseErrorSchema = z.object({
   serverDefinedCaptchaError: z.boolean().optional(),
   serverDefinedReFetchWith: z.string().optional(),
   words: z.array(z.string()).optional(),
+  version: z.literal(BENZER_VERSION).default(BENZER_VERSION),
 });
 
 export const BenzerPackageSchema = BenzerResponseSchema.or(

@@ -1,5 +1,6 @@
 import type { TDKResponse, TDKResponseError } from "#/tdk";
 import {
+  TDK_VERSION,
   TDKRecommendationSchema,
   TDKResponseErrorSchema,
   TDKResponseSchema,
@@ -53,6 +54,7 @@ function buildTDKAPIError(
       { madde: "dene-" },
       { madde: sharedMap.query.noNumPlusParen },
     ],
+    version: TDK_VERSION,
   };
 }
 
@@ -125,9 +127,10 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
     );
   }
   response.data = {
-    meanings: response.data,
+    meanings: response.data as any,
     url: url.user,
-  };
+    version: TDK_VERSION,
+  } satisfies TDKResponse;
   const parsed = TDKResponseSchema.safeParse(response.data);
   // Error handling
   {
@@ -139,6 +142,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
         error: error.data?.error || NO_RESULT,
         recommendations: await loadTDKRecommendations(e),
         url: url.user,
+        version: TDK_VERSION,
       };
       return setSharedMapResult(e, "tdk", data);
     }

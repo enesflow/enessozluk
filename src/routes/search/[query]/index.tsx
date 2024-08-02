@@ -51,25 +51,34 @@ export default component$(() => {
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
         <SearchBar value={loc.params.query} />
-        <h1 style="results-heading">
-          TDK Sonuçları: <ExternalLink href={urls.value.tdk} />
-        </h1>
-        <TDKView data={tdk.value} />
-        <h1 style="results-heading">
-          Nişanyan Sözlük Sonuçları: <ExternalLink href={urls.value.nisanyan} />
-        </h1>
-        <NisanyanView data={nisanyan.value} />
-        <h1 style="results-heading">
-          Luggat Sonuçları: <ExternalLink href={urls.value.luggat} />
-        </h1>
-        <LuggatView data={luggat.value} />
-        <h1 style="results-heading">
-          Benzer Kelimeler Sonuçları:{" "}
-          {urls.value.benzer.length === 1 && (
-            <ExternalLink href={urls.value.benzer[0]} />
-          )}
-        </h1>
-        <BenzerView data={benzer.value} />
+        <div data-version={tdk.value.version} data-dict="tdk">
+          <h1 style="results-heading">
+            TDK Sonuçları: <ExternalLink href={urls.value.tdk} />
+          </h1>
+          <TDKView data={tdk.value} />
+        </div>
+        <div data-version={nisanyan.value.version} data-dict="nisanyan">
+          <h1 style="results-heading">
+            Nişanyan Sözlük Sonuçları:{" "}
+            <ExternalLink href={urls.value.nisanyan} />
+          </h1>
+          <NisanyanView data={nisanyan.value} />
+        </div>
+        <div data-version={luggat.value.version} data-dict="luggat">
+          <h1 style="results-heading" data-version={luggat.value.version}>
+            Luggat Sonuçları: <ExternalLink href={urls.value.luggat} />
+          </h1>
+          <LuggatView data={luggat.value} />
+        </div>
+        <div data-version={benzer.value.version} data-dict="benzer">
+          <h1 style="results-heading">
+            Benzer Kelimeler Sonuçları:{" "}
+            {urls.value.benzer.length === 1 && (
+              <ExternalLink href={urls.value.benzer[0]} />
+            )}
+          </h1>
+          <BenzerView data={benzer.value} />
+        </div>
       </div>
     </>
   );

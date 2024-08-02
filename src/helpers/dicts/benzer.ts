@@ -20,6 +20,7 @@ import type {
   BenzerWord,
 } from "~/types/benzer";
 import {
+  BENZER_VERSION,
   BenzerResponseErrorSchema,
   BenzerResponseSchema,
 } from "~/types/benzer";
@@ -38,6 +39,7 @@ function buildBenzerAPIError(
     url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
+    version: BENZER_VERSION,
   };
 }
 
@@ -50,6 +52,7 @@ function checkCaptcha($: CheerioAPI, url: string): BenzerResponseError | null {
       serverDefinedCaptchaError: true,
       serverDefinedErrorText: "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
       isUnsuccessful: true,
+      version: BENZER_VERSION,
     };
   }
   return null;
@@ -161,6 +164,7 @@ function parseBenzer(
             url,
           },
         ],
+        version: BENZER_VERSION,
       };
     }
     const words = suggestionBox.toArray().map((element) => $(element).text());
@@ -168,6 +172,7 @@ function parseBenzer(
       url,
       isUnsuccessful: true,
       words,
+      version: BENZER_VERSION,
     };
   }
 
@@ -211,6 +216,7 @@ function parseBenzer(
           url,
         },
       ],
+      version: BENZER_VERSION,
     };
   }
 
@@ -225,6 +231,7 @@ function parseBenzer(
         url,
       },
     ],
+    version: BENZER_VERSION,
   };
 }
 
@@ -306,6 +313,7 @@ const cleanseBenzerResponse = (
     return {
       isUnsuccessful: false,
       words,
+      version: BENZER_VERSION,
     };
   } else {
     const isCaptcha = loaded.some(
@@ -320,6 +328,7 @@ const cleanseBenzerResponse = (
         serverDefinedErrorText:
           "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
         words: ["Tekrar", "dene-", sharedMap.query.noNumPlusParen],
+        version: BENZER_VERSION,
       };
     } else {
       const w = loaded
@@ -335,6 +344,7 @@ const cleanseBenzerResponse = (
         url: buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
         serverDefinedErrorText: NO_RESULT,
         words,
+        version: BENZER_VERSION,
       };
     }
   }

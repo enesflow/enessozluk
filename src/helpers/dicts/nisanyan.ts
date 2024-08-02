@@ -5,6 +5,7 @@ import type {
   NisanyanWordPackage,
 } from "#/nisanyan";
 import {
+  NISANYAN_VERSION,
   NisanyanAffixResponseErrorSchema,
   NisanyanAffixResponseSchema,
   NisanyanResponseErrorSchema,
@@ -56,6 +57,7 @@ function buildNisanyanAPIError(
         name: query.rawDecoded,
       },
     ],
+    version: NISANYAN_VERSION,
   };
 }
 
@@ -169,6 +171,7 @@ const loadNisanyanWord = server$(
           url: url.user,
           serverDefinedErrorText: NO_RESULT,
           isUnsuccessful: true,
+          version: NISANYAN_VERSION,
         });
       } else {
         return buildNisanyanAPIError(
@@ -179,9 +182,13 @@ const loadNisanyanWord = server$(
       }
     }
     response.data = {
-      ...response.data,
+      ...(response.data as {
+        words: any;
+        isUnsuccessful: any;
+      }),
       url: url.user,
-    };
+      version: NISANYAN_VERSION,
+    } as NisanyanResponse;
     const parsed = NisanyanResponseSchema.safeParse(response.data);
     // Error handling
     {
@@ -249,6 +256,7 @@ function cleanseNisanyanAffixResponse(
           timeUpdated: data.affix.timeUpdated,
         },
       ],
+      version: NISANYAN_VERSION,
     };
   else {
     return buildNisanyanAPIError(e, url, "Invalid query");

@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { weakString } from "./shared";
 
+export const TDK_VERSION = "1.0.0" as const;
+
 export const TDKAuthorSchema = z.object({
   yazar_id: weakString(),
   tam_adi: z.string(),
@@ -88,12 +90,14 @@ export const TDKResponseErrorSchema = z.object({
   error: z.string(),
   recommendations: TDKRecommendationSchema,
   url: z.string(),
+  version: z.literal(TDK_VERSION).default(TDK_VERSION),
 });
 
 export const TDKResponseSchema = z.object({
   meanings: TDKResultSchema.array(),
   url: z.string(),
   tts: weakString(),
+  version: z.literal(TDK_VERSION).default(TDK_VERSION),
 });
 
 export const TDKPackageSchema = TDKResponseSchema.or(TDKResponseErrorSchema);
