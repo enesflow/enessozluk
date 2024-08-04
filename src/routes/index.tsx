@@ -7,6 +7,15 @@ export default component$(() => {
       <div class="results-container">
         <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
         <SearchBar />
+        <div class="flex justify-center">
+          <img
+            width="640"
+            height="480"
+            src="https://media.istockphoto.com/id/471480053/photo/happy-cow.jpg?s=612x612&w=0&k=20&c=IYcNcymvDBXQ6-4fbg9_2BJy5EjVVWI8RQGtolzmhko="
+            alt="Cow"
+            class="rounded-xl"
+          />
+        </div>
       </div>
     </>
   );
