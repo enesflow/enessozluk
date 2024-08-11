@@ -17,7 +17,7 @@ function isALetter(word: string | undefined, char: string | undefined): boolean 
       // a question mark
       char === "?" ||
       // a closing paren 
-      (char === ")" && word?.includes("(")) 
+      (char === ")" && !word?.includes("(")) 
     )
   );
 }
