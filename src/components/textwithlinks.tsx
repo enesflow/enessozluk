@@ -3,7 +3,7 @@ import { LinkR } from "./linkWithRedirect";
 import { removeNumbersInWord } from "~/helpers/string";
 import { flattenVerb } from "~/helpers/redirect";
 
-function isALetter(char: string | undefined): boolean {
+function isALetter(word: string | undefined, char: string | undefined): boolean {
   return !(
     (
       // a comma
@@ -17,7 +17,7 @@ function isALetter(char: string | undefined): boolean {
       // a question mark
       char === "?" ||
       // a closing paren 
-      char === ")"
+      (char === ")" && word?.includes("(")) 
     )
   );
 }
@@ -49,13 +49,13 @@ export const TextWithLinks = component$<{
           <span key={index}>
             <>
               <LinkR
-                href={`/search/${!isALetter(word[word.length - 1]) ? word.slice(0, -1) : word}`}
+                href={`/search/${!isALetter(word, word[word.length - 1]) ? word.slice(0, -1) : word}`}
               >
                 {flattenVerb(removeNumbersInWord(
-                  !isALetter(word[word.length - 1]) ? word.slice(0, -1) : word,
+                  !isALetter(word, word[word.length - 1]) ? word.slice(0, -1) : word,
                 ))}
               </LinkR>
-              {!isALetter(word[word.length - 1]) ? (
+              {!isALetter(word, word[word.length - 1]) ? (
                 <>{removeNumbersInWord(word[word.length - 1])}</>
               ) : (
                 <></>
