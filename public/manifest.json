@@ -4,6 +4,6 @@
   "short_name": "Enes Sözlük",
   "start_url": ".",
   "display": "standalone",
-  "background_color": "#030712",
+  "background_color": "#000000",
   "description": "Türkçe sözlüklerde arama yapın."
 }
