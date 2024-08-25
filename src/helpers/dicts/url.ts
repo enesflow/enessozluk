@@ -20,8 +20,11 @@ export const NISANYAN_AFFIX_USER_URL =
   "https://www.nisanyansozluk.com/ek/" as const;
 export const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 export const BENZER_USER_URL = BENZER_URL;
-export const BENZER_ADVANCED_URL = "https://www.benzerkelimeler.com" as const;
+export const BENZER_ADVANCED_URL = "https://www.benzerkelimeler.com/" as const;
 // "https://www.benzerkelimeler.com/deniz-ile-baslayan-deniz-ile-biten-kelimeler";
+export const KUBBEALTI_URL = "https://eski.lugatim.com/rest/s/" as const;
+export const KUBBEALTI_USER_URL = "https://lugatim.com/s/" as const;
+export const KUBBEALTI_TTS_URL = "https://lugatim.com/static/media/" as const;
 
 const baseBuilder = (
   base: string,
@@ -135,9 +138,29 @@ export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
       : loadSharedMap(e).query.noNumPlusParenAccL;
   // replace a, e, i, ı, o, ö, u, ü with _
   const replaced = encodeURIComponent(s.replace(/[aeıioöuü]/g, "_"));
-  const url = `${BENZER_ADVANCED_URL}/${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;
+  const url = `${BENZER_ADVANCED_URL}${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;
   return {
     api: url,
     user: url,
   };
 };
+
+export const buildKubbealtiUrl = (
+  e: RequestEventBase | string,
+  lowercase = false,
+) => {
+  if (typeof e === "string") {
+    return {
+      api: baseBuilder(KUBBEALTI_URL, e, lowercase),
+      user: baseBuilder(KUBBEALTI_USER_URL, e, lowercase),
+    };
+  }
+  const sharedMap = loadSharedMap(e);
+  let query = sharedMap.query.noNumPlusParenAccL;
+  if (query[0] === "–") query = query.slice(1);
+  console.log("QUERY IS", query);
+  return {
+    api: baseBuilder(KUBBEALTI_URL, query, lowercase),
+    user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase),
+  };
+}

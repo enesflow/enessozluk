@@ -19,6 +19,7 @@ import { debugAPI } from "../log";
 import { to } from "../to";
 import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
 import { perf } from "../time";
+import { DEV_DISABLED } from "~/routes/search/[query]";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
@@ -112,6 +113,7 @@ const loadTTSId = async (data: TDKResponse | string) => {
 
 // eslint-disable-next-line qwik/loader-location
 export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
+  if (DEV_DISABLED.tdk) return buildTDKAPIError(e, "", "TDK is disabled");
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "tdk");

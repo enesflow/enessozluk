@@ -26,6 +26,7 @@ import {
 } from "~/types/benzer";
 import { nonNullable } from "../filter";
 import { perf } from "../time";
+import { DEV_DISABLED } from "~/routes/search/[query]";
 //import { unq } from "../array";
 
 export const CAPTCHA_PATH =
@@ -398,5 +399,6 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
 
 // eslint-disable-next-line qwik/loader-location
 export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
+  if (DEV_DISABLED.benzer) return buildBenzerAPIError(e, "", "Benzer is disabled");
   return benzerLoader.call(e);
 });

@@ -28,6 +28,7 @@ import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
 import { flattenVerb } from "../redirect";
 import { perf } from "../time";
+import { DEV_DISABLED } from "~/routes/search/[query]";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));
@@ -333,6 +334,7 @@ const loadNisanyanAffix = server$(
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   async (e) => {
+    if (DEV_DISABLED.nisanyan) return buildNisanyanAPIError(e, "", "Nisanyan is disabled");
     const sharedMap = loadSharedMap(e);
     if (isWord(sharedMap.query.rawDecoded)) {
       return loadNisanyanWord.call(e);

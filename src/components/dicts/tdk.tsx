@@ -50,7 +50,6 @@ const Play = component$<{ id: string | null | undefined }>(({ id }) => {
   const audio = useSignal<HTMLAudioElement>();
   return id ? (
     <button
-      class="sesGetir"
       onClick$={() => {
         audio.value?.play();
       }}

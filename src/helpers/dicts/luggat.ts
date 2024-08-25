@@ -18,6 +18,7 @@ import {
 } from "~/types/luggat";
 import { unq } from "../array";
 import { perf } from "../time";
+import { DEV_DISABLED } from "~/routes/search/[query]";
 
 function buildLuggatAPIError(
   e: RequestEventBase,
@@ -101,6 +102,7 @@ function parseLuggat(
 
 // eslint-disable-next-line qwik/loader-location
 export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
+  if (DEV_DISABLED.luggat) return buildLuggatAPIError(e, "", "Luggat is disabled");
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "luggat");

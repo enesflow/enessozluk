@@ -16,16 +16,32 @@ import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { loadSharedMap } from "~/helpers/request";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
-export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader };
+import { isDev } from "@builder.io/qwik/build";
+import { Dicts } from "~/types/dicts";
+import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
+import { KubbealtiView } from "~/components/dicts/kubbealti";
+
+// IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
+export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader, useKubbealtiLoader};
 
 type SearchPageData = {
   tdk: string;
   nisanyan: string;
   luggat: string;
   benzer: string[];
+  kubbealti: string;
   took: number;
   allFailed: boolean;
 };
+
+export const DEV_DISABLED: Record<Dicts, boolean> = {
+  tdk: true && isDev,
+  nisanyan: true && isDev,
+  luggat: true && isDev,
+  benzer: true && isDev,
+  kubbealti: false && isDev,
+  "nisanyan-affix": true && isDev,
+} as const; 
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   // const s = new Date().getTime();
@@ -34,12 +50,14 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   const nisanyan = await e.resolveValue(useNisanyanLoader);
   const luggat = await e.resolveValue(useLuggatLoader);
   const benzer = await e.resolveValue(useBenzerLoader);
+  const kubbealti = await e.resolveValue(useKubbealtiLoader);
   console.log(
     sharedMap.cacheTook,
     tdk.perf,
     nisanyan.perf,
     luggat.perf,
     benzer.perf,
+    kubbealti.perf,
   );
   return {
     tdk: tdk.url,
@@ -48,6 +66,7 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
     benzer: benzer.isUnsuccessful
       ? [benzer.url]
       : benzer.words.map((w) => w.url),
+    kubbealti: kubbealti.url,
     took:
       sharedMap.cacheTook +
       Math.max(
@@ -55,12 +74,14 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
         nisanyan.perf.took,
         luggat.perf.took,
         benzer.perf.took,
+        kubbealti.perf.took,
       ),
     allFailed:
       "error" in tdk &&
       nisanyan.isUnsuccessful &&
       luggat.isUnsuccessful &&
-      benzer.isUnsuccessful,
+      benzer.isUnsuccessful &&
+      "serverDefinedReason" in kubbealti,
   };
 });
 
@@ -82,6 +103,7 @@ export default component$(() => {
   const nisanyan = useNisanyanLoader();
   const luggat = useLuggatLoader();
   const benzer = useBenzerLoader();
+  const kubbealti = useKubbealtiLoader();
   const data = useDataLoader();
   return (
     <>
@@ -131,6 +153,13 @@ export default component$(() => {
             )}
           </h1>
           <BenzerView data={benzer.value} />
+        </div>
+        <div data-version={kubbealti.value.version} data-dict="kubbealti">
+          <h1 style="results-heading">
+            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı Lugatı Sonuçları:{" "}
+            <ExternalLink href={data.value.kubbealti} />
+          </h1>
+          <KubbealtiView data={kubbealti.value} />
         </div>
       </div>
     </>

@@ -139,3 +139,84 @@ body {
     transform: rotate(360deg);
   }
 }
+
+/* KUBBEALTI */
+
+.ChampturkB150 {
+  clear: left;
+  color: #bf4c4c;
+  font-family: ChampturkB;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.ChampturkI150 {
+  color: #1e852a;
+}
+
+.ChampturkI14,
+.ChampturkI150 {
+  font-family: ChampturkI;
+  font-size: 18px;
+  font-style: italic;
+  line-height: normal;
+}
+
+.ChampturkI14 {
+  color: #18b495;
+}
+
+.Champturk14 {
+  font-family: Champturk;
+  font-size: 18px;
+  line-height: normal;
+}
+
+.ChampturkBI14 {
+  color: #0b7c95;
+  font-family: ChampturkBI;
+}
+
+.ChampturkBI14,
+.ChampturkBI150 {
+  font-size: 18px;
+  font-style: italic;
+  font-weight: 700;
+  line-height: normal;
+}
+
+.ChampturkBI150 {
+  clear: left;
+  color: #bf4c4c;
+  font-family: ChampturkB;
+}
+
+.Champturk150,
+.ChampturkB16 {
+  font-family: ChampturkB;
+  font-size: 18px;
+  line-height: normal;
+}
+
+.ChampturkB16,
+.ChampturkI16 {
+  clear: left;
+  color: #bf4c4c;
+  font-weight: 700;
+}
+
+.ChampturkI16 {
+  font-family: ChampturkB;
+}
+
+.Arabic18,
+.ChampturkI16 {
+  font-size: 18px;
+  line-height: normal;
+}
+
+.Arabic18 {
+  direction: rtl;
+  font-family: Arabic;
+}

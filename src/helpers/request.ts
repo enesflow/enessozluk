@@ -7,6 +7,7 @@ import { LuggatPackageSchema } from "~/types/luggat";
 import { NisanyanWordPackageSchema } from "~/types/nisanyan";
 import { TDKPackageSchema } from "~/types/tdk";
 import { debugAPI, debugLog } from "./log";
+import { KubbealtiPackageSchema } from "~/types/kubbealti";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -62,6 +63,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
       raw: Response;
     }
 > {
+  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
   debugLog("Fetching", decodeURI(url));
   const response = await fetch(url, init);
   const error = buildError(response);
@@ -89,6 +91,7 @@ const Packages = {
   "nisanyan-affix": NisanyanWordPackageSchema,
   benzer: BenzerPackageSchema,
   nisanyan: NisanyanWordPackageSchema,
+  kubbealti: KubbealtiPackageSchema
 } as const;
 
 export function loadCache<T extends Dicts>(
