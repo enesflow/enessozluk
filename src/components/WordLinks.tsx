@@ -46,7 +46,7 @@ function toWords(words: string[] | Word[] | undefined): Word[] | undefined {
   return words as Word[];
 }
 
-const WordLink = component$<{ word: Word }>(({ word }) => {
+export const WordLink = component$<{ word: Word }>(({ word }) => {
   return (
     <>
       <LinkR

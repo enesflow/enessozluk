@@ -189,7 +189,7 @@ export default component$(() => {
             <CacheIndicator show={rhyme.value.perf.cached} /> Kâfiyeli
             Kelimeler:{" "}
           </h1>
-          <RhymeView data={rhyme.value} />
+          <RhymeView data={rhyme} />
         </div>
       </div>
     </>

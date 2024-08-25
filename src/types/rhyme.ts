@@ -1,15 +1,16 @@
 import { z } from "zod";
 import { PerformanceSchema } from "./shared";
 
-export const RHYME_VERSION = "1.0.1" as const;
+export const RHYME_VERSION = "1.0.2" as const;
 
 export const RhymeResponseSchema = z.object({
+  word: z.string(),
   version: z.literal(RHYME_VERSION),
   perf: PerformanceSchema,
   items: z.array(z.string()),
-  more_items: z.array(z.string()).optional(),
 });
 export const RhymeErrorSchema = z.object({
+  word: z.string(),
   version: z.literal(RHYME_VERSION),
   perf: PerformanceSchema,
   serverDefinedError: z.string(),

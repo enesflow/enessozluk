@@ -11,10 +11,12 @@ import { perf } from "../time";
 
 function buildRhymeAPIError(
   e: RequestEventBase,
+  word: string,
   title: string,
 ): RhymeErrorResponse {
   debugAPI(e, `Rhyme API Error: ${title}`);
   return {
+    word,
     serverDefinedError: title,
     version: RHYME_VERSION,
     perf: perf(e),
@@ -23,15 +25,15 @@ function buildRhymeAPIError(
 
 // eslint-disable-next-line qwik/loader-location
 export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
-  if (DEV_DISABLED.rhyme) return buildRhymeAPIError(e, "Rhyme API is disabled");
+  const sharedMap = loadSharedMap(e);
+  const word = sharedMap.query.noNumPlusParenAccL;
+  if (DEV_DISABLED.rhyme)
+    return buildRhymeAPIError(e, word, "Rhyme API is disabled");
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "rhyme");
     if (cache) return setSharedMapResult(e, "rhyme", cache);
   } /////////////////////////////
-  const sharedMap = loadSharedMap(e);
-  /* const [error, response] = await to(fetchAPI(url.api)); */
-  const word = sharedMap.query.noNumPlusParenAccL;
   const word_reversed = word.split("").reverse().join("");
 
   // binary search through the words array using word_reversed to get the index
@@ -53,6 +55,7 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     }
   }
   const data: RhymePackage = {
+    word,
     version: RHYME_VERSION,
     perf: perf(e),
     items: [],
@@ -65,8 +68,7 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     });
 
   // find -10 and +10 words from the index
-  const normalCount = 10;
-  const moreCount = 50;
+  const normalCount = 20;
   const start = Math.max(0, closest - normalCount);
   const end = Math.min(words.length, closest + normalCount);
   // const rhyming_words = words.slice(start, index).concat(words.slice(index + 1, end)).map((w) => w.split("").reverse().join(""));
@@ -85,25 +87,8 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   )
     .flat()
     .filter(Boolean);
-  const startMore = Math.max(0, closest - moreCount);
-  const endMore = Math.min(words.length, closest + moreCount);
-  const fromStartMore = words
-    .slice(startMore, start)
-    .map((w) => w.split("").reverse().join(""))
-    .reverse();
-  const fromEndMore = words
-    .slice(end + 1, endMore)
-    .map((w) => w.split("").reverse().join(""));
-  const rhymingWordsMore = Array.from(
-    { length: Math.max(fromStartMore.length, fromEndMore.length) },
-    (_, i) => [fromStartMore[i], fromEndMore[i]],
-  )
-    .flat()
-    .filter(Boolean);
-
   return setSharedMapResult(e, "rhyme", {
     ...data,
     items: rhymingWords,
-    more_items: rhymingWordsMore,
   });
 });
