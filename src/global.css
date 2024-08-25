@@ -114,7 +114,7 @@ html {
 }
 
 .error-message {
-  @apply relative my-4 max-w-xs rounded border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:bg-red-900 dark:text-red-300;
+  @apply relative my-4 max-w-xs rounded-md border border-red-400 bg-red-100 px-4 py-3 text-red-700 dark:bg-red-900 dark:text-red-300;
 }
 
 a {
@@ -138,6 +138,46 @@ body {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.obsidian-wrapper {
+  @apply result-title rounded-md border-2 border-[#6ee7b7] px-4 py-2 dark:border-[#059669];
+  @apply bg-[#6ee7b722] dark:bg-[#05966922];
+}
+
+.obsidian {
+  border-radius: 5px;
+  padding: 0 0.1rem;
+  line-height: 1.4rem;
+  text-decoration: none;
+  color: var(--secondary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+  color: #2ebd88;
+  background-color: rgba(143, 159, 169, 0.15);
+}
+/* different color for dark mode */
+@media (prefers-color-scheme: dark) {
+  .obsidian {
+    color: #059669;
+  }
+  .obsidian:hover {
+    color: #6ee7b7;
+  }
+}
+
+.obsidian:link {
+  text-decoration: none;
+}
+.obsidian:visited {
+  text-decoration: none;
+}
+.obsidian:hover {
+  color: #a0e2c0;
+}
+.obsidian:active {
+  text-decoration: none;
 }
 
 /* KUBBEALTI */

@@ -1,9 +1,17 @@
 import { component$ } from "@builder.io/qwik";
-import type { DocumentHead } from "@builder.io/qwik-city";
+import { Link, type DocumentHead } from "@builder.io/qwik-city";
 import { SearchBar } from "~/components/search";
 export default component$(() => {
   return (
     <>
+      <div class="flex justify-center">
+        <div class="obsidian-wrapper">
+          Yeni site{" "}
+          <Link href="https://enessiir.pages.dev" class="obsidian">
+            🕊️ Enes Şiir
+          </Link>
+        </div>
+      </div>
       <div class="results-container">
         <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
         <SearchBar />
