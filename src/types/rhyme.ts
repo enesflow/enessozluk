@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema } from "./shared";
 
-export const RHYME_VERSION = "1.0.2" as const;
+export const RHYME_VERSION = "1.0.3" as const;
 
 export const RhymeResponseSchema = z.object({
   word: z.string(),

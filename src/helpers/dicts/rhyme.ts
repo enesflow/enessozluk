@@ -23,6 +23,22 @@ function buildRhymeAPIError(
   };
 }
 
+function clear(word: string): string {
+  // replace all space and - with empty stringa
+  // replace â with a and î with i
+  // and û with u and ô with o
+  // and their uppercase versions
+  return word
+    .replace(/[\s-]/g, "")
+    .replace(/â/g, "a")
+    .replace(/î/g, "i")
+    .replace(/û/g, "u")
+    .replace(/ô/g, "o")
+    .replace(/Â/g, "A")
+    .replace(/Î/g, "İ")
+    .replace(/Û/g, "U")
+    .replace(/Ô/g, "O");
+}
 // eslint-disable-next-line qwik/loader-location
 export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   const sharedMap = loadSharedMap(e);
@@ -34,20 +50,21 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     const cache = loadCache(e, "rhyme");
     if (cache) return setSharedMapResult(e, "rhyme", cache);
   } /////////////////////////////
-  const word_reversed = word.split("").reverse().join("");
+  const word_reversed_clear = clear(word.split("").reverse().join(""));
 
-  // binary search through the words array using word_reversed to get the index
+  // binary search through the words array using word_reversed_clear to get the index
   let closest = -1;
   {
     let start = 0;
     let end = words.length - 1;
     while (start <= end) {
       const mid = Math.floor((start + end) / 2);
+      const wordMid = clear(words[mid]);
       closest = mid;
-      if (words[mid] === word_reversed) {
+      if (wordMid === word_reversed_clear) {
         // index = mid;
         break;
-      } else if (words[mid] < word_reversed) {
+      } else if (wordMid < word_reversed_clear) {
         start = mid + 1;
       } else {
         end = mid - 1;
