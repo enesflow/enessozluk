@@ -7,12 +7,13 @@ import {
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { DEV_DISABLED } from "~/routes/search/[query]";
+import type {
+  KubbealtiError,
+  KubbealtiPackage,
+  KubbealtiResponse} from "~/types/kubbealti";
 import {
   KUBBEALTI_VERSION,
-  KubbealtiError,
   KubbealtiErrorSchema,
-  KubbealtiPackage,
-  KubbealtiResponse,
   KubbealtiResponseSchema,
 } from "~/types/kubbealti";
 import { debugAPI } from "../log";
