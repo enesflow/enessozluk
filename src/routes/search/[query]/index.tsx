@@ -17,12 +17,21 @@ import { loadSharedMap } from "~/helpers/request";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
 import { isDev } from "@builder.io/qwik/build";
-import { Dicts } from "~/types/dicts";
+import type { Dicts } from "~/types/dicts";
 import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { KubbealtiView } from "~/components/dicts/kubbealti";
+import { useRhymeLoader } from "~/helpers/dicts/rhyme";
+import { RhymeView } from "~/components/dicts/rhyme";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
-export { useBenzerLoader, useLuggatLoader, useNisanyanLoader, useTDKLoader, useKubbealtiLoader};
+export {
+  useBenzerLoader,
+  useLuggatLoader,
+  useNisanyanLoader,
+  useTDKLoader,
+  useKubbealtiLoader,
+  useRhymeLoader,
+};
 
 type SearchPageData = {
   tdk: string;
@@ -30,18 +39,27 @@ type SearchPageData = {
   luggat: string;
   benzer: string[];
   kubbealti: string;
+  rhyme: true;
   took: number;
   allFailed: boolean;
 };
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   tdk: true && isDev,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   nisanyan: true && isDev,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   luggat: true && isDev,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   benzer: true && isDev,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   kubbealti: false && isDev,
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   "nisanyan-affix": true && isDev,
-} as const; 
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+  rhyme: true && isDev,
+} as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   // const s = new Date().getTime();
@@ -51,6 +69,7 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   const luggat = await e.resolveValue(useLuggatLoader);
   const benzer = await e.resolveValue(useBenzerLoader);
   const kubbealti = await e.resolveValue(useKubbealtiLoader);
+  const rhyme = await e.resolveValue(useRhymeLoader);
   console.log(
     sharedMap.cacheTook,
     tdk.perf,
@@ -67,6 +86,7 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
       ? [benzer.url]
       : benzer.words.map((w) => w.url),
     kubbealti: kubbealti.url,
+    rhyme: true,
     took:
       sharedMap.cacheTook +
       Math.max(
@@ -75,13 +95,15 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
         luggat.perf.took,
         benzer.perf.took,
         kubbealti.perf.took,
+        rhyme.perf.took,
       ),
     allFailed:
       "error" in tdk &&
       nisanyan.isUnsuccessful &&
       luggat.isUnsuccessful &&
       benzer.isUnsuccessful &&
-      "serverDefinedReason" in kubbealti,
+      "serverDefinedReason" in kubbealti &&
+      "serverDefinedError" in rhyme,
   };
 });
 
@@ -104,6 +126,7 @@ export default component$(() => {
   const luggat = useLuggatLoader();
   const benzer = useBenzerLoader();
   const kubbealti = useKubbealtiLoader();
+  const rhyme = useRhymeLoader();
   const data = useDataLoader();
   return (
     <>
@@ -156,10 +179,17 @@ export default component$(() => {
         </div>
         <div data-version={kubbealti.value.version} data-dict="kubbealti">
           <h1 style="results-heading">
-            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı Lugatı Sonuçları:{" "}
-            <ExternalLink href={data.value.kubbealti} />
+            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
+            Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
           </h1>
           <KubbealtiView data={kubbealti.value} />
+        </div>
+        <div data-version={rhyme.value.version} data-dict="rhyme">
+          <h1 style="results-heading">
+            <CacheIndicator show={rhyme.value.perf.cached} /> Kâfiyeli
+            Kelimeler:{" "}
+          </h1>
+          <RhymeView data={rhyme.value} />
         </div>
       </div>
     </>

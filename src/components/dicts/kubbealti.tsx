@@ -1,11 +1,7 @@
-import type { TDKPackage } from "#/tdk";
-import { romanOptional } from "#helpers/roman";
 import { component$, useSignal } from "@builder.io/qwik";
-import { KUBBEALTI_TTS_URL, TDK_TTS_URL } from "~/helpers/dicts/url";
-import { nonNullable } from "~/helpers/filter";
+import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
+import type { KubbealtiPackage } from "~/types/kubbealti";
 import Speaker from "../speaker";
-import { WordLinks } from "../WordLinks";
-import { KubbealtiPackage } from "~/types/kubbealti";
 
 // const TDK_LINK_DET = "► " as const;
 
@@ -47,21 +43,21 @@ import { KubbealtiPackage } from "~/types/kubbealti";
   };
 } */
 
-  const Play = component$<{ id: string | null | undefined }>(({ id }) => {
-    const audio = useSignal<HTMLAudioElement>();
-    return id ? (
-      <button
-        onClick$={() => {
-          audio.value?.play();
-        }}
-      >
-        <audio src={KUBBEALTI_TTS_URL + id + ".wav"} ref={audio}></audio>
-        <Speaker />
-      </button>
-    ) : (
-      <></>
-    );
-  });
+const Play = component$<{ id: string | null | undefined }>(({ id }) => {
+  const audio = useSignal<HTMLAudioElement>();
+  return id ? (
+    <button
+      onClick$={() => {
+        audio.value?.play();
+      }}
+    >
+      <audio src={KUBBEALTI_TTS_URL + id + ".wav"} ref={audio}></audio>
+      <Speaker />
+    </button>
+  ) : (
+    <></>
+  );
+});
 
 export const KubbealtiView = component$<{
   data: KubbealtiPackage;
@@ -88,45 +84,42 @@ export const KubbealtiView = component$<{
         </>
       ) : (
         <>
-        {" "}
-        <ul class="results-list">
-          {data.content.map((result, index) => (
-            <li key={result.id} class="result-item">
-              <h2 class="result-title">
-                {/* {romanOptional(index, data.meanings.length)}
+          {" "}
+          <ul class="results-list">
+            {data.content.map((result /* index */) => (
+              <li key={result.id} class="result-item">
+                <h2 class="result-title">
+                  {/* {romanOptional(index, data.meanings.length)}
                 {result.madde} {result.taki ? `-${result.taki}` : ""}
                 <i class="result-title-description">
                   {result.telaffuz && <> {result.telaffuz}</>}
                   {result.lisan && <> ({result.lisan})</>}
                 </i>{" "} */}
-                {result.kelime} {" "}
-                <Play id={result.id.toString()} />
-              </h2>
-              <ul class="results-list">
-                <div dangerouslySetInnerHTML={result.anlam} />
-                <ul>
-                        {result.serverDefinedQuotes?.map((example) => (
-                          <li key={example.quote} class="result-quote">
-                            <p>
-                              "
-                              {example.quote?.split("/").map((line, index) => (
-                                <>
-                                  {line}
-                                  {index <
-                                    (example.quote?.split("/").length ?? 0) -
-                                      1 && <br />}
-                                </>
-                              ))}
-                              "
-                              <br />
-                                <em class="ml-4">
-                                  {example.author}
-                                </em>
-                            </p>
-                          </li>
-                        ))}
-                      </ul>
-                {/* {result.anlamlarListe?.map((meaning) => (
+                  {result.kelime} <Play id={result.id.toString()} />
+                </h2>
+                <ul class="results-list">
+                  <div dangerouslySetInnerHTML={result.anlam} />
+                  <ul>
+                    {result.serverDefinedQuotes?.map((example) => (
+                      <li key={example.quote} class="result-quote">
+                        <p>
+                          "
+                          {example.quote.split("/").map((line, index) => (
+                            <>
+                              {line}
+                              {index < example.quote.split("/").length - 1 && (
+                                <br />
+                              )}
+                            </>
+                          ))}
+                          "
+                          <br />
+                          <em class="ml-4">{example.author}</em>
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                  {/* {result.anlamlarListe?.map((meaning) => (
                   <li
                     key={meaning.anlam_id}
                     class="result-subitem result-description"
@@ -170,11 +163,11 @@ export const KubbealtiView = component$<{
                     </ul>
                   </li>
                 ))} */}
-              </ul>
-            </li>
-          ))}
-        </ul>
-        {/* {data.meanings
+                </ul>
+              </li>
+            ))}
+          </ul>
+          {/* {data.meanings
           .map((result) =>
             result.birlesikler?.split(", ").map((word) => word.trim()),
           )
@@ -197,7 +190,7 @@ export const KubbealtiView = component$<{
             />
           </section>
         )} */}
-      </>
+        </>
       )}
     </>
   );

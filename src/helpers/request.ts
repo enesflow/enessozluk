@@ -3,11 +3,12 @@ import type { SharedMap } from "#/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import type { z } from "zod";
 import { BenzerPackageSchema } from "~/types/benzer";
+import { KubbealtiPackageSchema } from "~/types/kubbealti";
 import { LuggatPackageSchema } from "~/types/luggat";
 import { NisanyanWordPackageSchema } from "~/types/nisanyan";
+import { RhymePackageSchema } from "~/types/rhyme";
 import { TDKPackageSchema } from "~/types/tdk";
 import { debugAPI, debugLog } from "./log";
-import { KubbealtiPackageSchema } from "~/types/kubbealti";
 
 export function loadSharedMap(e: RequestEventBase) {
   const data = e.sharedMap.get("data");
@@ -91,7 +92,8 @@ const Packages = {
   "nisanyan-affix": NisanyanWordPackageSchema,
   benzer: BenzerPackageSchema,
   nisanyan: NisanyanWordPackageSchema,
-  kubbealti: KubbealtiPackageSchema
+  kubbealti: KubbealtiPackageSchema,
+  rhyme: RhymePackageSchema,
 } as const;
 
 export function loadCache<T extends Dicts>(
