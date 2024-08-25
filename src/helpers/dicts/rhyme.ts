@@ -1,9 +1,5 @@
-import {
-  loadCache,
-  loadSharedMap,
-  setSharedMapResult
-} from "#helpers/request";
-import type { RequestEventBase} from "@builder.io/qwik-city";
+import { loadCache, loadSharedMap, setSharedMapResult } from "#helpers/request";
+import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { DEV_DISABLED } from "~/routes/search/[query]";
 import type { RhymeErrorResponse, RhymePackage } from "~/types/rhyme";
@@ -60,12 +56,13 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     version: RHYME_VERSION,
     perf: perf(e),
     items: [],
-  }
+  };
   // if the word is not found, return an empty array
-  if (closest === -1) return setSharedMapResult(e, "rhyme", {
-    ...data,
-    serverDefinedError: NO_RESULT,
-  });
+  if (closest === -1)
+    return setSharedMapResult(e, "rhyme", {
+      ...data,
+      serverDefinedError: NO_RESULT,
+    });
 
   // find -10 and +10 words from the index
   const normalCount = 10;
@@ -73,26 +70,37 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   const start = Math.max(0, closest - normalCount);
   const end = Math.min(words.length, closest + normalCount);
   // const rhyming_words = words.slice(start, index).concat(words.slice(index + 1, end)).map((w) => w.split("").reverse().join(""));
-  const fromStart = words.slice(start, closest).map((w) => w.split("").reverse().join(""));
-  const fromEnd = words.slice(closest + 1, end).map((w) => w.split("").reverse().join(""));
+  const fromStart = words
+    .slice(start, closest)
+    .map((w) => w.split("").reverse().join(""))
+    .reverse();
+  const fromEnd = words
+    .slice(closest + 1, end)
+    .map((w) => w.split("").reverse().join(""));
   // make a new array with one from each array
   // like: [fromStart[0], fromEnd[0], fromStart[1], fromEnd[1], ...]
-  const rhymingWords = 
-    Array.from({ length: Math.max(fromStart.length, fromEnd.length) }, (_, i) => [
-      fromStart[i],
-      fromEnd[i],
-    ]).flat().filter(Boolean);
-    const startMore = Math.max(0, closest - moreCount);
-    const endMore = Math.min(words.length, closest + moreCount);
-    const fromStartMore = words.slice(startMore, start).map((w) => w.split("").reverse().join(""));
-    const fromEndMore = words.slice(end + 1, endMore).map((w) => w.split("").reverse().join(""));
-    const rhymingWordsMore = 
-      Array.from({ length: Math.max(fromStartMore.length, fromEndMore.length) }, (_, i) => [
-        fromStartMore[i],
-        fromEndMore[i],
-      ]).flat().filter(Boolean);
+  const rhymingWords = Array.from(
+    { length: Math.max(fromStart.length, fromEnd.length) },
+    (_, i) => [fromStart[i], fromEnd[i]],
+  )
+    .flat()
+    .filter(Boolean);
+  const startMore = Math.max(0, closest - moreCount);
+  const endMore = Math.min(words.length, closest + moreCount);
+  const fromStartMore = words
+    .slice(startMore, start)
+    .map((w) => w.split("").reverse().join(""))
+    .reverse();
+  const fromEndMore = words
+    .slice(end + 1, endMore)
+    .map((w) => w.split("").reverse().join(""));
+  const rhymingWordsMore = Array.from(
+    { length: Math.max(fromStartMore.length, fromEndMore.length) },
+    (_, i) => [fromStartMore[i], fromEndMore[i]],
+  )
+    .flat()
+    .filter(Boolean);
 
-  
   return setSharedMapResult(e, "rhyme", {
     ...data,
     items: rhymingWords,
