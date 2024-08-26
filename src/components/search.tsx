@@ -36,6 +36,8 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
             nav(`/search/${query.value}`).finally(() => {
               isLoading.value = false;
             });
+          } else {
+            nav("/");
           }
         }}
         class="search-form"
