@@ -1,7 +1,9 @@
 import { component$ } from "@builder.io/qwik";
 
+export const SPEAKER_DELAY = 0.5 as const;
+
 export const Speaker = component$<{ duration?: number }>(({ duration }) => {
-  const seconds = duration && `${duration + 0.5}s`;
+  const seconds = duration && `${duration + SPEAKER_DELAY}s`;
   return (
     <>
       <svg

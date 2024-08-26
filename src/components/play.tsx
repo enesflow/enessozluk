@@ -1,5 +1,5 @@
 import { component$, useSignal } from "@builder.io/qwik";
-import Speaker from "~/components/speaker";
+import Speaker, { SPEAKER_DELAY } from "~/components/speaker";
 export const Play = component$<{ base: string; id: string | null | undefined }>(
   ({ base, id }) => {
     const audio = useSignal<HTMLAudioElement>();
@@ -15,7 +15,7 @@ export const Play = component$<{ base: string; id: string | null | undefined }>(
             audioElement.play();
             setTimeout(
               () => (playing.value = false),
-              audioElement.duration * 1000,
+              (audioElement.duration + SPEAKER_DELAY) * 1000,
             );
           }
         }}
@@ -23,7 +23,6 @@ export const Play = component$<{ base: string; id: string | null | undefined }>(
         <audio
           src={base + id + ".wav"}
           ref={audio}
-          onEnded$={() => (playing.value = false)}
           onPlay$={() => (playing.value = true)}
         />
         <Speaker duration={playing.value ? audio.value?.duration : undefined} />
