@@ -96,7 +96,7 @@ export const KubbealtiView = component$<{
                 <h2 class="result-title">
                   {data.content.length === 1
                     ? "•"
-                    : `${convertToRoman(index + 1)}`}{" "}
+                    : `(${convertToRoman(index + 1)})`}{" "}
                   {result.kelime} <Play id={result.id.toString()} />
                 </h2>
                 <ul class="results-list">
