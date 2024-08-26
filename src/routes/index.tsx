@@ -16,6 +16,21 @@ export default component$(() => {
         <h1 class="header">Enes Sözlük'e Hoş Geldiniz 📕</h1>
         <SearchBar />
         <div class="flex justify-center">
+          <div class="new-features-wrapper">
+            <strong>Yeni özellikler:</strong>
+            <ul>
+              <li>
+                <i class="opacity-50">25 Ağu 2024 </i>
+                📖 <Link href="/search/kubbealtı">Kubbealtı</Link> Lugatı
+              </li>
+              <li>
+                <i class="opacity-50">25 Ağu 2024 </i>
+                🕊️ <Link href="/search/kafiye">Kâfiye</Link>li kelimeler
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="flex justify-center">
           <img
             width="640"
             height="480"

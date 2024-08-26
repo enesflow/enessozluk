@@ -147,6 +147,10 @@ select {
   appearance: none;
 }
 
+.new-features-wrapper {
+  @apply mb-4 rounded-md border-2 border-red-500 px-4 py-2 dark:border-red-400;
+}
+
 .obsidian-wrapper {
   @apply result-title rounded-md border-2 border-[#6ee7b7] px-4 py-2 dark:border-[#059669];
   @apply bg-[#6ee7b722] dark:bg-[#05966922];
