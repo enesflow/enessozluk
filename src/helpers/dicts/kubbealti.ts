@@ -221,7 +221,12 @@ export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
     }
   } /////////////////////////////
   if (parsed.data.totalElements === 0) {
-    return buildKubbealtiAPIError(e, url.user, NO_RESULT);
+    return setSharedMapResult(e, "kubbealti", {
+      serverDefinedReason: NO_RESULT,
+      url: url.user,
+      version: KUBBEALTI_VERSION,
+      perf: perf(e),
+    });
   }
   const data = cleanseKubbealtiResponse(parsed.data);
   return setSharedMapResult(e, "kubbealti", data);
