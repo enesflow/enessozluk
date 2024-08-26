@@ -94,7 +94,10 @@ export const KubbealtiView = component$<{
             {data.content.map((result, index) => (
               <li key={result.id} class="result-item">
                 <h2 class="result-title">
-                  ({convertToRoman(index+1)}) {result.kelime} <Play id={result.id.toString()} />
+                  {data.content.length === 1
+                    ? "•"
+                    : `${convertToRoman(index + 1)}`}{" "}
+                  {result.kelime} <Play id={result.id.toString()} />
                 </h2>
                 <ul class="results-list">
                   <div dangerouslySetInnerHTML={result.anlam} />
