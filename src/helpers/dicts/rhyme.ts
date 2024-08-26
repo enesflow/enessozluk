@@ -97,7 +97,8 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   const fromEnd = words
     .slice(closest + 1, end)
     .map((w) => w.split("").reverse().join(""));
-  if (index === -1) fromEnd.unshift(word);
+  if (index === -1)
+    fromEnd.unshift(words[closest].split("").reverse().join(""));
   // make a new array with one from each array
   // like: [fromStart[0], fromEnd[0], fromStart[1], fromEnd[1], ...]
   /* const rhymingWords = Array.from(
