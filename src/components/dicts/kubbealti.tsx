@@ -3,6 +3,7 @@ import { useLocation } from "@builder.io/qwik-city";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import type { KubbealtiPackage } from "~/types/kubbealti";
 import Speaker from "../speaker";
+import { convertToRoman } from "~/helpers/roman";
 
 // const TDK_LINK_DET = "► " as const;
 
@@ -90,10 +91,10 @@ export const KubbealtiView = component$<{
         <>
           <p class="result-title-took">{data.totalElements} sonuç bulundu.</p>{" "}
           <ul class="results-list">
-            {data.content.map((result /* index */) => (
+            {data.content.map((result, index) => (
               <li key={result.id} class="result-item">
                 <h2 class="result-title">
-                  {result.kelime} <Play id={result.id.toString()} />
+                  ({convertToRoman(index+1)}) {result.kelime} <Play id={result.id.toString()} />
                 </h2>
                 <ul class="results-list">
                   <div dangerouslySetInnerHTML={result.anlam} />
