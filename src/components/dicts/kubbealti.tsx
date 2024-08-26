@@ -109,16 +109,6 @@ export const KubbealtiView = component$<{
                 const url = loc.url;
                 // set kubbealtiPage to e.value
                 url.searchParams.set("kubbealtiPage", e.value);
-
-                /* await nav(url.toString(), {
-                  forceReload: true,
-                  replaceState: true,
-                  // either, "form", "link" or "popstate"
-                  type: "link",
-                });
-                // replace the url too:
-                window.history.replaceState({}, "", url.toString()); */
-                // just reload in normal way
                 window.location.href = url.toString();
               }}
               class="mb-4"
