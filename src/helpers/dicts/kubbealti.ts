@@ -141,6 +141,7 @@ const cleanseKubbealtiResponse = (
       }
       const nextText = cleanAuthor(next.text().trim());
       if (
+        nextText.length >= 6 &&
         next.hasClass("Champturk150") &&
         !elem.hasClass("tags") &&
         !nextText.endsWith('"')
