@@ -54,11 +54,11 @@ export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: true && isDev,
+  kubbealti: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: false && isDev,
+  rhyme: true && isDev,
 } as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {

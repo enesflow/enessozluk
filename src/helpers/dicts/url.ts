@@ -158,9 +158,11 @@ export const buildKubbealtiUrl = (
   const sharedMap = loadSharedMap(e);
   let query = sharedMap.query.noNumPlusParenAccL;
   if (query[0] === "–") query = query.slice(1);
-  console.log("QUERY IS", query);
+  const append = sharedMap.url?.kubbealtiPage
+    ? `/${sharedMap.url.kubbealtiPage}`
+    : "";
   return {
-    api: baseBuilder(KUBBEALTI_URL, query, lowercase),
-    user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase),
+    api: baseBuilder(KUBBEALTI_URL, query, lowercase) + append,
+    user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase) + append,
   };
-}
+};

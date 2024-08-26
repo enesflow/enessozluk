@@ -106,6 +106,13 @@ export const onRequest: RequestHandler = async (e) => {
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),
+    url: {
+      kubbealtiPage:
+        e.query.has("kubbealtiPage") &&
+        !Number.isNaN(Number(e.query.get("kubbealtiPage")))
+          ? parseInt(e.query.get("kubbealtiPage") as string)
+          : 1,
+    },
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     result: {},
     forceFetch: {},

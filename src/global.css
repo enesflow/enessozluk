@@ -140,6 +140,13 @@ body {
   }
 }
 
+select {
+  @apply w-full max-w-md rounded-md bg-gray-100 p-2 text-gray-700 outline outline-gray-300 focus:outline-none focus:ring focus:ring-red-500 dark:bg-black dark:text-gray-300 dark:outline-gray-700 sm:w-11/12 md:w-5/6 lg:w-3/4 xl:w-2/3;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+}
+
 .obsidian-wrapper {
   @apply result-title rounded-md border-2 border-[#6ee7b7] px-4 py-2 dark:border-[#059669];
   @apply bg-[#6ee7b722] dark:bg-[#05966922];
@@ -183,80 +190,83 @@ body {
 /* KUBBEALTI */
 
 .ChampturkB150 {
-  clear: left;
+  /* clear: left;
   color: #bf4c4c;
   font-family: ChampturkB;
-  font-size: 18px;
+  font-size: 18px; */
   font-weight: 700;
-  line-height: normal;
+  /* line-height: normal; */
 }
 
 .ChampturkI150 {
-  color: #1e852a;
+  /* color: #1e852a; */
+  font-weight: 700;
 }
 
 .ChampturkI14,
 .ChampturkI150 {
-  font-family: ChampturkI;
-  font-size: 18px;
+  /* font-family: ChampturkI;
+  font-size: 18px; */
   font-style: italic;
-  line-height: normal;
+  /* line-height: normal; */
 }
 
 .ChampturkI14 {
-  color: #18b495;
+  /* color: #18b495; */
+  font-weight: 700;
 }
 
 .Champturk14 {
-  font-family: Champturk;
+  /* font-family: Champturk;
   font-size: 18px;
-  line-height: normal;
+  line-height: normal; */
 }
 
 .ChampturkBI14 {
-  color: #0b7c95;
-  font-family: ChampturkBI;
+  /* color: #0b7c95; */
+  /* font-family: ChampturkBI; */
+  font-weight: 700;
 }
 
 .ChampturkBI14,
 .ChampturkBI150 {
-  font-size: 18px;
+  /* font-size: 18px; */
   font-style: italic;
   font-weight: 700;
-  line-height: normal;
+  /* line-height: normal; */
 }
 
 .ChampturkBI150 {
-  clear: left;
+  /*  clear: left;
   color: #bf4c4c;
-  font-family: ChampturkB;
+  font-family: ChampturkB; */
 }
 
 .Champturk150,
 .ChampturkB16 {
-  font-family: ChampturkB;
+  /* font-family: ChampturkB;
   font-size: 18px;
-  line-height: normal;
+  line-height: normal; */
 }
 
 .ChampturkB16,
 .ChampturkI16 {
-  clear: left;
-  color: #bf4c4c;
+  /* clear: left;
+  color: #bf4c4c; */
   font-weight: 700;
 }
 
 .ChampturkI16 {
-  font-family: ChampturkB;
+  /* font-family: ChampturkB; */
 }
 
 .Arabic18,
 .ChampturkI16 {
-  font-size: 18px;
-  line-height: normal;
+  /* font-size: 18px;
+  line-height: normal; */
 }
 
 .Arabic18 {
   direction: rtl;
-  font-family: Arabic;
+  /* font-family: Arabic; */
 }

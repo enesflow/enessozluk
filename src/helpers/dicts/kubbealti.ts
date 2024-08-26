@@ -1,16 +1,13 @@
 import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
-import {
-  fetchAPI,
-  loadCache,
-  setSharedMapResult
-} from "#helpers/request";
+import { fetchAPI, loadCache, setSharedMapResult } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { DEV_DISABLED } from "~/routes/search/[query]";
 import type {
   KubbealtiError,
   KubbealtiPackage,
-  KubbealtiResponse} from "~/types/kubbealti";
+  KubbealtiResponse,
+} from "~/types/kubbealti";
 import {
   KUBBEALTI_VERSION,
   KubbealtiErrorSchema,
@@ -21,7 +18,7 @@ import { perf } from "../time";
 import { to } from "../to";
 import { buildKubbealtiUrl } from "./url";
 import { load } from "cheerio";
-
+import { NISANYAN_ABBREVIATIONS } from "~/components/dicts/nisanyan";
 
 // DONT DELETE THIS YET
 // https://eski.lugatim.com/rest/word-search/merhaba
@@ -47,91 +44,132 @@ function buildKubbealtiAPIError(
   debugAPI(e, `Kubbealti API Error: ${title}`);
   return {
     serverDefinedReason: title,
-    items: [],
+    // items: [],
     url,
     version: KUBBEALTI_VERSION,
     perf: perf(e),
   };
 }
 
-const cleanseKubbealtiResponse = (data: KubbealtiResponse):KubbealtiResponse  => {
+const TAGS = {
+  "i.": "isim",
+  "sıf.": "sıfat",
+  "zf.": "zarf",
+  "birl.": "birleşik",
+  "ve.": "ve",
+} as const;
+
+function cleanAuthor(author: string) {
+  return author
+    .replace(/\.$/, "")
+    .replace(/^\(/, "")
+    .replace(/\)$/, "")
+    .replace(/['’]den$/, "")
+    .replace(/['’]dan$/, "")
+    .replace(/['’]ten$/, "")
+    .replace(/['’]tan$/, "");
+}
+
+const cleanseKubbealtiResponse = (
+  data: KubbealtiResponse,
+): KubbealtiResponse => {
   for (const item of data.content) {
-    item.anlam = item.anlam
+    /* item.anlam = item.anlam
       .replaceAll('href="/s/–', 'href="/s/')
       .replaceAll("href='/s/–", "href='/s/")
       .replaceAll('href="/s/', 'href="/search/')
-      .replaceAll("href='/s/", "href='/search/");
-    /* item.anlam = item.anlam.replaceAll("ChampturkI150", "result-quote"); */
-    const $ = load(item.anlam);
-    /* $(".ChampturkI150").each((i, elem) => {
-      const html = $(elem).html();
-      const text = $(elem).text().trim();
-      console.log("TEXT", text);
-      if (text[text.length - 1] === ".") return;
-      const attributes = $(elem).attr() as any;
-      let {
-        class: className,
-        ... otherAttributes
-      } = attributes;
-      className = className.replaceAll("ChampturkI150", "result-quote");
-      $(elem).replaceWith(`<li class="${className}" ${otherAttributes}>${html}</li>`);
+      .replaceAll("href='/s/", "href='/search/"); */
+    const $ = load(
+      item.anlam
+        .replaceAll("“", '"')
+        .replaceAll("”", '"')
+        // .replaceAll("&nbsp;", "")
+        .replace(/ѻ|●/g, ""),
+    );
+    // remove the style tag of all elements
+    $("*")
+      .removeAttr("style")
+      .each((_, el) => {
+        // if the hrefe starts with /s/ replace it with /search/
+        if ((el as any).name === "a") {
+          const elem = $(el);
+          let href = elem.attr("href");
+          // if href's first char is -, remove it
+          if (href?.startsWith("-")) {
+            href = href.slice(1);
+          }
+          if (href?.startsWith("/s/")) {
+            elem.attr("href", href.replace("/s/", "/search/"));
+          }
+          // if it doesn't start with it, just add /search/ to the beginning
+          else {
+            elem.attr("href", "/search/" + href);
+          }
+        }
+      });
+    $(".ChampturkI150, .ChampturkI14").each((_, el) => {
+      const elem = $(el);
+      const tags = elem.text().trim().replaceAll(" ve ", " ve. ").split(" ");
+      if (tags.every((tag) => tag.endsWith("."))) {
+        elem.text(tags.map((tag) => (TAGS as any)[tag] || tag).join(" ") + " ");
+        elem.addClass("tags");
+      }
     });
-    $(".Champturk150").each((i, elem) => {
-      const html = $(elem).html();
-      const text = $(elem).text().trim();
-      console.log("TEXT", text);
-      if (text.length === 1) return;
-      const attributes = $(elem).attr() as any;
-      let {
-        class: className,
-        ... otherAttributes
-      } = attributes;
-      className = className.replaceAll("Champturk150", "ml-4 result-quote");
-      $(elem).replaceWith(`<em class="${className}" ${otherAttributes}>${html}</em>`);
-    }); */
-    const quotes = [] as { quote: string; author: string }[];
-    // .ChampturkI150 classes are the quote's content,
-    // every .ChampturkI150 has a .Champturk150 "right after" as a sibling, which is the author
-    // So we need to iterate over .ChampturkI150 and get the next .Champturk150
-    const wordTypes = {
-      "i.": "isim",
-      "birl.": "birleşik",
-      "sıf.": "sıfat",
-    } as Record<string, string>;
-    const tags = [] as string[];
-    // get the first ChampturkI150, which holds the types
-    $(".ChampturkI150").first().text().split(" ").forEach((tag) => {
-      const trimmed = tag.trim();
-      if (trimmed === "") return;
-      tags.push(wordTypes[trimmed] ?? trimmed);
+    // replace the language abbrevations
+    $(".Champturk14").each((_, el) => {
+      Object.entries(NISANYAN_ABBREVIATIONS).forEach(([key, value]) => {
+        el.children.forEach((child) => {
+          if (child.type === "text") {
+            child.data = child.data.replace(key + ".", value);
+          }
+        });
+      });
     });
-    $(".ChampturkI150").each((i, elem) => {
-      let quote = $(elem).text().trim();
-      let author = $(elem).next().text().trim();
-      if (quote.split(" ").every((word) => word.endsWith("."))) return;
-      // if author has a "." at the end, remove it
-      if (author[author.length - 1] === ".") author = author.slice(0, -1);
-      // from quote, remove “ from the beginning and ” from the end
-      quote = quote.replace(/“/, "").replace(/”/, "");
-
-      // remove the paranthesis around the author using regex, replace ( from the start and ) from the end
-      author = author.replace(/^\(/, "").replace(/\)$/, "");
-      // remove all turkish dan den etc. from the end
-      // example: "Ali Veli'den" -> "Ali Veli"
-      author = author.replace(/['’]den$/, "").replace(/['’]dan$/, "").replace(/['’]ten$/, "").replace(/['’]tan$/, "");
-      quotes.push({ quote, author });
+    // loop over all .ChampturkI150 and print the text
+    $(".ChampturkI150").each((_, el) => {
+      const elem = $(el);
+      let next = elem.next();
+      // if elem has a child with the class "Temizle", make it next
+      if (elem.children().hasClass("Temizle")) {
+        elem.children().each((_, child) => {
+          const childElem = $(child);
+          if (childElem.hasClass("Temizle")) {
+            childElem.addClass("Champturk150");
+            next = childElem;
+          }
+        });
+      }
+      const nextText = cleanAuthor(next.text().trim());
+      if (
+        next.hasClass("Champturk150") &&
+        !elem.hasClass("tags") &&
+        !nextText.endsWith('"')
+      ) {
+        if (next.next().is("br")) {
+          next.next().remove();
+        }
+        // make elem a <p>
+        if (nextText.length) {
+          next.attr("class", "ml-4");
+          elem.append("<br>");
+          const em = $("<em>");
+          em.attr("class", "ml-4");
+          em.text(nextText);
+          elem.append(em);
+          next.remove();
+        }
+        elem.replaceWith(
+          `<p class="result-quote">${elem.html()?.replaceAll(" / ", "<br/>")}</p>`,
+        );
+      }
     });
-    //console.log("QUOTES", quotes);
-    console.log("TAGS", tags);
-    // item.anlam = $.html();
-    item.serverDefinedQuotes = quotes;
+    item.anlam = $.html();
   }
   return data;
 };
 
 // eslint-disable-next-line qwik/loader-location
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
-  console.log("I am being called");
   if (DEV_DISABLED.kubbealti)
     return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
   // If there is data in cache, return it
@@ -144,7 +182,6 @@ export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
   const [error, response] = await to(fetchAPI(url.api));
   // Returns error if request failed
   if (error || !response?.success) {
-    console.log(url);
     debugAPI(e, `Kubbealti API Error: ${error?.message || response?.code}`);
     return buildKubbealtiAPIError(
       e,
@@ -166,7 +203,7 @@ export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
     if (error.success) {
       const data: KubbealtiError = {
         serverDefinedReason: NO_RESULT,
-        items: error.data.items,
+        // items: error.data.items,
         url: url.user,
         version: KUBBEALTI_VERSION,
         perf: perf(e),
@@ -182,6 +219,9 @@ export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
       );
     }
   } /////////////////////////////
+  if (parsed.data.totalElements === 0) {
+    return buildKubbealtiAPIError(e, url.user, NO_RESULT);
+  }
   const data = cleanseKubbealtiResponse(parsed.data);
   return setSharedMapResult(e, "kubbealti", data);
 });

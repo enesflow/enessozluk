@@ -44,7 +44,7 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   const sharedMap = loadSharedMap(e);
   const word = sharedMap.query.noNumPlusParenAccL;
   if (DEV_DISABLED.rhyme)
-    return buildRhymeAPIError(e, word, "Rhyme API is disabled");
+    return buildRhymeAPIError(e, word, "Rhyme is disabled");
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "rhyme");
