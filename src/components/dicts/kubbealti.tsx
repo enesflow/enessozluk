@@ -1,9 +1,9 @@
-import { component$, useSignal } from "@builder.io/qwik";
+import { component$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
-import type { KubbealtiPackage } from "~/types/kubbealti";
-import Speaker from "../speaker";
 import { convertToRoman } from "~/helpers/roman";
+import type { KubbealtiPackage } from "~/types/kubbealti";
+import { Play } from "../play";
 
 // const TDK_LINK_DET = "► " as const;
 
@@ -45,22 +45,6 @@ import { convertToRoman } from "~/helpers/roman";
   };
 } */
 
-const Play = component$<{ id: string | null | undefined }>(({ id }) => {
-  const audio = useSignal<HTMLAudioElement>();
-  return id ? (
-    <button
-      onClick$={() => {
-        audio.value?.play();
-      }}
-    >
-      <audio src={KUBBEALTI_TTS_URL + id + ".wav"} ref={audio}></audio>
-      <Speaker />
-    </button>
-  ) : (
-    <></>
-  );
-});
-
 export const KubbealtiView = component$<{
   data: KubbealtiPackage;
 }>(({ data }) => {
@@ -97,7 +81,8 @@ export const KubbealtiView = component$<{
                   {data.content.length === 1
                     ? "•"
                     : `(${convertToRoman(index + 1)})`}{" "}
-                  {result.kelime} <Play id={result.id.toString()} />
+                  {result.kelime}{" "}
+                  <Play id={result.id.toString()} base={KUBBEALTI_TTS_URL} />
                 </h2>
                 <ul class="results-list">
                   <div dangerouslySetInnerHTML={result.anlam} />
