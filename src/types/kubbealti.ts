@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema, weakString } from "./shared";
 
-export const KUBBEALTI_VERSION = "1.0.0" as const;
+export const KUBBEALTI_VERSION = "1.0.1" as const;
 
 export const KubbealtiResponseSchema = z.object({
   version: z.literal(KUBBEALTI_VERSION),
