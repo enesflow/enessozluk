@@ -115,7 +115,7 @@ export const KubbealtiView = component$<{
             >
               {Array.from({ length: data.totalPages }, (_, i) => (
                 <option key={i} value={i + 1} selected={i + 1 === currentPage}>
-                  {"Sayfa " + (i + 1).toString()}
+                  {"Kubbealtı Sayfa " + (i + 1).toString()}
                 </option>
               ))}
             </select>
