@@ -77,6 +77,7 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
     luggat.perf,
     benzer.perf,
     kubbealti.perf,
+    rhyme.perf,
   );
   return {
     tdk: tdk.url,
@@ -102,8 +103,10 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
       nisanyan.isUnsuccessful &&
       luggat.isUnsuccessful &&
       benzer.isUnsuccessful &&
-      "serverDefinedReason" in kubbealti &&
-      "serverDefinedError" in rhyme,
+      "serverDefinedReason" in kubbealti,
+    // removing this because rhyme never fails
+    /*  &&
+      "serverDefinedError" in rhyme, */
   };
 });
 
