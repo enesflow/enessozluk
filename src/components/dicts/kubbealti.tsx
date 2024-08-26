@@ -1,8 +1,8 @@
 import { component$, useSignal } from "@builder.io/qwik";
+import { useLocation } from "@builder.io/qwik-city";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import type { KubbealtiPackage } from "~/types/kubbealti";
 import Speaker from "../speaker";
-import { useLocation, useNavigate } from "@builder.io/qwik-city";
 
 // const TDK_LINK_DET = "► " as const;
 
@@ -63,7 +63,6 @@ const Play = component$<{ id: string | null | undefined }>(({ id }) => {
 export const KubbealtiView = component$<{
   data: KubbealtiPackage;
 }>(({ data }) => {
-  const nav = useNavigate();
   const loc = useLocation();
   const currentPage =
     "items" in data ? data.items.find((item) => item.current)?.number : -1;
@@ -111,14 +110,16 @@ export const KubbealtiView = component$<{
                 // set kubbealtiPage to e.value
                 url.searchParams.set("kubbealtiPage", e.value);
 
-                await nav(url.toString(), {
+                /* await nav(url.toString(), {
                   forceReload: true,
                   replaceState: true,
                   // either, "form", "link" or "popstate"
                   type: "link",
                 });
                 // replace the url too:
-                window.history.replaceState({}, "", url.toString());
+                window.history.replaceState({}, "", url.toString()); */
+                // just reload in normal way
+                window.location.href = url.toString();
               }}
               class="mb-4"
             >
