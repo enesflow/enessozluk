@@ -160,6 +160,13 @@ export default component$(() => {
           </h1>
           <NisanyanView data={nisanyan.value} />
         </div>
+        <div data-version={kubbealti.value.version} data-dict="kubbealti">
+          <h1 style="results-heading">
+            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
+            Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
+          </h1>
+          <KubbealtiView data={kubbealti.value} />
+        </div>
         <div data-version={luggat.value.version} data-dict="luggat">
           <h1 style="results-heading" data-version={luggat.value.version}>
             <CacheIndicator show={luggat.value.perf.cached} /> Luggat Sonuçları:{" "}
@@ -176,13 +183,6 @@ export default component$(() => {
             )}
           </h1>
           <BenzerView data={benzer.value} />
-        </div>
-        <div data-version={kubbealti.value.version} data-dict="kubbealti">
-          <h1 style="results-heading">
-            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
-            Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
-          </h1>
-          <KubbealtiView data={kubbealti.value} />
         </div>
         <div data-version={rhyme.value.version} data-dict="rhyme">
           <h1 style="results-heading">
