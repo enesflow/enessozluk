@@ -1,6 +1,6 @@
 import { component$ } from "@builder.io/qwik";
 
-export const SPEAKER_DELAY = 0.5 as const;
+export const SPEAKER_DELAY = 0.2 as const;
 
 export const Speaker = component$<{ duration?: number }>(({ duration }) => {
   const seconds = duration && `${duration + SPEAKER_DELAY}s`;
