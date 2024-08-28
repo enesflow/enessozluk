@@ -1,36 +1,44 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useContextProvider, useStore } from "@builder.io/qwik";
 import {
   routeLoader$,
   useLocation,
   type DocumentHead,
 } from "@builder.io/qwik-city";
+import { isDev } from "@builder.io/qwik/build";
+import type { CollapsableStore } from "~/components/collapsable";
+import {
+  Collapsable,
+  CollapsableCTX,
+  DEFAULT_COLLAPSABLE,
+  useCollapsableLoader,
+} from "~/components/collapsable";
+import { KubbealtiView } from "~/components/dicts/kubbealti";
 import { LuggatView } from "~/components/dicts/luggat";
+import { RhymeView } from "~/components/dicts/rhyme";
 import { TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { Check } from "~/components/svgs/check";
 import { useBenzerLoader } from "~/helpers/dicts/benzer";
+import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
+import { useRhymeLoader } from "~/helpers/dicts/rhyme";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { loadSharedMap } from "~/helpers/request";
+import type { Dicts } from "~/types/dicts";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
-import { isDev } from "@builder.io/qwik/build";
-import type { Dicts } from "~/types/dicts";
-import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
-import { KubbealtiView } from "~/components/dicts/kubbealti";
-import { useRhymeLoader } from "~/helpers/dicts/rhyme";
-import { RhymeView } from "~/components/dicts/rhyme";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
   useBenzerLoader,
+  useCollapsableLoader,
+  useKubbealtiLoader,
   useLuggatLoader,
   useNisanyanLoader,
-  useTDKLoader,
-  useKubbealtiLoader,
   useRhymeLoader,
+  useTDKLoader,
 };
 
 type SearchPageData = {
@@ -123,6 +131,13 @@ const CacheIndicator = component$<{ show: boolean }>(({ show }) => {
 });
 
 export default component$(() => {
+  const loadedCollapsable = useCollapsableLoader();
+  const collapsed = useStore<CollapsableStore>(
+    loadedCollapsable.value.success
+      ? loadedCollapsable.value.data
+      : DEFAULT_COLLAPSABLE,
+  );
+  useContextProvider(CollapsableCTX, collapsed);
   const loc = useLocation();
   const tdk = useTDKLoader();
   const nisanyan = useNisanyanLoader();
@@ -149,36 +164,56 @@ export default component$(() => {
             />
           </p>
         )}
-        <div data-version={tdk.value.version} data-dict="tdk">
-          <h1 style="results-heading">
+        <Collapsable data-version={tdk.value.version} data-dict="tdk" cId="tdk">
+          <h1 style="results-heading" q:slot="header">
             <CacheIndicator show={tdk.value.perf.cached} /> TDK Sonuçları:{" "}
             <ExternalLink href={data.value.tdk} />
           </h1>
           <TDKView data={tdk.value} />
-        </div>
-        <div data-version={nisanyan.value.version} data-dict="nisanyan">
-          <h1 style="results-heading align-middle">
+        </Collapsable>
+        <Collapsable
+          data-version={nisanyan.value.version}
+          data-dict="nisanyan"
+          cId="nisanyan"
+        >
+          <h1 style="results-heading" q:slot="header">
             <CacheIndicator show={nisanyan.value.perf.cached} /> Nişanyan Sözlük
             Sonuçları: <ExternalLink href={data.value.nisanyan} />
           </h1>
           <NisanyanView data={nisanyan.value} />
-        </div>
-        <div data-version={kubbealti.value.version} data-dict="kubbealti">
-          <h1 style="results-heading">
+        </Collapsable>
+        <Collapsable
+          data-version={kubbealti.value.version}
+          data-dict="kubbealti"
+          cId="kubbealti"
+        >
+          <h1 style="results-heading" q:slot="header">
             <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
             Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
           </h1>
           <KubbealtiView data={kubbealti.value} />
-        </div>
-        <div data-version={luggat.value.version} data-dict="luggat">
-          <h1 style="results-heading" data-version={luggat.value.version}>
+        </Collapsable>
+        <Collapsable
+          data-version={luggat.value.version}
+          data-dict="luggat"
+          cId="luggat"
+        >
+          <h1
+            style="results-heading"
+            q:slot="header"
+            data-version={luggat.value.version}
+          >
             <CacheIndicator show={luggat.value.perf.cached} /> Luggat Sonuçları:{" "}
             <ExternalLink href={data.value.luggat} />
           </h1>
           <LuggatView data={luggat.value} />
-        </div>
-        <div data-version={benzer.value.version} data-dict="benzer">
-          <h1 style="results-heading">
+        </Collapsable>
+        <Collapsable
+          data-version={benzer.value.version}
+          data-dict="benzer"
+          cId="benzer"
+        >
+          <h1 style="results-heading" q:slot="header">
             <CacheIndicator show={benzer.value.perf.cached} /> Benzer Kelimeler
             Sonuçları:{" "}
             {data.value.benzer.length === 1 && (
@@ -186,14 +221,18 @@ export default component$(() => {
             )}
           </h1>
           <BenzerView data={benzer} />
-        </div>
-        <div data-version={rhyme.value.version} data-dict="rhyme">
-          <h1 style="results-heading">
+        </Collapsable>
+        <Collapsable
+          data-version={rhyme.value.version}
+          data-dict="rhyme"
+          cId="rhyme"
+        >
+          <h1 style="results-heading" q:slot="header">
             <CacheIndicator show={rhyme.value.perf.cached} /> Kâfiyeli
             Kelimeler:{" "}
           </h1>
           <RhymeView data={rhyme} />
-        </div>
+        </Collapsable>
       </div>
     </>
   );
