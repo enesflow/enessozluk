@@ -8,9 +8,6 @@
 
 /* global.css */
 
-@import url("https://fonts.googleapis.com/css2?family=Urbanist&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&display=swap");
-
 .urbanist {
   font-family: "Urbanist", sans-serif;
   font-optical-sizing: auto;
