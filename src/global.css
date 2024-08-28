@@ -46,6 +46,8 @@ html {
 
 * {
   font-family: "Atkinson Hyperlegible", "monospace";
+  /* remove the blue highlight on mobile: */
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes bounceLeftToRight {

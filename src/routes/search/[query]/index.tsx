@@ -54,9 +54,9 @@ type SearchPageData = {
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: true && isDev,
+  tdk: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: false && isDev,
+  nisanyan: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   luggat: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
