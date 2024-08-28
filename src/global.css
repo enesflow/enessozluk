@@ -8,12 +8,47 @@
 
 /* global.css */
 
+@import url("https://fonts.googleapis.com/css2?family=Urbanist&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&display=swap");
+
+.urbanist {
+  font-family: "Urbanist", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-display: swap;
+  font-family: "Urbanist";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../public/fonts/Urbanist-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-display: swap;
+  font-family: "Atkinson Hyperlegible";
+  font-style: normal;
+  font-weight: 400;
+  src: url("../public/fonts/AtkinsonHyperlegible-Regular.ttf")
+    format("truetype");
+}
+.atkinson-hyperlegible {
+  font-family: "Atkinson Hyperlegible", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
 body {
   @apply selection:bg-red-500 selection:text-white;
 }
 
 html {
   @apply dark:bg-black dark:text-white;
+}
+
+* {
+  font-family: "Atkinson Hyperlegible", "monospace";
 }
 
 @keyframes bounceLeftToRight {
@@ -83,6 +118,7 @@ html {
 
 .result-title {
   @apply text-xl font-medium;
+  @apply urbanist;
 }
 
 .result-title-description {
@@ -95,6 +131,7 @@ html {
 
 .result-subtitle {
   @apply text-lg font-semibold;
+  @apply urbanist;
 }
 
 .result-description {
