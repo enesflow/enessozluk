@@ -35,18 +35,12 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
     $(() => {
       const formTop = placeholderRef.value?.getBoundingClientRect().top ?? 0;
       const height = formRef.value?.getBoundingClientRect().height ?? 0;
-      const fix = formTop < -(height + 16); // 16px is m-4
-      fixToTop.value = fix;
-      if (fix) {
-        placeholderRef.value?.style.setProperty("height", `${height}px`);
-      } else {
-        placeholderRef.value?.style.removeProperty("height");
-      }
+      fixToTop.value = formTop < -(height + 16);
     }),
   );
   return (
-    <>
-      <div ref={placeholderRef} class="my-4" />
+    <div class="relative">
+      <div ref={placeholderRef} class=" my-4 h-10 w-full"></div>
       <form
         ref={formRef}
         preventdefault:submit
@@ -60,7 +54,7 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
             nav("/");
           }
         }}
-        class={`search-form ${fixToTop.value ? "search-form-fixed" : ""}`}
+        class={`search-form absolute ${fixToTop.value ? "search-form-fixed" : ""}`}
       >
         <input
           type="text"
@@ -83,6 +77,6 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
           )}
         </button>
       </form>
-    </>
+    </div>
   );
 });
