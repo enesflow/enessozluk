@@ -59,11 +59,9 @@ export const TDKView = component$<{
               <div class="result-item result-subitem">
                 Öneriler:{" "}
                 <WordLinks
-                  words={data.recommendations
-                    .map((rec) => rec.madde)
-                    .filter(
-                      (value, index, self) => self.indexOf(value) === index,
-                    )}
+                  words={[
+                    ...new Set(data.recommendations.map((rec) => rec.madde)),
+                  ]}
                 />
               </div>
             </>

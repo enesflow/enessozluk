@@ -1,7 +1,7 @@
 import type { Signal } from "@builder.io/qwik";
 import { component$ } from "@builder.io/qwik";
 import type { RhymePackage } from "~/types/rhyme";
-import { WordLink } from "../WordLinks";
+import { WordLinks } from "../WordLinks";
 
 export const RhymeView = component$<{
   data: Signal<RhymePackage>;
@@ -14,13 +14,7 @@ export const RhymeView = component$<{
         </>
       ) : (
         <>
-          {data.value.items.map((word, index) => (
-            <span key={word} class="result-description">
-              <WordLink word={{ word }} />
-
-              {index < (data.value as any).items.length - 1 && ", "}
-            </span>
-          ))}
+          <WordLinks words={data.value.items} />
         </>
       )}
     </>

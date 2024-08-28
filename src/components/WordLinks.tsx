@@ -1,14 +1,10 @@
 import { removeNumbersAtEnd } from "#helpers/string";
-import {
-  component$,
-  useComputed$,
-  useSignal,
-  useTask$,
-} from "@builder.io/qwik";
-import { Link, useLocation } from "@builder.io/qwik-city";
-import { LinkR } from "./linkWithRedirect";
-import { convertToRoman } from "~/helpers/roman";
+import type { Signal } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
+import { Link } from "@builder.io/qwik-city";
 import { flattenVerb } from "~/helpers/redirect";
+import { convertToRoman } from "~/helpers/roman";
+import { LinkR } from "./linkWithRedirect";
 
 export function putTheNumbersAtTheEndAsRomanToTheBeginning(
   text: string,
@@ -33,28 +29,15 @@ type Word = {
   recursive?: string;
 };
 
-type More = {
-  title: string;
-  words: Word[] | string[];
-};
-
-function toWords(words: string[] | Word[] | undefined): Word[] | undefined {
-  if (!words) return;
-  if (typeof words[0] === "string") {
-    return (words as string[]).map((word) => ({ word }));
-  }
-  return words as Word[];
-}
-
-export const WordLink = component$<{ word: Word }>(({ word }) => {
+export const WordLink = component$<{ word: Word | string }>(({ word }) => {
   return (
     <>
       <LinkR
-        href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word.word))}`}
+        href={`/search/${cleanWordFromRom(removeNumbersAtEnd(toKey(word)))}`}
       >
-        {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(word.word))}
+        {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(toKey(word)))}
       </LinkR>
-      {word.recursive && (
+      {typeof word !== "string" && word.recursive && (
         <>
           {" "}
           (<WordLink word={{ word: word.recursive }} />)
@@ -64,56 +47,57 @@ export const WordLink = component$<{ word: Word }>(({ word }) => {
   );
 });
 
+function toKey(word: Word | string): string {
+  return typeof word === "string" ? word : word.word;
+}
+
+const ShowMoreOrLess = component$<{ showMore: Signal<boolean> }>(
+  ({ showMore }) => (
+    <div class="result-description">
+      <Link
+        onClick$={() => (showMore.value = !showMore.value)}
+        class="cursor-pointer font-bold"
+        preventdefault:click
+      >
+        {showMore.value ? "«" : "»"} Daha {showMore.value ? "az" : "fazla"}{" "}
+        göster
+      </Link>
+    </div>
+  ),
+);
+
 export const WordLinks = component$<{
   words: Word[] | string[] | undefined;
-  more?: More[];
+  more?: Word[] | string[] | undefined;
 }>(({ words, more }) => {
-  const loc = useLocation();
   const showMore = useSignal(false);
-  const words_ = toWords(words);
-  const entries = useComputed$(() => {
-    showMore.value;
-    // if you remove the random code above, you get error
-    // Internal assert, this is likely caused by a bug in Qwik: resume: index is out of bounds
-    if (more && showMore.value && words_) {
-      return words_.concat(more.flatMap((m) => toWords(m.words) ?? []));
-    }
-    return words_ ?? [];
-  });
-  useTask$(({ track }) => {
-    track(() => loc.isNavigating);
-    if (!loc.isNavigating) showMore.value = false;
-  });
   return (
     <>
-      {
-        // if showMore then join words and more, else just words
-        entries.value.map((word, index) => (
-          <span key={word.word} class="result-description">
-            {/* <LinkR
-              href={`/search/${cleanWordFromRom(removeNumbersAtEnd(word.word))}`}
-            >
-              {flattenVerb(
-                putTheNumbersAtTheEndAsRomanToTheBeginning(word.word),
-              )}
-            </LinkR> */}
-            <WordLink word={word} />
+      {// if showMore then join words and more, else just words
+      words?.map((word, index) => (
+        <span key={toKey(word)} class="result-description">
+          <WordLink word={word} />
+          {index < words.length - 1 && ", "}
+        </span>
+      ))}
 
-            {index < entries.value.length - 1 && ", "}
-          </span>
-        ))
-      }
       {!!more?.length && (
-        <div class="result-description">
-          <Link
-            onClick$={() => (showMore.value = !showMore.value)}
-            class="cursor-pointer font-bold"
-            preventdefault:click
-          >
-            {showMore.value ? "«" : "»"} Daha {showMore.value ? "az" : "fazla"}{" "}
-            göster
-          </Link>
-        </div>
+        <>
+          {showMore.value ? (
+            <>
+              <br />
+              <ShowMoreOrLess showMore={showMore} />{" "}
+              {more.map((word, index) => (
+                <span key={toKey(word)} class="result-description">
+                  <WordLink word={word} />
+                  {index < more.length - 1 && ", "}
+                </span>
+              ))}
+            </>
+          ) : (
+            <ShowMoreOrLess showMore={showMore} />
+          )}
+        </>
       )}
     </>
   );

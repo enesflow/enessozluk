@@ -50,7 +50,8 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     const cache = loadCache(e, "rhyme");
     if (cache) return setSharedMapResult(e, "rhyme", cache);
   } /////////////////////////////
-  const word_reversed_clear = clear(word.split("").reverse().join(""));
+  const clearWord = clear(word);
+  const word_reversed_clear = clearWord.split("").reverse().join("");
 
   // binary search through the words array using word_reversed_clear to get the index
   let closest = -1;
@@ -87,26 +88,22 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
 
   // find -10 and +10 words from the index
   const normalCount = 20;
-  const start = Math.max(0, closest - normalCount);
-  const end = Math.min(words.length, closest + normalCount);
-  // const rhyming_words = words.slice(start, index).concat(words.slice(index + 1, end)).map((w) => w.split("").reverse().join(""));
+  const maxCount = 40;
+  const start = Math.max(0, closest - maxCount);
+  const end = Math.min(words.length, closest + maxCount);
   const fromStart = words
     .slice(start, closest)
     .map((w) => w.split("").reverse().join(""))
-    .reverse();
+    .reverse()
+    .filter((w) => !w.endsWith(" " + clearWord))
+    .slice(-normalCount);
   const fromEnd = words
     .slice(closest + 1, end)
-    .map((w) => w.split("").reverse().join(""));
+    .map((w) => w.split("").reverse().join(""))
+    .filter((w) => !w.endsWith(" " + clearWord))
+    .slice(0, normalCount);
   if (index === -1)
     fromEnd.unshift(words[closest].split("").reverse().join(""));
-  // make a new array with one from each array
-  // like: [fromStart[0], fromEnd[0], fromStart[1], fromEnd[1], ...]
-  /* const rhymingWords = Array.from(
-    { length: Math.max(fromStart.length, fromEnd.length) },
-    (_, i) => [fromStart[i], fromEnd[i]],
-  )
-    .flat()
-    .filter(Boolean); */
   const rhymingWords = fromEnd.concat(fromStart);
   return setSharedMapResult(e, "rhyme", {
     ...data,

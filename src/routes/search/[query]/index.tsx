@@ -48,17 +48,17 @@ export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   tdk: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: true && isDev,
+  nisanyan: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   luggat: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: false && isDev,
+  kubbealti: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: true && isDev,
+  rhyme: false && isDev,
 } as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
@@ -185,7 +185,7 @@ export default component$(() => {
               <ExternalLink href={data.value.benzer[0]} />
             )}
           </h1>
-          <BenzerView data={benzer.value} />
+          <BenzerView data={benzer} />
         </div>
         <div data-version={rhyme.value.version} data-dict="rhyme">
           <h1 style="results-heading">

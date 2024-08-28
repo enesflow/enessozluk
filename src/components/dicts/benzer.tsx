@@ -1,6 +1,6 @@
 import type { BenzerPackage, BenzerResponseError } from "#/benzer";
 import { NO_RESULT } from "#helpers/constants";
-import type { QRL } from "@builder.io/qwik";
+import type { QRL, Signal } from "@builder.io/qwik";
 import {
   $,
   component$,
@@ -112,13 +112,13 @@ function makeBold(text: string) {
 }
 
 export const BenzerView = component$<{
-  data: BenzerPackage;
-}>(({ data: _data }) => {
-  const data = useComputed$(() => _data);
+  data: Signal<BenzerPackage>;
+}>(({ data: data }) => {
   const showCaptcha = useComputed$(
     () =>
-      (data.value.isUnsuccessful && data.value.serverDefinedCaptchaError) ||
-      false,
+      (data.value as any) &&
+      ((data.value.isUnsuccessful && data.value.serverDefinedCaptchaError) ||
+        false),
   );
   return (
     <>
@@ -143,7 +143,7 @@ export const BenzerView = component$<{
           {!!data.value.words?.length && (
             <>
               <div class="result-item result-subitem">
-                Öneriler: <WordLinks words={data.value.words!} />
+                Öneriler: <WordLinks words={data.value.words} />
               </div>
             </>
           )}
@@ -172,10 +172,7 @@ export const BenzerView = component$<{
               {word.words.length ? (
                 <WordLinks
                   words={word.words}
-                  more={Object.keys(word.moreWords).map((category) => ({
-                    title: category,
-                    words: word.moreWords[category],
-                  }))}
+                  more={Object.values(word.moreWords).flat()}
                 />
               ) : (
                 <p class="result-description">
