@@ -78,7 +78,12 @@ html {
 }
 
 .search-form {
-  @apply my-4 flex items-center justify-center gap-4;
+  @apply my-4 flex w-full items-center justify-center gap-4;
+}
+
+.search-form-fixed {
+  width: calc(100% - 4rem);
+  @apply fixed left-1/2 top-0 z-50 -translate-x-1/2 transform opacity-80 shadow-md focus-within:opacity-100;
 }
 
 .search-input {
