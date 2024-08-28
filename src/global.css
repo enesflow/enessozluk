@@ -121,7 +121,7 @@ html {
 }
 
 .result-title {
-  @apply text-xl font-medium;
+  @apply text-xl;
   @apply urbanist;
 }
 
