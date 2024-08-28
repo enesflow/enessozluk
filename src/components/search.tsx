@@ -11,7 +11,6 @@ import { isBrowser } from "@builder.io/qwik/build";
 import Spinner from "./spinner";
 export const SearchBar = component$<{ value?: string }>(({ value }) => {
   const placeholderRef = useSignal<HTMLFormElement>();
-  const formRef = useSignal<HTMLFormElement>();
   const fixToTop = useSignal(false);
   const nav = useNavigate();
   const query = useSignal(value ?? "");
@@ -34,15 +33,13 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
     "scroll",
     $(() => {
       const formTop = placeholderRef.value?.getBoundingClientRect().top ?? 0;
-      const height = formRef.value?.getBoundingClientRect().height ?? 0;
-      fixToTop.value = formTop < -(height + 16);
+      fixToTop.value = formTop < 16; // 16px is m-4
     }),
   );
   return (
     <div class="relative">
       <div ref={placeholderRef} class=" my-4 h-10 w-full"></div>
       <form
-        ref={formRef}
         preventdefault:submit
         onSubmit$={() => {
           if (query.value.length > 0) {
