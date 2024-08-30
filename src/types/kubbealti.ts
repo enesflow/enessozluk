@@ -1,24 +1,24 @@
 import { z } from "zod";
-import { PerformanceSchema, weakString } from "./shared";
+import { PerformanceSchema } from "./shared";
 
-export const KUBBEALTI_VERSION = "1.0.2" as const;
+export const KUBBEALTI_VERSION = "1.0.3" as const;
 
 export const KubbealtiContentSchema = z.array(
   z.object({
-    pageNumber: z.null(),
-    pageCount: z.number(),
+    // pageNumber: z.null(),
+    // pageCount: z.number(),
     id: z.number(),
-    entityStatus: z.number().nullable(),
-    entityVersion: z.number().nullable(),
-    dateModified: z.number().nullable(),
-    modifier: z.null(),
-    creationTime: z.number().nullable(),
+    // entityStatus: z.number().nullable(),
+    // entityVersion: z.number().nullable(),
+    // dateModified: z.number().nullable(),
+    // modifier: z.null(),
+    // creationTime: z.number().nullable(),
     kelime: z.string(),
     anlam: z.string(),
-    status: z.number(),
-    surumId: z.number(),
-    baseWordId: z.number().nullable(),
-    surum: z
+    // status: z.number(),
+    // surumId: z.number(),
+    // baseWordId: z.number().nullable(),
+    /* surum: z
       .object({
         pageNumber: z.null(),
         pageCount: z.number(),
@@ -50,17 +50,17 @@ export const KubbealtiContentSchema = z.array(
         handler: z.object({}),
         hibernateLazyInitializer: z.object({}),
       })
-      .nullable(),
-    kelimeSiralama: z.string(),
-    wordSearch: z.string(),
-    noHtml: z.string(),
-    anlamAksansiz: z.string().nullable(),
-    ozet: z.null(),
+      .nullable(), */
+    // kelimeSiralama: z.string(),
+    // wordSearch: z.string(),
+    // noHtml: z.string(),
+    // anlamAksansiz: z.string().nullable(),
+    // ozet: z.null(),
     url: z.null(),
-    pool: z.boolean().nullable(),
-    indexedTime: z.null(),
-    indexed: z.null(),
-    audioUrl: z.null(),
+    // pool: z.boolean().nullable(),
+    // indexedTime: z.null(),
+    // indexed: z.null(),
+    // audioUrl: z.null(),
   }),
 );
 
@@ -72,9 +72,9 @@ export const KubbealtiResponseSchema = z.object({
   totalPages: z.number(),
   totalElements: z.number(),
   lastPage: z.boolean(),
-  hasPreviousPage: z.boolean(),
-  hasNextPage: z.boolean(),
-  firstPage: z.boolean(),
+  // hasPreviousPage: z.boolean(),
+  // hasNextPage: z.boolean(),
+  // firstPage: z.boolean(),
   size: z.number(),
   content: z.record(
     z.coerce.number(),
@@ -91,10 +91,10 @@ export const KubbealtiErrorSchema = z.object({
   url: z.string(),
   totalPages: z.number().optional().default(0),
   totalElements: z.number().optional(),
-  lastPage: z.boolean().optional(),
-  hasPreviousPage: z.boolean().optional(),
-  hasNextPage: z.boolean().optional(),
-  firstPage: z.boolean().optional(),
+  // lastPage: z.boolean().optional(),
+  // hasPreviousPage: z.boolean().optional(),
+  // hasNextPage: z.boolean().optional(),
+  // firstPage: z.boolean().optional(),
   size: z.number().optional(),
   content: z
     .record(z.coerce.number(), z.array(z.unknown()))
