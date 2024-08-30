@@ -112,7 +112,7 @@ export const onRequest: RequestHandler = async (e) => {
       kubbealtiPage,
     },
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
-    result: {},
+    result: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     forceFetch: {},
     startTime: s,
     cacheTook: new Date().getTime() - s,
