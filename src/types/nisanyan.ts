@@ -1,55 +1,55 @@
 import { z } from "zod";
 import { PerformanceSchema, weakString } from "./shared";
 
-export const NISANYAN_VERSION = "1.0.5" as const;
+export const NISANYAN_VERSION = "1.0.6" as const;
 
 export const NisanyanLanguageSchema = z.object({
-  _id: z.string(),
+  // _id: z.string(),
   name: weakString(),
-  description: weakString(),
-  description2: weakString(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
+  // description: weakString(),
+  // description2: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
   abbreviation: weakString(),
-  id_depr: z.number().optional(),
+  // id_depr: z.number().optional(),
 });
 
 export const NisanyanRelationSchema = z.object({
-  _id: z.string(),
-  name: z.string(),
+  // _id: z.string(),
+  // name: z.string(),
   abbreviation: z.string(),
   text: z.string(),
 });
 
 export const NisanyanGrammarCaseSchema = z.object({
-  _id: z.string(),
-  order: z.number().optional(),
-  name: z.string(),
-  description: weakString(),
-  tooltip: weakString(),
+  // _id: z.string(),
+  // order: z.number().optional(),
+  // name: z.string(),
+  // description: weakString(),
+  // tooltip: weakString(),
 });
 
 export const NisanyanSemiticFormSchema = z.object({
-  _id: z.string(),
-  id_depr: z.number().optional(),
-  name: weakString(),
-  description: weakString(),
-  language: NisanyanLanguageSchema.optional(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
+  // _id: z.string(),
+  // id_depr: z.number().optional(),
+  // name: weakString(),
+  // description: weakString(),
+  // language: NisanyanLanguageSchema.optional(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
 });
 
 export const NisanyanGrammarSchema = z.object({
-  grammaticalCase: weakString(),
-  case: z.array(NisanyanGrammarCaseSchema).optional(),
-  semiticRoot: weakString(),
-  semiticForm: NisanyanSemiticFormSchema.optional(),
+  // grammaticalCase: weakString(),
+  // case: z.array(NisanyanGrammarCaseSchema).optional(),
+  // semiticRoot: weakString(),
+  // semiticForm: NisanyanSemiticFormSchema.optional(),
 });
 
 export const NisanyanWordClassSchema = z.object({
-  _id: z.string(),
+  // _id: z.string(),
   name: z.string(),
-  description: weakString(),
+  // description: weakString(),
   abbreviation: z.string(),
 });
 
@@ -71,46 +71,46 @@ export const NisanyanAffixesSchema = z.object({
 export const NisanyanEtymologySchema = z.object({
   serverDefinedMoreIndentation: z.boolean().optional(),
   serverDefinedEndOfJoin: z.boolean().optional(),
-  _id: z.string(),
-  id_depr: z.number().optional(),
+  // _id: z.string(),
+  // id_depr: z.number().optional(),
   paranthesis: weakString(),
   relation: NisanyanRelationSchema,
   languages: z.array(NisanyanLanguageSchema),
   originalText: z.string(),
   romanizedText: z.string(),
-  grammar: NisanyanGrammarSchema,
+  // grammar: NisanyanGrammarSchema,
   definition: z.string(),
-  neologism: weakString(),
+  // neologism: weakString(),
   wordClass: NisanyanWordClassSchema,
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
   affixes: NisanyanAffixesSchema.optional(),
 });
 
 export const NisanyanSourceSchema = z.object({
-  _id: z.string(),
+  // _id: z.string(),
   name: weakString(),
   book: weakString(),
-  editor: weakString(),
-  datePublished: weakString(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
-  id_depr: z.number().optional(),
-  abbreviation: weakString(),
-  date: weakString(),
+  // editor: weakString(),
+  // datePublished: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
+  // id_depr: z.number().optional(),
+  // abbreviation: weakString(),
+  // date: weakString(),
 });
 
 export const NisanyanHistorySchema = z.object({
-  _id: z.string(),
-  id_depr: z.number().optional(),
-  excerpt: weakString(),
-  definition: weakString(),
+  // _id: z.string(),
+  // id_depr: z.number().optional(),
+  // excerpt: weakString(),
+  // definition: weakString(),
   source: NisanyanSourceSchema.optional(),
   date: z.string(),
   dateSortable: z.number().optional().nullable(),
   quote: z.string(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
   language: NisanyanLanguageSchema.optional(),
 });
 
@@ -120,33 +120,33 @@ export const NisanyanelatedWordSchema = z.object({
 });
 
 export const NisanyanWordReferenceSchema = z.object({
-  _id: z.string(),
-  id_depr: z.number().optional(),
+  // _id: z.string(),
+  // id_depr: z.number().optional(),
   name: z.string(),
-  note: weakString(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
-  queries: z.array(z.string()).optional(),
-  similarWords: z.array(z.string()).optional(),
-  references: z
-    .array(
-      z.object({
-        _id: z.string(),
-      }),
-    )
-    .optional(),
-  etymologies: z
-    .array(
-      z.object({
-        _id: z.string(),
-      }),
-    )
-    .optional(),
-  histories: z.array(
-    z.object({
-      _id: z.string(),
-    }),
-  ),
+  // note: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
+  // queries: z.array(z.string()).optional(),
+  // similarWords: z.array(z.string()).optional(),
+  // references: z
+  //   .array(
+  //     z.object({
+  //       _id: z.string(),
+  //     }),
+  //   )
+  //   .optional(),
+  // etymologies: z
+  //   .array(
+  //     z.object({
+  //       _id: z.string(),
+  //     }),
+  //   )
+  //   .optional(),
+  // histories: z.array(
+  //   z.object({
+  //     _id: z.string(),
+  //   }),
+  // ),
   referenceOf: z.array(NisanyanelatedWordSchema).optional(),
 });
 
@@ -180,36 +180,36 @@ export const NisanyanAffixResponseErrorSchema = z.object({
 });
 
 export const NisanyanReferenceSchema = z.object({
-  _id: z.string(),
-  id_depr: z.number().optional(),
+  // _id: z.string(),
+  // id_depr: z.number().optional(),
   name: z.string(),
-  note: weakString(),
-  timeCreated: weakString(),
-  timeUpdated: weakString(),
-  queries: z.array(z.string()).optional(),
-  similarWords: z.array(z.string()).optional(),
-  references: z
-    .array(
-      z.object({
-        _id: z.string(),
-      }),
-    )
-    .optional(),
-  etymologies: z
-    .array(
-      z.object({
-        _id: z.string(),
-      }),
-    )
-    .optional(),
-  histories: z.array(
-    z.object({
-      _id: z.string(),
-    }),
-  ),
-  referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
-  alternateSpellings: z.array(z.string()).optional(),
-  misspellings: z.array(z.string()).optional(),
+  // note: weakString(),
+  // timeCreated: weakString(),
+  // timeUpdated: weakString(),
+  // queries: z.array(z.string()).optional(),
+  // similarWords: z.array(z.string()).optional(),
+  // references: z
+  //   .array(
+  //     z.object({
+  //       _id: z.string(),
+  //     }),
+  //   )
+  //   .optional(),
+  // etymologies: z
+  //   .array(
+  //     z.object({
+  //       _id: z.string(),
+  //     }),
+  //   )
+  //   .optional(),
+  // histories: z.array(
+  //   z.object({
+  //     _id: z.string(),
+  //   }),
+  // ),
+  // referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
+  // alternateSpellings: z.array(z.string()).optional(),
+  // misspellings: z.array(z.string()).optional(),
 });
 
 export const NisanyanWordSchema = z.object({
