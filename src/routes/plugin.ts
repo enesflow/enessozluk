@@ -104,7 +104,7 @@ export const onRequest: RequestHandler = async (e) => {
   ///////////////////////////////
   const s = new Date().getTime();
   const kubbealtiPage = getKubbealtiPage(e.url);
-  const key = `${query.rawDecodedL}`;
+  const key = query.rawDecodedL;
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),
