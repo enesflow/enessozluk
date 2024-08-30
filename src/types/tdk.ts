@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema, weakString } from "./shared";
 
-export const TDK_VERSION = "1.0.2" as const;
+export const TDK_VERSION = "1.0.3" as const;
 
 export const TDKAuthorSchema = z.object({
   // yazar_id: weakString(),
