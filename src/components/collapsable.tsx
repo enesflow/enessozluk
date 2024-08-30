@@ -14,7 +14,7 @@ function loadCollapsable(
   return collapsableStoreSchema.safeParse(cookie);
 }
 function setCollapsable(collapsed: CollapsableStore) {
-  document.cookie = `collapsed=${JSON.stringify(collapsed)};path=/`;
+  document.cookie = `collapsed=${JSON.stringify(collapsed)};path=/;max-age=31536000`;
 }
 // eslint-disable-next-line qwik/loader-location
 export const useCollapsableLoader = routeLoader$<
