@@ -7,6 +7,7 @@ import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
 import { sha256 } from "~/helpers/sha256";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isDev } from "@builder.io/qwik/build";
+import { getKubbealtiPage } from "~/helpers/dicts/kubbealti";
 
 const CACHE_DISABLED = /* false */ isDev as boolean;
 
@@ -102,12 +103,8 @@ export const onRequest: RequestHandler = async (e) => {
   const query = getQuery(e.params.query);
   ///////////////////////////////
   const s = new Date().getTime();
-  const kubbealtiPage =
-    e.query.has("kubbealtiPage") &&
-    !Number.isNaN(Number(e.query.get("kubbealtiPage")))
-      ? parseInt(e.query.get("kubbealtiPage") as string)
-      : 1;
-  const key = `${query.rawDecodedL}-${kubbealtiPage}`;
+  const kubbealtiPage = getKubbealtiPage(e.url);
+  const key = `${query.rawDecodedL}`;
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),

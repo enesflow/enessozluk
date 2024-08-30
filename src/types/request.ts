@@ -18,8 +18,8 @@ export type QueryType = {
 
 export type SharedMap = {
   query: AddL<QueryType>;
-  url?: {
-    kubbealtiPage?: number;
+  url: {
+    kubbealtiPage: number;
   };
   cache: {
     tdk?: unknown; // a json, it will be checked by the loader

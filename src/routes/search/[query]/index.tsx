@@ -54,7 +54,7 @@ type SearchPageData = {
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: false && isDev,
+  tdk: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   nisanyan: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -62,7 +62,7 @@ export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: true && isDev,
+  kubbealti: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -191,7 +191,7 @@ export default component$(() => {
             <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
             Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
           </h1>
-          <KubbealtiView data={kubbealti.value} />
+          <KubbealtiView data={kubbealti} />
         </Collapsable>
         <Collapsable
           data-version={luggat.value.version}

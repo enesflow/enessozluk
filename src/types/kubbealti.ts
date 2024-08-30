@@ -1,7 +1,68 @@
 import { z } from "zod";
 import { PerformanceSchema, weakString } from "./shared";
 
-export const KUBBEALTI_VERSION = "1.0.1" as const;
+export const KUBBEALTI_VERSION = "1.0.2" as const;
+
+export const KubbealtiContentSchema = z.array(
+  z.object({
+    pageNumber: z.null(),
+    pageCount: z.number(),
+    id: z.number(),
+    entityStatus: z.number().nullable(),
+    entityVersion: z.number().nullable(),
+    dateModified: z.number().nullable(),
+    modifier: z.null(),
+    creationTime: z.number().nullable(),
+    kelime: z.string(),
+    anlam: z.string(),
+    status: z.number(),
+    surumId: z.number(),
+    baseWordId: z.number().nullable(),
+    surum: z
+      .object({
+        pageNumber: z.null(),
+        pageCount: z.number(),
+        id: z.number(),
+        entityStatus: z.number(),
+        entityVersion: z.number(),
+        dateModified: z.number(),
+        modifier: z.null(),
+        creationTime: z.number(),
+        parameterType: z.object({
+          pageNumber: z.null(),
+          pageCount: z.number(),
+          id: z.number(),
+          entityStatus: z.number(),
+          entityVersion: z.number(),
+          dateModified: z.number(),
+          modifier: z.null(),
+          creationTime: z.number(),
+          name: weakString(),
+          code: weakString(),
+          handler: z.object({}),
+          hibernateLazyInitializer: z.object({}),
+        }),
+        value: weakString(),
+        factorOne: z.string().nullable(),
+        active: z.boolean().nullable(),
+        orderId: z.number(),
+        paramTypeId: z.number(),
+        handler: z.object({}),
+        hibernateLazyInitializer: z.object({}),
+      })
+      .nullable(),
+    kelimeSiralama: z.string(),
+    wordSearch: z.string(),
+    noHtml: z.string(),
+    anlamAksansiz: z.string().nullable(),
+    ozet: z.null(),
+    url: z.null(),
+    pool: z.boolean().nullable(),
+    indexedTime: z.null(),
+    indexed: z.null(),
+    audioUrl: z.null(),
+  }),
+);
 
 export const KubbealtiResponseSchema = z.object({
   version: z.literal(KUBBEALTI_VERSION),
@@ -15,65 +76,9 @@ export const KubbealtiResponseSchema = z.object({
   hasNextPage: z.boolean(),
   firstPage: z.boolean(),
   size: z.number(),
-  content: z.array(
-    z.object({
-      pageNumber: z.null(),
-      pageCount: z.number(),
-      id: z.number(),
-      entityStatus: z.number().nullable(),
-      entityVersion: z.number().nullable(),
-      dateModified: z.number().nullable(),
-      modifier: z.null(),
-      creationTime: z.number().nullable(),
-      kelime: z.string(),
-      anlam: z.string(),
-      status: z.number(),
-      surumId: z.number(),
-      baseWordId: z.number().nullable(),
-      surum: z
-        .object({
-          pageNumber: z.null(),
-          pageCount: z.number(),
-          id: z.number(),
-          entityStatus: z.number(),
-          entityVersion: z.number(),
-          dateModified: z.number(),
-          modifier: z.null(),
-          creationTime: z.number(),
-          parameterType: z.object({
-            pageNumber: z.null(),
-            pageCount: z.number(),
-            id: z.number(),
-            entityStatus: z.number(),
-            entityVersion: z.number(),
-            dateModified: z.number(),
-            modifier: z.null(),
-            creationTime: z.number(),
-            name: weakString(),
-            code: weakString(),
-            handler: z.object({}),
-            hibernateLazyInitializer: z.object({}),
-          }),
-          value: weakString(),
-          factorOne: z.string().nullable(),
-          active: z.boolean().nullable(),
-          orderId: z.number(),
-          paramTypeId: z.number(),
-          handler: z.object({}),
-          hibernateLazyInitializer: z.object({}),
-        })
-        .nullable(),
-      kelimeSiralama: z.string(),
-      wordSearch: z.string(),
-      noHtml: z.string(),
-      anlamAksansiz: z.string().nullable(),
-      ozet: z.null(),
-      url: z.null(),
-      pool: z.boolean().nullable(),
-      indexedTime: z.null(),
-      indexed: z.null(),
-      audioUrl: z.null(),
-    }),
+  content: z.record(
+    z.coerce.number(),
+    KubbealtiContentSchema.or(z.undefined()),
   ),
   number: z.number(),
 });
@@ -84,14 +89,17 @@ export const KubbealtiErrorSchema = z.object({
   perf: PerformanceSchema,
   // items: z.array(z.unknown()).length(0),
   url: z.string(),
-  totalPages: z.number().optional(),
+  totalPages: z.number().optional().default(0),
   totalElements: z.number().optional(),
   lastPage: z.boolean().optional(),
   hasPreviousPage: z.boolean().optional(),
   hasNextPage: z.boolean().optional(),
   firstPage: z.boolean().optional(),
   size: z.number().optional(),
-  content: z.array(z.unknown()).optional(),
+  content: z
+    .record(z.coerce.number(), z.array(z.unknown()))
+    .optional()
+    .default({}),
   number: z.number().optional(),
 });
 

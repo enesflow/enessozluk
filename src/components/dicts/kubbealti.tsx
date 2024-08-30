@@ -1,5 +1,7 @@
-import { component$ } from "@builder.io/qwik";
+import type { Signal } from "@builder.io/qwik";
+import { component$, useSignal } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
+import { getKubbealtiPage, kubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import { convertToRoman } from "~/helpers/roman";
 import type { KubbealtiPackage } from "~/types/kubbealti";
@@ -46,22 +48,21 @@ import { Play } from "../play";
 } */
 
 export const KubbealtiView = component$<{
-  data: KubbealtiPackage;
+  data: Signal<KubbealtiPackage>;
 }>(({ data }) => {
   const loc = useLocation();
-  const currentPage =
-    "items" in data ? data.items.find((item) => item.current)?.number : -1;
+  const kubbealtiPage = useSignal(getKubbealtiPage(loc.url));
   return (
     <>
-      {"serverDefinedReason" in data ? (
+      {"serverDefinedReason" in data.value ? (
         <>
-          <p class="error-message">{data.serverDefinedReason}</p>
-          {/* {data.recommendations.length > 0 && (
+          <p class="error-message">{data.value.serverDefinedReason}</p>
+          {/* {data.value.recommendations.length > 0 && (
             <>
               <div class="result-item result-subitem">
                 Öneriler:{" "}
                 <WordLinks
-                  words={data.recommendations
+                  words={data.value.recommendations
                     .map((rec) => rec.madde)
                     .filter(
                       (value, index, self) => self.indexOf(value) === index,
@@ -73,12 +74,14 @@ export const KubbealtiView = component$<{
         </>
       ) : (
         <>
-          <p class="result-title-took">{data.totalElements} sonuç bulundu.</p>{" "}
+          <p class="result-title-took">
+            {data.value.totalElements} sonuç bulundu.
+          </p>{" "}
           <ul class="results-list">
-            {data.content.map((result, index) => (
+            {data.value.content[kubbealtiPage.value]?.map((result, index) => (
               <li key={result.id} class="result-item">
                 <h2 class="result-title">
-                  {data.content.length === 1
+                  {data.value.content[kubbealtiPage.value]?.length === 1
                     ? "•"
                     : `(${convertToRoman(index + 1)})`}{" "}
                   {result.kelime}{" "}
@@ -91,19 +94,25 @@ export const KubbealtiView = component$<{
             ))}
           </ul>
           {/* a page selector */}
-          {data.totalPages > 1 && (
+          {data.value.totalPages > 1 && (
             <select
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               onChange$={async (_, e) => {
+                const value = Number.parseInt(e.value) || 1;
                 const url = loc.url;
-                // set kubbealtiPage to e.value
-                url.searchParams.set("kubbealtiPage", e.value);
-                window.location.href = url.toString();
+                url.searchParams.set("kubbealtiPage", value.toString());
+                window.history.replaceState(null, "", url.toString());
+                if (!(value in data.value.content))
+                  data.value = await kubbealtiLoader(value);
+                kubbealtiPage.value = value;
               }}
               class="mb-4"
             >
-              {Array.from({ length: data.totalPages }, (_, i) => (
-                <option key={i} value={i + 1} selected={i + 1 === currentPage}>
+              {Array.from({ length: data.value.totalPages }, (_, i) => (
+                <option
+                  key={i}
+                  value={i + 1}
+                  selected={i + 1 === kubbealtiPage.value}
+                >
                   {"Kubbealtı Sayfa " + (i + 1).toString()}
                 </option>
               ))}
