@@ -11,7 +11,7 @@ export const NisanyanLanguageSchema = z.object({
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
   abbreviation: weakString(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
 });
 
 export const NisanyanRelationSchema = z.object({
@@ -23,7 +23,7 @@ export const NisanyanRelationSchema = z.object({
 
 export const NisanyanGrammarCaseSchema = z.object({
   // _id: z.string(),
-  // order: z.number().optional(),
+  // order: z.number().optional().nullable(),
   // name: z.string(),
   // description: weakString(),
   // tooltip: weakString(),
@@ -31,19 +31,19 @@ export const NisanyanGrammarCaseSchema = z.object({
 
 export const NisanyanSemiticFormSchema = z.object({
   // _id: z.string(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   // name: weakString(),
   // description: weakString(),
-  // language: NisanyanLanguageSchema.optional(),
+  // language: NisanyanLanguageSchema.optional().nullable(),
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
 });
 
 export const NisanyanGrammarSchema = z.object({
   // grammaticalCase: weakString(),
-  // case: z.array(NisanyanGrammarCaseSchema).optional(),
+  // case: z.array(NisanyanGrammarCaseSchema).optional().nullable(),
   // semiticRoot: weakString(),
-  // semiticForm: NisanyanSemiticFormSchema.optional(),
+  // semiticForm: NisanyanSemiticFormSchema.optional().nullable(),
 });
 
 export const NisanyanWordClassSchema = z.object({
@@ -57,22 +57,22 @@ export const NisanyanAffixSchema = z.object({
   _id: z.string(),
   name: z.string(),
   description: weakString(),
-  language: NisanyanLanguageSchema.optional(),
+  language: NisanyanLanguageSchema.optional().nullable(),
   timeCreated: weakString(),
   timeUpdated: weakString(),
-  id_depr: z.number().optional(),
+  id_depr: z.number().optional().nullable(),
 });
 
 export const NisanyanAffixesSchema = z.object({
-  prefix: NisanyanAffixSchema.optional(),
-  suffix: NisanyanAffixSchema.optional(),
+  prefix: NisanyanAffixSchema.optional().nullable(),
+  suffix: NisanyanAffixSchema.optional().nullable(),
 });
 
 export const NisanyanEtymologySchema = z.object({
-  serverDefinedMoreIndentation: z.boolean().optional(),
-  serverDefinedEndOfJoin: z.boolean().optional(),
+  serverDefinedMoreIndentation: z.boolean().optional().nullable(),
+  serverDefinedEndOfJoin: z.boolean().optional().nullable(),
   // _id: z.string(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   paranthesis: weakString(),
   relation: NisanyanRelationSchema,
   languages: z.array(NisanyanLanguageSchema),
@@ -84,7 +84,7 @@ export const NisanyanEtymologySchema = z.object({
   wordClass: NisanyanWordClassSchema,
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
-  affixes: NisanyanAffixesSchema.optional(),
+  affixes: NisanyanAffixesSchema.optional().nullable(),
 });
 
 export const NisanyanSourceSchema = z.object({
@@ -95,23 +95,23 @@ export const NisanyanSourceSchema = z.object({
   // datePublished: weakString(),
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   // abbreviation: weakString(),
   // date: weakString(),
 });
 
 export const NisanyanHistorySchema = z.object({
   // _id: z.string(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   // excerpt: weakString(),
   // definition: weakString(),
-  source: NisanyanSourceSchema.optional(),
+  source: NisanyanSourceSchema.optional().nullable(),
   date: z.string(),
   dateSortable: z.number().optional().nullable(),
   quote: z.string(),
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
-  language: NisanyanLanguageSchema.optional(),
+  language: NisanyanLanguageSchema.optional().nullable(),
 });
 
 export const NisanyanelatedWordSchema = z.object({
@@ -121,41 +121,41 @@ export const NisanyanelatedWordSchema = z.object({
 
 export const NisanyanWordReferenceSchema = z.object({
   // _id: z.string(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   name: z.string(),
   // note: weakString(),
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
-  // queries: z.array(z.string()).optional(),
-  // similarWords: z.array(z.string()).optional(),
+  // queries: z.array(z.string()).optional().nullable(),
+  // similarWords: z.array(z.string()).optional().nullable(),
   // references: z
   //   .array(
   //     z.object({
   //       _id: z.string(),
   //     }),
   //   )
-  //   .optional(),
+  //   .optional().nullable(),
   // etymologies: z
   //   .array(
   //     z.object({
   //       _id: z.string(),
   //     }),
   //   )
-  //   .optional(),
+  //   .optional().nullable(),
   // histories: z.array(
   //   z.object({
   //     _id: z.string(),
   //   }),
   // ),
-  referenceOf: z.array(NisanyanelatedWordSchema).optional(),
+  referenceOf: z.array(NisanyanelatedWordSchema).optional().nullable(),
 });
 
 export const NisanyanGeneralResponseSchema = z.object({
-  serverDefinedIsGeneratedFromAffix: z.boolean().optional(),
+  serverDefinedIsGeneratedFromAffix: z.boolean().optional().nullable(),
   isUnsuccessful: z.boolean(),
-  fiveBefore: z.array(NisanyanelatedWordSchema).optional(),
-  fiveAfter: z.array(NisanyanelatedWordSchema).optional(),
-  randomWord: NisanyanelatedWordSchema.optional(),
+  fiveBefore: z.array(NisanyanelatedWordSchema).optional().nullable(),
+  fiveAfter: z.array(NisanyanelatedWordSchema).optional().nullable(),
+  randomWord: NisanyanelatedWordSchema.optional().nullable(),
   version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
   perf: PerformanceSchema,
 });
@@ -163,11 +163,11 @@ export const NisanyanGeneralResponseSchema = z.object({
 export const NisanyanResponseErrorSchema = z.object({
   url: z.string(),
   isUnsuccessful: z.literal(true),
-  error: z.object({}).optional(),
-  words: z.array(NisanyanelatedWordSchema).optional(),
-  fiveBefore: z.array(NisanyanelatedWordSchema).optional(),
-  fiveAfter: z.array(NisanyanelatedWordSchema).optional(),
-  randomWord: NisanyanelatedWordSchema.optional(),
+  error: z.object({}).optional().nullable(),
+  words: z.array(NisanyanelatedWordSchema).optional().nullable(),
+  fiveBefore: z.array(NisanyanelatedWordSchema).optional().nullable(),
+  fiveAfter: z.array(NisanyanelatedWordSchema).optional().nullable(),
+  randomWord: NisanyanelatedWordSchema.optional().nullable(),
   serverDefinedErrorText: weakString(),
   version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
   perf: PerformanceSchema,
@@ -181,52 +181,52 @@ export const NisanyanAffixResponseErrorSchema = z.object({
 
 export const NisanyanReferenceSchema = z.object({
   // _id: z.string(),
-  // id_depr: z.number().optional(),
+  // id_depr: z.number().optional().nullable(),
   name: z.string(),
   // note: weakString(),
   // timeCreated: weakString(),
   // timeUpdated: weakString(),
-  // queries: z.array(z.string()).optional(),
-  // similarWords: z.array(z.string()).optional(),
+  // queries: z.array(z.string()).optional().nullable(),
+  // similarWords: z.array(z.string()).optional().nullable(),
   // references: z
   //   .array(
   //     z.object({
   //       _id: z.string(),
   //     }),
   //   )
-  //   .optional(),
+  //   .optional().nullable(),
   // etymologies: z
   //   .array(
   //     z.object({
   //       _id: z.string(),
   //     }),
   //   )
-  //   .optional(),
+  //   .optional().nullable(),
   // histories: z.array(
   //   z.object({
   //     _id: z.string(),
   //   }),
   // ),
-  // referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
-  // alternateSpellings: z.array(z.string()).optional(),
-  // misspellings: z.array(z.string()).optional(),
+  // referenceOf: z.array(NisanyanWordReferenceSchema).optional().nullable(),
+  // alternateSpellings: z.array(z.string()).optional().nullable(),
+  // misspellings: z.array(z.string()).optional().nullable(),
 });
 
 export const NisanyanWordSchema = z.object({
-  serverDefinedLastJoinedIndex: z.number().optional(),
+  serverDefinedLastJoinedIndex: z.number().optional().nullable(),
   serverDefinedTitleDescription: weakString(),
-  serverDefinedIsMisspelling: z.boolean().optional(),
-  serverDefinedAffixLanguage: NisanyanLanguageSchema.optional(),
+  serverDefinedIsMisspelling: z.boolean().optional().nullable(),
+  serverDefinedAffixLanguage: NisanyanLanguageSchema.optional().nullable(),
   _id: z.string(),
-  etymologies: z.array(NisanyanEtymologySchema).optional(),
+  etymologies: z.array(NisanyanEtymologySchema).optional().nullable(),
   histories: z.array(NisanyanHistorySchema).optional().nullable(),
-  id_depr: z.number().optional(),
+  id_depr: z.number().optional().nullable(),
   misspellings: z.array(z.string()).optional().nullable(),
   name: z.string(),
   note: weakString(),
-  queries: z.array(z.string()).optional(),
-  references: z.array(NisanyanReferenceSchema).optional(),
-  referenceOf: z.array(NisanyanWordReferenceSchema).optional(),
+  queries: z.array(z.string()).optional().nullable(),
+  references: z.array(NisanyanReferenceSchema).optional().nullable(),
+  referenceOf: z.array(NisanyanWordReferenceSchema).optional().nullable(),
   similarWords: z.array(z.string()).optional().nullable(),
   timeCreated: weakString(),
   timeUpdated: weakString(),
@@ -237,7 +237,7 @@ export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
   z.object({
     url: z.string(),
     isUnsuccessful: z.literal(false),
-    words: z.array(NisanyanWordSchema).optional(),
+    words: z.array(NisanyanWordSchema).optional().nullable(),
     version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
     perf: PerformanceSchema,
   }),
@@ -246,7 +246,7 @@ export const NisanyanResponseSchema = NisanyanGeneralResponseSchema.and(
 export const NisanyanAffixResponseSchema = z
   .object({
     affix: NisanyanAffixSchema,
-    words: z.array(NisanyanWordSchema).optional(),
+    words: z.array(NisanyanWordSchema).optional().nullable(),
     version: z.literal(NISANYAN_VERSION).default(NISANYAN_VERSION),
     perf: PerformanceSchema,
   })
