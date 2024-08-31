@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema, weakString } from "./shared";
 
-export const NISANYAN_VERSION = "1.0.6" as const;
+export const NISANYAN_VERSION = "1.0.7" as const;
 
 export const NisanyanLanguageSchema = z.object({
   // _id: z.string(),
@@ -219,7 +219,7 @@ export const NisanyanWordSchema = z.object({
   serverDefinedAffixLanguage: NisanyanLanguageSchema.optional(),
   _id: z.string(),
   etymologies: z.array(NisanyanEtymologySchema).optional(),
-  histories: z.array(NisanyanHistorySchema).optional(),
+  histories: z.array(NisanyanHistorySchema).optional().nullable(),
   id_depr: z.number().optional(),
   misspellings: z.array(z.string()).optional().nullable(),
   name: z.string(),
