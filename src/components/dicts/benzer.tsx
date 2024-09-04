@@ -77,7 +77,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                       show.value = false;
                       await callback?.();
                     }}
-                    class="cursor-pointer"
+                    class="cursor-pointer !bg-transparent"
                   >
                     Yeniden yükle
                   </Link>
