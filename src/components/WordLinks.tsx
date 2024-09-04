@@ -56,7 +56,7 @@ const ShowMoreOrLess = component$<{ showMore: Signal<boolean> }>(
     <div class="result-description">
       <Link
         onClick$={() => (showMore.value = !showMore.value)}
-        class="cursor-pointer font-bold"
+        class="cursor-pointer !bg-transparent font-bold"
         preventdefault:click
       >
         {showMore.value ? "«" : "»"} Daha {showMore.value ? "az" : "fazla"}{" "}

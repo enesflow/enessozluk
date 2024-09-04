@@ -64,7 +64,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                   show.value = false;
                   showForceReload.value = false;
                 }}
-                class="cursor-pointer"
+                class="cursor-pointer !bg-transparent"
               >
                 Güvenlik doğrulamasını kapat
               </Link>
@@ -95,7 +95,7 @@ export const IFrame = component$<{ src: string; callback?: QRL<any> }>(
                 show.value = true;
               }, 100);
             }}
-            class="cursor-pointer"
+            class="cursor-pointer !bg-transparent"
           >
             Güvenlik doğrulamasını göster
           </Link>
