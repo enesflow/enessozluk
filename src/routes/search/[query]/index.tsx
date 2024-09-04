@@ -221,14 +221,7 @@ export default component$(() => {
             />
           </p>
         )}
-        {hash.value && (
-          <Link
-            class="result-item !bg-transparent"
-            href={removeHashFromUrl(loc.url).href}
-          >
-            Bütün sonuçları göster
-          </Link>
-        )}
+        
         {data.value.recommendations && (
           <div class="result-item result-subitem">
             Öneriler: <WordLinks words={data.value.recommendations} />
