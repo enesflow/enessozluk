@@ -11,7 +11,7 @@
   font-family: "Atkinson Hyperlegible";
   font-style: normal;
   font-weight: 400;
-  src: url("../fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+  src: url("../public/fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
 }
 
 body {
