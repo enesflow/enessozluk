@@ -40,25 +40,11 @@ function buildNisanyanAPIError(
   title: string,
 ): NisanyanResponseError {
   debugAPI(e, `Nisanyan API Error: ${title}`);
-  const { query } = loadSharedMap(e);
   return {
     url,
     serverDefinedErrorText: API_FAILED_TEXT,
     isUnsuccessful: true,
-    words: [
-      {
-        _id: "1",
-        name: "Tekrar",
-      },
-      {
-        _id: "2",
-        name: "dene-",
-      },
-      {
-        _id: "3",
-        name: query.rawDecoded,
-      },
-    ],
+    words: [],
     version: NISANYAN_VERSION,
     perf: perf(e),
   };
@@ -334,7 +320,8 @@ const loadNisanyanAffix = server$(
 // eslint-disable-next-line qwik/loader-location
 export const useNisanyanLoader = routeLoader$<NisanyanWordPackage>(
   async (e) => {
-    if (DEV_DISABLED.nisanyan) return buildNisanyanAPIError(e, "", "Nisanyan is disabled");
+    if (DEV_DISABLED.nisanyan)
+      return buildNisanyanAPIError(e, "", "Nisanyan is disabled");
     const sharedMap = loadSharedMap(e);
     if (isWord(sharedMap.query.rawDecoded)) {
       return loadNisanyanWord.call(e);

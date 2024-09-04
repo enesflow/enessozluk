@@ -342,7 +342,7 @@ const cleanseBenzerResponse = (
 
         serverDefinedErrorText:
           "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-        words: ["Tekrar", "dene-", sharedMap.query.noNumPlusParen],
+        words: [],
         version: BENZER_VERSION,
         perf: perf(e),
       };
@@ -399,6 +399,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
 
 // eslint-disable-next-line qwik/loader-location
 export const useBenzerLoader = routeLoader$<BenzerPackage>(async (e) => {
-  if (DEV_DISABLED.benzer) return buildBenzerAPIError(e, "", "Benzer is disabled");
+  if (DEV_DISABLED.benzer)
+    return buildBenzerAPIError(e, "", "Benzer is disabled");
   return benzerLoader.call(e);
 });
