@@ -10,7 +10,7 @@ export default component$(() => {
       <div class="flex justify-center">
         <div class="obsidian-wrapper result-title">
           Yeni site{" "}
-          <Link href="https://enessiir.pages.dev" class="obsidian">
+          <Link href="https://siir.enesin.xyz" class="obsidian">
             🕊️ Enes Şiir
           </Link>
         </div>
