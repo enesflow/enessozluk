@@ -171,12 +171,6 @@ export function getFakeHeaders() {
 }
 
 export function noCache(e: RequestEventBase): void {
-  /* e.cacheControl({
-    noCache: true,
-    maxAge: 0,
-    noStore: true,
-    sMaxAge: 0,
-  }); */
   // just 5 seconds, there is probably a temporary issue and a refresh will fix it
   e.cacheControl(
     {
