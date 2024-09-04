@@ -23,7 +23,7 @@ html {
 }
 
 * {
-  font-family: "Atkinson Hyperlegible", "monospace";
+  font-family: "Atkinson Hyperlegible", sans-serif;
   /* remove the blue highlight on mobile: */
   -webkit-tap-highlight-color: transparent;
 }
