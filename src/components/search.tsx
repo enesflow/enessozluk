@@ -4,12 +4,16 @@ import {
   useOnDocument,
   useOnWindow,
   useSignal,
+  useStyles$,
   useTask$,
 } from "@builder.io/qwik";
 import { useLocation, useNavigate } from "@builder.io/qwik-city";
 import { isBrowser } from "@builder.io/qwik/build";
 import Spinner from "./spinner";
+import styles from "~/styles/searchBar.css?inline";
+
 export const SearchBar = component$<{ value?: string }>(({ value }) => {
+  useStyles$(styles);
   const placeholderRef = useSignal<HTMLFormElement>();
   const fixToTop = useSignal(false);
   const nav = useNavigate();

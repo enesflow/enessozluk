@@ -1,0 +1,35 @@
+.ChampturkB150 {
+  font-weight: 700;
+}
+
+.ChampturkI150 {
+  font-weight: 700;
+}
+
+.ChampturkI14,
+.ChampturkI150 {
+  font-style: italic;
+}
+
+.ChampturkI14 {
+  font-weight: 700;
+}
+
+.ChampturkBI14 {
+  font-weight: 700;
+}
+
+.ChampturkBI14,
+.ChampturkBI150 {
+  font-style: italic;
+  font-weight: 700;
+}
+
+.ChampturkB16,
+.ChampturkI16 {
+  font-weight: 700;
+}
+
+.Arabic18 {
+  direction: rtl;
+}

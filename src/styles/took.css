@@ -1,0 +1,3 @@
+.result-title-took {
+  @apply text-xs italic text-gray-700 dark:text-gray-400;
+}

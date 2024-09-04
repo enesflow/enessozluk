@@ -1,6 +1,8 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useStyles$ } from "@builder.io/qwik";
+import styles from "~/styles/spinner.css?inline";
 
 export const Spinner = component$(() => {
+  useStyles$(styles);
   // simple pure svg/css spinner (spinning %70 circle)
   return (
     <svg

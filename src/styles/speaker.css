@@ -1,0 +1,43 @@
+/* .speaker has two paths inside */
+/* periodically make one visible and the other hide and vice-versa animation */
+@keyframes speaker-first {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  34% {
+    opacity: 1;
+  }
+  56% {
+    opacity: 0;
+  }
+  84% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes speaker-last {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 0;
+  }
+  34% {
+    opacity: 1;
+  }
+  56% {
+    opacity: 1;
+  }
+  84% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}

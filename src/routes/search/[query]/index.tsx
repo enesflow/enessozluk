@@ -1,4 +1,9 @@
-import { component$, useContextProvider, useStore } from "@builder.io/qwik";
+import {
+  component$,
+  useContextProvider,
+  useStore,
+  useStyles$,
+} from "@builder.io/qwik";
 import {
   routeLoader$,
   useLocation,
@@ -29,6 +34,8 @@ import { loadSharedMap } from "~/helpers/request";
 import type { Dicts } from "~/types/dicts";
 import { BenzerView } from "../../../components/dicts/benzer";
 import { NisanyanView } from "../../../components/dicts/nisanyan";
+import styles from "~/styles/search.css?inline";
+import tookStyles from "~/styles/took.css?inline";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -131,6 +138,8 @@ const CacheIndicator = component$<{ show: boolean }>(({ show }) => {
 });
 
 export default component$(() => {
+  useStyles$(styles);
+  useStyles$(tookStyles);
   const loadedCollapsable = useCollapsableLoader();
   const collapsed = useStore<CollapsableStore>(
     loadedCollapsable.value.success
@@ -165,7 +174,7 @@ export default component$(() => {
           </p>
         )}
         <Collapsable data-version={tdk.value.version} data-dict="tdk" cId="tdk">
-          <h1 style="results-heading" q:slot="header">
+          <h1 class="results-heading" q:slot="header">
             <CacheIndicator show={tdk.value.perf.cached} /> TDK Sonuçları:{" "}
             <ExternalLink href={data.value.tdk} />
           </h1>
@@ -176,7 +185,7 @@ export default component$(() => {
           data-dict="nisanyan"
           cId="nisanyan"
         >
-          <h1 style="results-heading" q:slot="header">
+          <h1 class="results-heading" q:slot="header">
             <CacheIndicator show={nisanyan.value.perf.cached} /> Nişanyan Sözlük
             Sonuçları: <ExternalLink href={data.value.nisanyan} />
           </h1>
@@ -187,7 +196,7 @@ export default component$(() => {
           data-dict="kubbealti"
           cId="kubbealti"
         >
-          <h1 style="results-heading" q:slot="header">
+          <h1 class="results-heading" q:slot="header">
             <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
             Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
           </h1>
@@ -199,7 +208,7 @@ export default component$(() => {
           cId="luggat"
         >
           <h1
-            style="results-heading"
+            class="results-heading"
             q:slot="header"
             data-version={luggat.value.version}
           >
@@ -213,7 +222,7 @@ export default component$(() => {
           data-dict="benzer"
           cId="benzer"
         >
-          <h1 style="results-heading" q:slot="header">
+          <h1 class="results-heading" q:slot="header">
             <CacheIndicator show={benzer.value.perf.cached} /> Benzer Kelimeler
             Sonuçları:{" "}
             {data.value.benzer.length === 1 && (
@@ -227,7 +236,7 @@ export default component$(() => {
           data-dict="rhyme"
           cId="rhyme"
         >
-          <h1 style="results-heading" q:slot="header">
+          <h1 class="results-heading" q:slot="header">
             <CacheIndicator show={rhyme.value.perf.cached} /> Kâfiyeli
             Kelimeler:{" "}
           </h1>

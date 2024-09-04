@@ -1,8 +1,10 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useStyles$ } from "@builder.io/qwik";
+import styles from "~/styles/speaker.css?inline";
 
 export const SPEAKER_DELAY = 0.05 as const;
 
 export const Speaker = component$<{ duration?: number }>(({ duration }) => {
+  useStyles$(styles);
   const seconds = duration && `${duration + SPEAKER_DELAY}s`;
   return (
     <>

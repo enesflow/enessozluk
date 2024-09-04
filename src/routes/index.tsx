@@ -1,11 +1,14 @@
-import { component$ } from "@builder.io/qwik";
+import { component$, useStyles$ } from "@builder.io/qwik";
 import { Link, type DocumentHead } from "@builder.io/qwik-city";
 import { SearchBar } from "~/components/search";
+import styles from "~/styles/index.css?inline";
+
 export default component$(() => {
+  useStyles$(styles);
   return (
     <>
       <div class="flex justify-center">
-        <div class="obsidian-wrapper">
+        <div class="obsidian-wrapper result-title">
           Yeni site{" "}
           <Link href="https://enessiir.pages.dev" class="obsidian">
             🕊️ Enes Şiir

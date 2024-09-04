@@ -1,55 +1,19 @@
 import type { Signal } from "@builder.io/qwik";
-import { component$, useSignal } from "@builder.io/qwik";
+import { component$, useSignal, useStyles$ } from "@builder.io/qwik";
 import { useLocation } from "@builder.io/qwik-city";
 import { getKubbealtiPage, kubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import { convertToRoman } from "~/helpers/roman";
 import type { KubbealtiPackage } from "~/types/kubbealti";
 import { Play } from "../play";
-
-// const TDK_LINK_DET = "► " as const;
-
-/* export function isOutLink(word: string): {
-  outLink: boolean;
-  cleanWords: string[];
-} {
-  function romanToFront(word: string): string {
-    // example:
-    // input: heykel (I)
-    // output: (I) heykel
-    const words = word.split(" ");
-    if (words.length < 2) {
-      return word;
-    }
-    const lastWord = words[words.length - 1];
-    if (lastWord.startsWith("(") && lastWord.endsWith(")")) {
-      return `${lastWord} ${words.slice(0, -1).join(" ")}`;
-    }
-    return word;
-  }
-  if (word.startsWith(TDK_LINK_DET)) {
-    return {
-      outLink: true,
-      cleanWords: word.slice(TDK_LINK_DET.length).split(", ").map(romanToFront),
-    };
-  }
-  // To make sense of this check, check queries "server" and "z kuşağı" on TDK
-  if (word.startsWith("343 ")) {
-    return {
-      outLink: true,
-      cleanWords: word.slice(4).split(", ").map(romanToFront),
-    };
-  }
-
-  return {
-    outLink: false,
-    cleanWords: [],
-  };
-} */
+import styles from "~/styles/kubbealti.css?inline";
+import tookStyles from "~/styles/took.css?inline";
 
 export const KubbealtiView = component$<{
   data: Signal<KubbealtiPackage>;
 }>(({ data }) => {
+  useStyles$(styles);
+  useStyles$(tookStyles);
   const loc = useLocation();
   const kubbealtiPage = useSignal(getKubbealtiPage(loc.url));
   return (
@@ -57,20 +21,6 @@ export const KubbealtiView = component$<{
       {"serverDefinedReason" in data.value ? (
         <>
           <p class="error-message">{data.value.serverDefinedReason}</p>
-          {/* {data.value.recommendations.length > 0 && (
-            <>
-              <div class="result-item result-subitem">
-                Öneriler:{" "}
-                <WordLinks
-                  words={data.value.recommendations
-                    .map((rec) => rec.madde)
-                    .filter(
-                      (value, index, self) => self.indexOf(value) === index,
-                    )}
-                />
-              </div>
-            </>
-          )} */}
         </>
       ) : (
         <>

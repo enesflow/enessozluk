@@ -51,6 +51,7 @@
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
   "type": "module",
   "dependencies": {
+    "@qwikest/icons": "^0.0.13",
     "compress-json": "^3.1.0",
     "zod": "^3.23.8"
   }
