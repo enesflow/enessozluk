@@ -126,7 +126,6 @@ export const BenzerView = component$<{
       ((data.value.isUnsuccessful && data.value.serverDefinedCaptchaError) ||
         false),
   );
-  // console.log("BENZER", data.value);
   return (
     <>
       {isBenzerFailed(data.value) ? (
@@ -176,7 +175,6 @@ export const BenzerView = component$<{
                   ></li>
                 </ul>
               }
-
               {word.words.length ? (
                 <WordLinks
                   words={word.words}
