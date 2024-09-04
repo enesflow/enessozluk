@@ -8,6 +8,7 @@ const ONE_DAY = 24 * ONE_HOUR;
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   cacheControl({
     maxAge: ONE_DAY,
+    sMaxAge: ONE_DAY,
     staleWhileRevalidate: 15 * ONE_MINUTE,
   });
 };
