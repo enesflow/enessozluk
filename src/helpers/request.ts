@@ -174,7 +174,6 @@ export function noCache(e: RequestEventBase): void {
   // just 5 seconds, there is probably a temporary issue and a refresh will fix it
   e.cacheControl({
     maxAge: 5,
-    staleWhileRevalidate: 5,
   });
 }
 
