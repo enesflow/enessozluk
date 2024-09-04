@@ -1,4 +1,4 @@
-import type { TDKPackage } from "#/tdk";
+import type { TDKPackage, TDKResponseError } from "#/tdk";
 import { romanOptional } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
 import { TDK_TTS_URL } from "~/helpers/dicts/url";
@@ -46,12 +46,21 @@ export function isOutLink(word: string): {
   };
 }
 
+/* export function isTDKFailed(data: TDKPackage): boolean {
+  return "error" in data;
+} */
+// MAKE IT TYPESAFE, IF TRUE then return while assuring there is "error" in data in Typescript
+
+export function isTDKFailed(data: TDKPackage): data is TDKResponseError {
+  return "error" in data;
+}
+
 export const TDKView = component$<{
   data: TDKPackage;
 }>(({ data }) => {
   return (
     <>
-      {"error" in data ? (
+      {isTDKFailed(data) ? (
         <>
           <p class="error-message">{data.error}</p>
           {data.recommendations.length > 0 && (

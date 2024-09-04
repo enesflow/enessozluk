@@ -111,6 +111,12 @@ function makeBold(text: string) {
   return text;
 }
 
+export function isBenzerFailed(
+  data: BenzerPackage,
+): data is BenzerResponseError {
+  return "isUnsuccessful" in data;
+}
+
 export const BenzerView = component$<{
   data: Signal<BenzerPackage>;
 }>(({ data: data }) => {
@@ -122,7 +128,7 @@ export const BenzerView = component$<{
   );
   return (
     <>
-      {data.value.isUnsuccessful ? (
+      {isBenzerFailed(data.value) ? (
         <>
           {showCaptcha.value && (
             <IFrame

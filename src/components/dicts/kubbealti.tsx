@@ -4,10 +4,16 @@ import { useLocation } from "@builder.io/qwik-city";
 import { getKubbealtiPage, kubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import { convertToRoman } from "~/helpers/roman";
-import type { KubbealtiPackage } from "~/types/kubbealti";
+import type { KubbealtiError, KubbealtiPackage } from "~/types/kubbealti";
 import { Play } from "../play";
 import styles from "~/styles/kubbealti.css?inline";
 import tookStyles from "~/styles/took.css?inline";
+
+export function isKubbealtiFailed(
+  data: KubbealtiPackage,
+): data is KubbealtiError {
+  return "serverDefinedReason" in data;
+}
 
 export const KubbealtiView = component$<{
   data: Signal<KubbealtiPackage>;
@@ -18,7 +24,7 @@ export const KubbealtiView = component$<{
   const kubbealtiPage = useSignal(getKubbealtiPage(loc.url));
   return (
     <>
-      {"serverDefinedReason" in data.value ? (
+      {isKubbealtiFailed(data.value) ? (
         <>
           <p class="error-message">{data.value.serverDefinedReason}</p>
         </>

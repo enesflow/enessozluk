@@ -10,6 +10,7 @@ import {
   type DocumentHead,
 } from "@builder.io/qwik-city";
 import { isDev } from "@builder.io/qwik/build";
+import { LuCheckCircle2, LuXCircle } from "@qwikest/icons/lucide";
 import type { CollapsableStore } from "~/components/collapsable";
 import {
   Collapsable,
@@ -17,13 +18,12 @@ import {
   DEFAULT_COLLAPSABLE,
   useCollapsableLoader,
 } from "~/components/collapsable";
-import { KubbealtiView } from "~/components/dicts/kubbealti";
-import { LuggatView } from "~/components/dicts/luggat";
+import { isKubbealtiFailed, KubbealtiView } from "~/components/dicts/kubbealti";
+import { isLuggatFailed, LuggatView } from "~/components/dicts/luggat";
 import { RhymeView } from "~/components/dicts/rhyme";
-import { TDKView } from "~/components/dicts/tdk";
+import { isTDKFailed, TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
-import { Check } from "~/components/svgs/check";
 import { useBenzerLoader } from "~/helpers/dicts/benzer";
 import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
@@ -31,11 +31,14 @@ import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useRhymeLoader } from "~/helpers/dicts/rhyme";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
 import { loadSharedMap } from "~/helpers/request";
-import type { Dicts } from "~/types/dicts";
-import { BenzerView } from "../../../components/dicts/benzer";
-import { NisanyanView } from "../../../components/dicts/nisanyan";
 import styles from "~/styles/search.css?inline";
 import tookStyles from "~/styles/took.css?inline";
+import type { Dicts } from "~/types/dicts";
+import { BenzerView, isBenzerFailed } from "../../../components/dicts/benzer";
+import {
+  isNisanyanFailed,
+  NisanyanView,
+} from "../../../components/dicts/nisanyan";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -114,14 +117,12 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
         rhyme.perf.took,
       ),
     allFailed:
-      "error" in tdk &&
-      nisanyan.isUnsuccessful &&
-      luggat.isUnsuccessful &&
-      benzer.isUnsuccessful &&
-      "serverDefinedReason" in kubbealti,
-    // removing this because rhyme never fails
-    /*  &&
-      "serverDefinedError" in rhyme, */
+      isTDKFailed(tdk) &&
+      isNisanyanFailed(nisanyan) &&
+      isLuggatFailed(luggat) &&
+      isBenzerFailed(benzer) &&
+      isKubbealtiFailed(kubbealti),
+    //rhyme never fails
   };
 });
 
@@ -133,9 +134,21 @@ function getGoogleQuery(query: string) {
   return `${query} ne demek?`;
 }
 
-const CacheIndicator = component$<{ show: boolean }>(({ show }) => {
-  return <>{show && <Check />}</>;
-});
+const Icon = component$<{ show: boolean; failed: boolean }>(
+  ({ show, failed }) => {
+    return (
+      <>
+        {failed ? (
+          <>
+            <LuXCircle class="mb-0.5 inline w-auto text-red-500" />
+          </>
+        ) : (
+          <>{show && <LuCheckCircle2 class="mb-0.5 inline w-auto" />}</>
+        )}
+      </>
+    );
+  },
+);
 
 export default component$(() => {
   useStyles$(styles);
@@ -175,8 +188,11 @@ export default component$(() => {
         )}
         <Collapsable data-version={tdk.value.version} data-dict="tdk" cId="tdk">
           <h1 class="results-heading" q:slot="header">
-            <CacheIndicator show={tdk.value.perf.cached} /> TDK Sonuçları:{" "}
-            <ExternalLink href={data.value.tdk} />
+            <Icon
+              show={tdk.value.perf.cached}
+              failed={isTDKFailed(tdk.value)}
+            />{" "}
+            TDK Sonuçları: <ExternalLink href={data.value.tdk} />
           </h1>
           <TDKView data={tdk.value} />
         </Collapsable>
@@ -186,8 +202,12 @@ export default component$(() => {
           cId="nisanyan"
         >
           <h1 class="results-heading" q:slot="header">
-            <CacheIndicator show={nisanyan.value.perf.cached} /> Nişanyan Sözlük
-            Sonuçları: <ExternalLink href={data.value.nisanyan} />
+            <Icon
+              show={nisanyan.value.perf.cached}
+              failed={isNisanyanFailed(nisanyan.value)}
+            />{" "}
+            Nişanyan Sözlük Sonuçları:{" "}
+            <ExternalLink href={data.value.nisanyan} />
           </h1>
           <NisanyanView data={nisanyan.value} />
         </Collapsable>
@@ -197,8 +217,12 @@ export default component$(() => {
           cId="kubbealti"
         >
           <h1 class="results-heading" q:slot="header">
-            <CacheIndicator show={kubbealti.value.perf.cached} /> Kubbealtı
-            Lugatı Sonuçları: <ExternalLink href={data.value.kubbealti} />
+            <Icon
+              show={kubbealti.value.perf.cached}
+              failed={isKubbealtiFailed(kubbealti.value)}
+            />{" "}
+            Kubbealtı Lugatı Sonuçları:{" "}
+            <ExternalLink href={data.value.kubbealti} />
           </h1>
           <KubbealtiView data={kubbealti} />
         </Collapsable>
@@ -212,8 +236,11 @@ export default component$(() => {
             q:slot="header"
             data-version={luggat.value.version}
           >
-            <CacheIndicator show={luggat.value.perf.cached} /> Luggat Sonuçları:{" "}
-            <ExternalLink href={data.value.luggat} />
+            <Icon
+              show={luggat.value.perf.cached}
+              failed={isLuggatFailed(luggat.value)}
+            />{" "}
+            Luggat Sonuçları: <ExternalLink href={data.value.luggat} />
           </h1>
           <LuggatView data={luggat.value} />
         </Collapsable>
@@ -223,8 +250,11 @@ export default component$(() => {
           cId="benzer"
         >
           <h1 class="results-heading" q:slot="header">
-            <CacheIndicator show={benzer.value.perf.cached} /> Benzer Kelimeler
-            Sonuçları:{" "}
+            <Icon
+              show={benzer.value.perf.cached}
+              failed={isBenzerFailed(benzer.value)}
+            />{" "}
+            Benzer Kelimeler Sonuçları:{" "}
             {data.value.benzer.length === 1 && (
               <ExternalLink href={data.value.benzer[0]} />
             )}
@@ -237,7 +267,7 @@ export default component$(() => {
           cId="rhyme"
         >
           <h1 class="results-heading" q:slot="header">
-            <CacheIndicator show={rhyme.value.perf.cached} /> Kâfiyeli
+            <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
             Kelimeler:{" "}
           </h1>
           <RhymeView data={rhyme} />

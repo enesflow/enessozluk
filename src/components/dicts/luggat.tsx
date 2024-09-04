@@ -1,4 +1,4 @@
-import type { LuggatPackage } from "#/luggat";
+import type { LuggatPackage, LuggatResponseError } from "#/luggat";
 import { NO_RESULT } from "#helpers/constants";
 import { romanOptional } from "#helpers/roman";
 import { component$ } from "@builder.io/qwik";
@@ -6,12 +6,18 @@ import { TextWithLinks } from "../textwithlinks";
 
 const LUGGAT_LINK_REGEX = /\(Bak[:.] (.+?)\)/g;
 
+export function isLuggatFailed(
+  data: LuggatPackage,
+): data is LuggatResponseError {
+  return data.isUnsuccessful;
+}
+
 export const LuggatView = component$<{
   data: LuggatPackage;
 }>(({ data }) => {
   return (
     <>
-      {data.isUnsuccessful ? (
+      {isLuggatFailed(data) ? (
         <p class="error-message">{data.serverDefinedErrorText ?? NO_RESULT}</p>
       ) : (
         <ul class="results-list">

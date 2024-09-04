@@ -7,6 +7,7 @@ import {
 } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
+import { LuChevronRight } from "@qwikest/icons/lucide";
 
 function loadCollapsable(
   cookie: unknown | null,
@@ -45,26 +46,6 @@ export const DEFAULT_COLLAPSABLE: CollapsableStore = {
   rhyme: false,
 };
 
-const Chevron = component$<QwikIntrinsicElements["svg"]>(({ ...props }) => {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-      class="chevron mb-0.5 inline h-6 w-auto align-middle"
-      {...props}
-    >
-      <path d="m9 18 6-6-6-6" />
-    </svg>
-  );
-});
-
 export const Collapsable = component$<
   QwikIntrinsicElements["div"] & {
     cId: keyof CollapsableStore;
@@ -80,7 +61,11 @@ export const Collapsable = component$<
             setCollapsable(collapsed);
           }}
         >
-          <Chevron style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }} />
+          {/* <Chevron style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }} /> */}
+          <LuChevronRight
+            style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }}
+            class="chevron mb-0.5 inline h-6 w-auto align-middle"
+          />
         </button>
         <Slot name="header" />
       </div>

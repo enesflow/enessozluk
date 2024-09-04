@@ -1,6 +1,7 @@
 import type {
   NisanyanEtymology,
   NisanyanResponse,
+  NisanyanResponseError,
   NisanyanWordPackage,
 } from "#/nisanyan";
 import { NO_RESULT } from "#helpers/constants";
@@ -236,12 +237,18 @@ function getWordTitle(index: number, length: number, name: string) {
   }
 }
 
+export function isNisanyanFailed(
+  data: NisanyanWordPackage,
+): data is NisanyanResponseError {
+  return data.isUnsuccessful;
+}
+
 export const NisanyanView = component$<{
   data: NisanyanWordPackage;
 }>(({ data }) => {
   return (
     <>
-      {data.isUnsuccessful ? (
+      {isNisanyanFailed(data) ? (
         <>
           <p class="error-message">
             {data.serverDefinedErrorText ?? NO_RESULT}
