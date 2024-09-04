@@ -236,6 +236,22 @@ function getWordTitle(index: number, length: number, name: string) {
     return `${romanOptional(index, length)}${removeNumbersInWord(name)}`;
   }
 }
+function getWordTitleTwoParts(
+  index: number,
+  length: number,
+  name: string,
+): { outsideLink: string; insideLink: string } {
+  if (/\d$/.test(name)) {
+    return {
+      outsideLink: "",
+      insideLink: `${putTheNumbersAtTheEndAsRomanToTheBeginning(name)}`,
+    };
+  }
+  return {
+    outsideLink: `${romanOptional(index, length)} `,
+    insideLink: `${removeNumbersInWord(name)}`,
+  };
+}
 
 export function isNisanyanFailed(
   data: NisanyanWordPackage,
@@ -273,9 +289,22 @@ export const NisanyanView = component$<{
               <h2 class="result-title">
                 {/* */}
                 {word.serverDefinedIsMisspelling ? (
-                  <LinkR href={`/search/${word.name}`}>
-                    {getWordTitle(index, data.words!.length, word.name)}
-                  </LinkR>
+                  <>
+                    {
+                      getWordTitleTwoParts(index, data.words!.length, word.name)
+                        .outsideLink
+                    }
+                    <LinkR href={`/search/${word.name}`}>
+                      {/* {getWordTitle(index, data.words!.length, word.name)} */}
+                      {
+                        getWordTitleTwoParts(
+                          index,
+                          data.words!.length,
+                          word.name,
+                        ).insideLink
+                      }
+                    </LinkR>
+                  </>
                 ) : (
                   <>{getWordTitle(index, data.words!.length, word.name)}</>
                 )}
