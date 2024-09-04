@@ -64,7 +64,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
       raw: Response;
     }
 > {
-  process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+  process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
   debugLog("Fetching", decodeURI(url));
   const response = await fetch(url, init);
   const error = buildError(response);
@@ -168,4 +168,31 @@ export function getFakeHeaders() {
     accept:
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
   };
+}
+
+export function noCache(e: RequestEventBase): void {
+  /* e.cacheControl({
+    noCache: true,
+    maxAge: 0,
+    noStore: true,
+    sMaxAge: 0,
+  }); */
+  // just 5 seconds, there is probably a temporary issue and a refresh will fix it
+  e.cacheControl(
+    {
+      maxAge: 5,
+      staleWhileRevalidate: 5,
+    },
+    "Cloudflare-CDN-Cache-Control",
+  );
+}
+
+export function withoutCache<D>(e: RequestEventBase, d: D): D {
+  noCache(e);
+  const isObject = typeof d === "object" && d !== null;
+  console.log(
+    "DISABLING CACHE FOR DATA",
+    isObject ? ("url" in d ? d.url : d) : d,
+  );
+  return d;
 }

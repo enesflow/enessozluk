@@ -4,7 +4,12 @@ import { load } from "cheerio";
 import { API_FAILED_TEXT, NO_RESULT } from "~/helpers/constants";
 import { buildLuggatUrl } from "~/helpers/dicts/url";
 import { debugAPI } from "~/helpers/log";
-import { fetchAPI, loadCache, setSharedMapResult } from "~/helpers/request";
+import {
+  fetchAPI,
+  loadCache,
+  setSharedMapResult,
+  withoutCache,
+} from "~/helpers/request";
 import { to } from "~/helpers/to";
 import type {
   LuggatPackage,
@@ -26,13 +31,13 @@ function buildLuggatAPIError(
   title: string,
 ): LuggatResponseError {
   debugAPI(e, `Luggat API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
     version: LUGGAT_VERSION,
     perf: perf(e),
-  };
+  });
 }
 
 function parseLuggat(
@@ -102,7 +107,8 @@ function parseLuggat(
 
 // eslint-disable-next-line qwik/loader-location
 export const useLuggatLoader = routeLoader$<LuggatPackage>(async (e) => {
-  if (DEV_DISABLED.luggat) return buildLuggatAPIError(e, "", "Luggat is disabled");
+  if (DEV_DISABLED.luggat)
+    return buildLuggatAPIError(e, "", "Luggat is disabled");
   // If there is data in cache, return it
   {
     const cache = loadCache(e, "luggat");

@@ -1,4 +1,9 @@
-import { loadCache, loadSharedMap, setSharedMapResult } from "#helpers/request";
+import {
+  loadCache,
+  loadSharedMap,
+  setSharedMapResult,
+  withoutCache,
+} from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { DEV_DISABLED } from "~/routes/search/[query]";
@@ -15,12 +20,12 @@ function buildRhymeAPIError(
   title: string,
 ): RhymeErrorResponse {
   debugAPI(e, `Rhyme API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     word,
     serverDefinedError: title,
     version: RHYME_VERSION,
     perf: perf(e),
-  };
+  });
 }
 
 function clear(word: string): string {

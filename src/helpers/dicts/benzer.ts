@@ -11,6 +11,7 @@ import {
   loadCache,
   loadSharedMap,
   setSharedMapResult,
+  withoutCache,
 } from "~/helpers/request";
 import { to } from "~/helpers/to";
 import { clearAccent } from "~/routes/plugin";
@@ -38,13 +39,13 @@ function buildBenzerAPIError(
   title: string,
 ): BenzerResponseError {
   debugAPI(e, `Benzer API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     url,
     serverDefinedErrorText: title,
     isUnsuccessful: true,
     version: BENZER_VERSION,
     perf: perf(e),
-  };
+  });
 }
 
 function checkCaptcha(
@@ -55,14 +56,14 @@ function checkCaptcha(
   const path = CAPTCHA_PATH;
   const isCaptcha = $(path).length;
   if (isCaptcha) {
-    return {
+    return withoutCache(e, {
       url,
       serverDefinedCaptchaError: true,
       serverDefinedErrorText: "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
       isUnsuccessful: true,
       version: BENZER_VERSION,
       perf: perf(e),
-    };
+    });
   }
   return null;
 }

@@ -17,6 +17,7 @@ import {
   loadCache,
   loadSharedMap,
   setSharedMapResult,
+  withoutCache,
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
@@ -40,14 +41,14 @@ function buildNisanyanAPIError(
   title: string,
 ): NisanyanResponseError {
   debugAPI(e, `Nisanyan API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     url,
     serverDefinedErrorText: API_FAILED_TEXT,
     isUnsuccessful: true,
     words: [],
     version: NISANYAN_VERSION,
     perf: perf(e),
-  };
+  });
 }
 
 //The function below is written by chatgpt, I couldn't check it. I will revert it in case of an error.

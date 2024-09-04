@@ -12,14 +12,15 @@ import {
   loadCache,
   loadSharedMap,
   setSharedMapResult,
+  withoutCache,
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
+import { DEV_DISABLED } from "~/routes/search/[query]";
 import { debugAPI } from "../log";
+import { perf } from "../time";
 import { to } from "../to";
 import { buildTDKRecommendationsUrl, buildTDKUrl } from "./url";
-import { perf } from "../time";
-import { DEV_DISABLED } from "~/routes/search/[query]";
 
 const loadTDKRecommendations = async (e: RequestEventBase) => {
   const url = buildTDKRecommendationsUrl(e);
@@ -41,13 +42,13 @@ function buildTDKAPIError(
   title: string,
 ): TDKResponseError {
   debugAPI(e, `TDK API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     url,
     error: title,
     recommendations: [],
     version: TDK_VERSION,
     perf: perf(e),
-  };
+  });
 }
 
 const cleanseTDKResponse = (data: TDKResponse) => {

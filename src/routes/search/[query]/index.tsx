@@ -1,12 +1,10 @@
 import {
   component$,
-  useComputed$,
   useContextProvider,
   useStore,
   useStyles$,
 } from "@builder.io/qwik";
 import {
-  Link,
   routeLoader$,
   useLocation,
   type DocumentHead,
@@ -30,6 +28,7 @@ import {
 } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
+import { WordLinks } from "~/components/WordLinks";
 import { useBenzerLoader } from "~/helpers/dicts/benzer";
 import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
@@ -50,7 +49,6 @@ import {
   isNisanyanFailed,
   NisanyanView,
 } from "../../../components/dicts/nisanyan";
-import { WordLinks } from "~/components/WordLinks";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -77,19 +75,19 @@ type SearchPageData = {
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: true && isDev,
+  tdk: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: true && isDev,
+  nisanyan: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  luggat: true && isDev,
+  luggat: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  benzer: true && isDev,
+  benzer: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: true && isDev,
+  kubbealti: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  "nisanyan-affix": true && isDev,
+  "nisanyan-affix": false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: true && isDev,
+  rhyme: false && isDev,
 } as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
@@ -173,12 +171,6 @@ const Icon = component$<{ show: boolean; failed: boolean }>(
   },
 );
 
-function removeHashFromUrl(url: URL) {
-  const newUrl = new URL(url.href);
-  newUrl.hash = "";
-  return newUrl;
-}
-
 export default component$(() => {
   useStyles$(styles);
   useStyles$(tookStyles);
@@ -197,12 +189,6 @@ export default component$(() => {
   const kubbealti = useKubbealtiLoader();
   const rhyme = useRhymeLoader();
   const data = useDataLoader();
-  const hash = useComputed$(() => {
-    return "kubbealti";
-    const hash = loc.url.hash;
-    if (hash === "") return undefined;
-    return hash;
-  });
   return (
     <>
       <div class="results-container">
@@ -221,7 +207,7 @@ export default component$(() => {
             />
           </p>
         )}
-        
+
         {data.value.recommendations && (
           <div class="result-item result-subitem">
             Öneriler: <WordLinks words={data.value.recommendations} />

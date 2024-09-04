@@ -4,6 +4,7 @@ import {
   loadCache,
   loadSharedMap,
   setSharedMapResult,
+  withoutCache,
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
@@ -23,7 +24,6 @@ import { debugAPI } from "../log";
 import { perf } from "../time";
 import { to } from "../to";
 import { buildKubbealtiUrl } from "./url";
-import { isDev } from "@builder.io/qwik/build";
 
 // DONT DELETE THIS YET
 // https://eski.lugatim.com/rest/word-search/merhaba
@@ -55,7 +55,7 @@ function buildKubbealtiAPIError(
   title: string,
 ): KubbealtiError {
   debugAPI(e, `Kubbealti API Error: ${title}`);
-  return {
+  return withoutCache(e, {
     serverDefinedReason: title,
     // items: [],
     url,
@@ -63,7 +63,7 @@ function buildKubbealtiAPIError(
     perf: perf(e),
     totalPages: 0,
     content: {},
-  };
+  });
 }
 
 const TAGS = {
@@ -284,6 +284,6 @@ export const kubbealtiLoader = server$(async function (
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
   // if (isDev && DEV_DISABLED.kubbealti)
   // qwik errors on build.server when I uncomment the if statement above
-  if (isDev) return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
+  // if (isDev) return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
   return kubbealtiLoader.call(e);
 });

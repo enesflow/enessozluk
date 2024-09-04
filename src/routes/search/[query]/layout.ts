@@ -1,11 +1,15 @@
 import type { RequestHandler } from "@builder.io/qwik-city";
+
+const ONE_SECOND = 1;
+const ONE_MINUTE = 60 * ONE_SECOND;
+const ONE_HOUR = 60 * ONE_MINUTE;
+const ONE_DAY = 24 * ONE_HOUR;
+
 export const onGet: RequestHandler = async ({ cacheControl }) => {
   cacheControl(
     {
-      // Always serve a cached response by default, up to a week stale
-      staleWhileRevalidate: 60 * 60 * 24 * 7,
-      // Max once every 5 seconds, revalidate on the server to get a fresh version of this page
-      maxAge: 5,
+      maxAge: 15 * ONE_MINUTE,
+      staleWhileRevalidate: 1 * ONE_DAY,
     },
     "Cloudflare-CDN-Cache-Control",
   );
