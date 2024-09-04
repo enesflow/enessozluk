@@ -72,7 +72,7 @@ export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: false && isDev,
+  kubbealti: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
