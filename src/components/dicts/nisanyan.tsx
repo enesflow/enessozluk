@@ -243,6 +243,18 @@ export function isNisanyanFailed(
   return data.isUnsuccessful;
 }
 
+export function getNisanyanRecommendations(
+  data: NisanyanResponseError,
+): string[] {
+  return Array.from(
+    new Set([
+      ...(data.words?.map((word) => word.name) || []),
+      ...(data.fiveAfter?.map((word) => word.name) || []),
+      ...(data.fiveBefore?.map((word) => word.name) || []),
+    ]),
+  );
+}
+
 export const NisanyanView = component$<{
   data: NisanyanWordPackage;
 }>(({ data }) => {
@@ -253,22 +265,6 @@ export const NisanyanView = component$<{
           <p class="error-message">
             {data.serverDefinedErrorText ?? NO_RESULT}
           </p>
-          {data.words && (
-            <>
-              <div class="result-item result-subitem">
-                Öneriler:{" "}
-                <WordLinks
-                  words={Array.from(
-                    new Set([
-                      ...data.words.map((word) => word.name),
-                      ...(data.fiveAfter?.map((word) => word.name) || []),
-                      ...(data.fiveBefore?.map((word) => word.name) || []),
-                    ]),
-                  )}
-                />
-              </div>
-            </>
-          )}
         </>
       ) : (
         <ul class="results-list">

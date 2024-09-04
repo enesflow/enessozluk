@@ -21,7 +21,11 @@ import {
 import { isKubbealtiFailed, KubbealtiView } from "~/components/dicts/kubbealti";
 import { isLuggatFailed, LuggatView } from "~/components/dicts/luggat";
 import { RhymeView } from "~/components/dicts/rhyme";
-import { isTDKFailed, TDKView } from "~/components/dicts/tdk";
+import {
+  getTDKRecommendations,
+  isTDKFailed,
+  TDKView,
+} from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { useBenzerLoader } from "~/helpers/dicts/benzer";
@@ -34,11 +38,17 @@ import { loadSharedMap } from "~/helpers/request";
 import styles from "~/styles/search.css?inline";
 import tookStyles from "~/styles/took.css?inline";
 import type { Dicts } from "~/types/dicts";
-import { BenzerView, isBenzerFailed } from "../../../components/dicts/benzer";
 import {
+  BenzerView,
+  getBenzerRecommendations,
+  isBenzerFailed,
+} from "../../../components/dicts/benzer";
+import {
+  getNisanyanRecommendations,
   isNisanyanFailed,
   NisanyanView,
 } from "../../../components/dicts/nisanyan";
+import { WordLinks } from "~/components/WordLinks";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -60,21 +70,22 @@ type SearchPageData = {
   rhyme: true;
   took: number;
   allFailed: boolean;
+  recommendations?: string[];
 };
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: true && isDev,
+  tdk: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: true && isDev,
+  nisanyan: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  luggat: true && isDev,
+  luggat: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  benzer: true && isDev,
+  benzer: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: true && isDev,
+  kubbealti: false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  "nisanyan-affix": true && isDev,
+  "nisanyan-affix": false && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   rhyme: false && isDev,
 } as const;
@@ -96,6 +107,15 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
     benzer.perf,
     kubbealti.perf,
     rhyme.perf,
+  );
+  const recommendations = Array.from(
+    new Set([
+      ...(isTDKFailed(tdk) ? getTDKRecommendations(tdk) : []),
+      ...(isNisanyanFailed(nisanyan)
+        ? getNisanyanRecommendations(nisanyan)
+        : []),
+      ...(isBenzerFailed(benzer) ? getBenzerRecommendations(benzer) : []),
+    ]),
   );
   return {
     tdk: tdk.url,
@@ -123,6 +143,7 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
       isBenzerFailed(benzer) &&
       isKubbealtiFailed(kubbealti),
     //rhyme never fails
+    recommendations: recommendations.length ? recommendations : undefined,
   };
 });
 
@@ -185,6 +206,12 @@ export default component$(() => {
               )}`}
             />
           </p>
+        )}
+
+        {data.value.recommendations && (
+          <div class="result-item result-subitem">
+            Öneriler: <WordLinks words={data.value.recommendations} />
+          </div>
         )}
         <Collapsable data-version={tdk.value.version} data-dict="tdk" cId="tdk">
           <h1 class="results-heading" q:slot="header">

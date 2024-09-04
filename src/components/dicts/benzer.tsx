@@ -117,6 +117,10 @@ export function isBenzerFailed(
   return data.isUnsuccessful;
 }
 
+export function getBenzerRecommendations(data: BenzerResponseError): string[] {
+  return data.words ?? [];
+}
+
 export const BenzerView = component$<{
   data: Signal<BenzerPackage>;
 }>(({ data: data }) => {
@@ -146,13 +150,6 @@ export const BenzerView = component$<{
           <p class="error-message">
             {data.value.serverDefinedErrorText ?? NO_RESULT}
           </p>
-          {!!data.value.words?.length && (
-            <>
-              <div class="result-item result-subitem">
-                Öneriler: <WordLinks words={data.value.words} />
-              </div>
-            </>
-          )}
         </>
       ) : (
         <ul class="results-list">

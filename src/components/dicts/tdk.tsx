@@ -55,6 +55,10 @@ export function isTDKFailed(data: TDKPackage): data is TDKResponseError {
   return "error" in data;
 }
 
+export function getTDKRecommendations(data: TDKResponseError): string[] {
+  return data.recommendations.map((rec) => rec.madde);
+}
+
 export const TDKView = component$<{
   data: TDKPackage;
 }>(({ data }) => {
@@ -63,18 +67,6 @@ export const TDKView = component$<{
       {isTDKFailed(data) ? (
         <>
           <p class="error-message">{data.error}</p>
-          {data.recommendations.length > 0 && (
-            <>
-              <div class="result-item result-subitem">
-                Öneriler:{" "}
-                <WordLinks
-                  words={[
-                    ...new Set(data.recommendations.map((rec) => rec.madde)),
-                  ]}
-                />
-              </div>
-            </>
-          )}
         </>
       ) : (
         <>
