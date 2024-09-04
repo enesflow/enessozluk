@@ -4,10 +4,12 @@ import {
   createContextId,
   Slot,
   useContext,
+  useStyles$,
 } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { z } from "zod";
 import { LuChevronRight } from "@qwikest/icons/lucide";
+import styles from "~/styles/collapsable.css?inline";
 
 function loadCollapsable(
   cookie: unknown | null,
@@ -51,9 +53,10 @@ export const Collapsable = component$<
     cId: keyof CollapsableStore;
   }
 >(({ cId, ...props }) => {
+  useStyles$(styles);
   const collapsed = useContext(CollapsableCTX);
   return (
-    <div {...props}>
+    <div {...props} class="collapsable">
       <div class="flex items-start gap-1">
         <button
           onClick$={() => {

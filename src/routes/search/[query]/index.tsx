@@ -1,10 +1,12 @@
 import {
   component$,
+  useComputed$,
   useContextProvider,
   useStore,
   useStyles$,
 } from "@builder.io/qwik";
 import {
+  Link,
   routeLoader$,
   useLocation,
   type DocumentHead,
@@ -75,19 +77,19 @@ type SearchPageData = {
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: false && isDev,
+  tdk: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: false && isDev,
+  nisanyan: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  luggat: false && isDev,
+  luggat: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  benzer: false && isDev,
+  benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: false && isDev,
+  kubbealti: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  "nisanyan-affix": false && isDev,
+  "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: false && isDev,
+  rhyme: true && isDev,
 } as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
@@ -171,6 +173,12 @@ const Icon = component$<{ show: boolean; failed: boolean }>(
   },
 );
 
+function removeHashFromUrl(url: URL) {
+  const newUrl = new URL(url.href);
+  newUrl.hash = "";
+  return newUrl;
+}
+
 export default component$(() => {
   useStyles$(styles);
   useStyles$(tookStyles);
@@ -189,6 +197,12 @@ export default component$(() => {
   const kubbealti = useKubbealtiLoader();
   const rhyme = useRhymeLoader();
   const data = useDataLoader();
+  const hash = useComputed$(() => {
+    return "kubbealti";
+    const hash = loc.url.hash;
+    if (hash === "") return undefined;
+    return hash;
+  });
   return (
     <>
       <div class="results-container">
@@ -207,98 +221,107 @@ export default component$(() => {
             />
           </p>
         )}
-
+        {hash.value && (
+          <Link
+            class="result-item !bg-transparent"
+            href={removeHashFromUrl(loc.url).href}
+          >
+            Bütün sonuçları göster
+          </Link>
+        )}
         {data.value.recommendations && (
           <div class="result-item result-subitem">
             Öneriler: <WordLinks words={data.value.recommendations} />
           </div>
         )}
-        <Collapsable data-version={tdk.value.version} data-dict="tdk" cId="tdk">
-          <h1 class="results-heading" q:slot="header">
-            <Icon
-              show={tdk.value.perf.cached}
-              failed={isTDKFailed(tdk.value)}
-            />{" "}
-            TDK Sonuçları: <ExternalLink href={data.value.tdk} />
-          </h1>
-          <TDKView data={tdk.value} />
-        </Collapsable>
-        <Collapsable
-          data-version={nisanyan.value.version}
-          data-dict="nisanyan"
-          cId="nisanyan"
-        >
-          <h1 class="results-heading" q:slot="header">
-            <Icon
-              show={nisanyan.value.perf.cached}
-              failed={isNisanyanFailed(nisanyan.value)}
-            />{" "}
-            Nişanyan Sözlük Sonuçları:{" "}
-            <ExternalLink href={data.value.nisanyan} />
-          </h1>
-          <NisanyanView data={nisanyan.value} />
-        </Collapsable>
-        <Collapsable
-          data-version={kubbealti.value.version}
-          data-dict="kubbealti"
-          cId="kubbealti"
-        >
-          <h1 class="results-heading" q:slot="header">
-            <Icon
-              show={kubbealti.value.perf.cached}
-              failed={isKubbealtiFailed(kubbealti.value)}
-            />{" "}
-            Kubbealtı Lugatı Sonuçları:{" "}
-            <ExternalLink href={data.value.kubbealti} />
-          </h1>
-          <KubbealtiView data={kubbealti} />
-        </Collapsable>
-        <Collapsable
-          data-version={luggat.value.version}
-          data-dict="luggat"
-          cId="luggat"
-        >
-          <h1
-            class="results-heading"
-            q:slot="header"
-            data-version={luggat.value.version}
+        <div class="relative">
+          <Collapsable data-version={tdk.value.version} id="tdk" cId="tdk">
+            <h1 class="results-heading" q:slot="header">
+              <Icon
+                show={tdk.value.perf.cached}
+                failed={isTDKFailed(tdk.value)}
+              />{" "}
+              TDK Sonuçları: <ExternalLink href={data.value.tdk} />
+            </h1>
+            <TDKView data={tdk.value} />
+          </Collapsable>
+          <Collapsable
+            data-version={nisanyan.value.version}
+            id="nisanyan"
+            cId="nisanyan"
           >
-            <Icon
-              show={luggat.value.perf.cached}
-              failed={isLuggatFailed(luggat.value)}
-            />{" "}
-            Luggat Sonuçları: <ExternalLink href={data.value.luggat} />
-          </h1>
-          <LuggatView data={luggat.value} />
-        </Collapsable>
-        <Collapsable
-          data-version={benzer.value.version}
-          data-dict="benzer"
-          cId="benzer"
-        >
-          <h1 class="results-heading" q:slot="header">
-            <Icon
-              show={benzer.value.perf.cached}
-              failed={isBenzerFailed(benzer.value)}
-            />{" "}
-            Benzer Kelimeler Sonuçları:{" "}
-            {data.value.benzer.length === 1 && (
-              <ExternalLink href={data.value.benzer[0]} />
-            )}
-          </h1>
-          <BenzerView data={benzer} />
-        </Collapsable>
-        <Collapsable
-          data-version={rhyme.value.version}
-          data-dict="rhyme"
-          cId="rhyme"
-        >
-          <h1 class="results-heading" q:slot="header">
-            <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
-            Kelimeler:{" "}
-          </h1>
-          <RhymeView data={rhyme} />
-        </Collapsable>
+            <h1 class="results-heading" q:slot="header">
+              <Icon
+                show={nisanyan.value.perf.cached}
+                failed={isNisanyanFailed(nisanyan.value)}
+              />{" "}
+              Nişanyan Sözlük Sonuçları:{" "}
+              <ExternalLink href={data.value.nisanyan} />
+            </h1>
+            <NisanyanView data={nisanyan.value} />
+          </Collapsable>
+          <Collapsable
+            data-version={kubbealti.value.version}
+            id="kubbealti"
+            cId="kubbealti"
+          >
+            <h1 class="results-heading" q:slot="header">
+              <Icon
+                show={kubbealti.value.perf.cached}
+                failed={isKubbealtiFailed(kubbealti.value)}
+              />{" "}
+              Kubbealtı Lugatı Sonuçları:{" "}
+              <ExternalLink href={data.value.kubbealti} />
+            </h1>
+            <KubbealtiView data={kubbealti} />
+          </Collapsable>
+          <Collapsable
+            data-version={luggat.value.version}
+            id="luggat"
+            cId="luggat"
+          >
+            <h1
+              class="results-heading"
+              q:slot="header"
+              data-version={luggat.value.version}
+            >
+              <Icon
+                show={luggat.value.perf.cached}
+                failed={isLuggatFailed(luggat.value)}
+              />{" "}
+              Luggat Sonuçları: <ExternalLink href={data.value.luggat} />
+            </h1>
+            <LuggatView data={luggat.value} />
+          </Collapsable>
+          <Collapsable
+            data-version={benzer.value.version}
+            id="benzer"
+            cId="benzer"
+          >
+            <h1 class="results-heading" q:slot="header">
+              <Icon
+                show={benzer.value.perf.cached}
+                failed={isBenzerFailed(benzer.value)}
+              />{" "}
+              Benzer Kelimeler Sonuçları:{" "}
+              {data.value.benzer.length === 1 && (
+                <ExternalLink href={data.value.benzer[0]} />
+              )}
+            </h1>
+            <BenzerView data={benzer} />
+          </Collapsable>
+          <Collapsable
+            data-version={rhyme.value.version}
+            id="rhyme"
+            cId="rhyme"
+          >
+            <h1 class="results-heading" q:slot="header">
+              <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
+              Kelimeler:{" "}
+            </h1>
+            <RhymeView data={rhyme} />
+          </Collapsable>
+        </div>
       </div>
     </>
   );
