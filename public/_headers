@@ -1,7 +1,0 @@
-# https://developers.cloudflare.com/pages/platform/headers/
-
-/*service-worker.js
-  Cache-Control: no-store
-  Content-Type: application/javascript
-  X-Content-Type-Options: nosniff
-
