@@ -200,7 +200,7 @@ const cleanseKubbealtiResponse = (
             `<a href="/search/${next.text().toLocaleLowerCase()}">${next.html()}</a>`,
           );
         }
-        elem.text("Bakınız:");
+        elem.text("Bakınız: ");
       }
     });
     item.anlam = $.html();
