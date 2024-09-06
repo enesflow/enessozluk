@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema } from "./shared";
 
-export const KUBBEALTI_VERSION = "1.0.3" as const;
+export const KUBBEALTI_VERSION = "1.0.4" as const;
 
 export const KubbealtiContentSchema = z.array(
   z.object({

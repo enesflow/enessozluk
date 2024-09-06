@@ -191,11 +191,16 @@ const cleanseKubbealtiResponse = (
       const text = elem.text().trim();
       if (text === "Bk.") {
         const next = elem.next();
-        if (!next.is("a")) {
+        if (
+          !next.is("a") &&
+          // and does not have a child with "a" tag
+          !next.children().is("a")
+        ) {
           next.replaceWith(
             `<a href="/search/${next.text().toLocaleLowerCase()}">${next.html()}</a>`,
           );
         }
+        elem.text("Bakınız:");
       }
     });
     item.anlam = $.html();
