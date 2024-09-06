@@ -75,19 +75,19 @@ type SearchPageData = {
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: false && isDev,
+  tdk: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: false && isDev,
+  nisanyan: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  luggat: false && isDev,
+  luggat: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  benzer: false && isDev,
+  benzer: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: false && isDev,
+  kubbealti: true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  "nisanyan-affix": false && isDev,
+  "nisanyan-affix": true && isDev,
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: false && isDev,
+  rhyme: true && isDev,
 } as const;
 
 export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {

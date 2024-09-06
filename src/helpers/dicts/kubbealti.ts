@@ -185,6 +185,19 @@ const cleanseKubbealtiResponse = (
         );
       }
     });
+    $(".Champturk150").each((_, el) => {
+      // if the text.trim equals "Bk." make the next item a link to /search/{text}
+      const elem = $(el);
+      const text = elem.text().trim();
+      if (text === "Bk.") {
+        const next = elem.next();
+        if (!next.is("a")) {
+          next.replaceWith(
+            `<a href="/search/${next.text().toLocaleLowerCase()}">${next.html()}</a>`,
+          );
+        }
+      }
+    });
     item.anlam = $.html();
   }
   return data;
