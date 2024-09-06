@@ -281,6 +281,7 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
     "ms",
     "for word",
     word,
+    url.api,
   );
   // Returns error if request failed
   if (error || !response?.success) {

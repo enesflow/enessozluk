@@ -101,12 +101,12 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   const rhyme = await e.resolveValue(useRhymeLoader);
   console.log({
     "cache took": sharedMap.cacheTook,
-    tdk: tdk.perf.took,
-    nisanyan: nisanyan.perf.took,
-    luggat: luggat.perf.took,
-    benzer: benzer.perf.took,
-    kubbealti: kubbealti.perf.took,
-    rhyme,
+    tdk: tdk.perf,
+    nisanyan: nisanyan.perf,
+    luggat: luggat.perf,
+    benzer: benzer.perf,
+    kubbealti: kubbealti.perf,
+    rhyme: rhyme.perf,
   });
   const recommendations = Array.from(
     new Set([
