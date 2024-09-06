@@ -152,18 +152,22 @@ export function getFakeHeaders(e: RequestEventBase): HeadersInit {
 
   const cookieText = Object.entries({
     ...e.cookie,
-    ...Object.fromEntries(
-      e.headers
-        .get("cookie")!
-        .split(";")
-        .map((c) => c.split("=")),
-    ),
-    ...Object.fromEntries(
-      e.request.headers
-        .get("cookie")!
-        .split(";")
-        .map((c) => c.split("=")),
-    ),
+    ...(e.headers.get("cookie")
+      ? Object.fromEntries(
+          e.headers
+            .get("cookie")!
+            .split(";")
+            .map((c) => c.split("=")),
+        )
+      : {}),
+    ...(e.request.headers.get("cookie")
+      ? Object.fromEntries(
+          e.request.headers
+            .get("cookie")!
+            .split(";")
+            .map((c) => c.split("=")),
+        )
+      : {}),
   })
     .map(([key, value]) => `${key}=${value}`)
     .join("; ");
