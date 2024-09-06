@@ -88,6 +88,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     };
   }
   const url = buildBenzerAdvancedUrl(e);
+  const t = new Date().getTime();
   const [error, response] = await to(
     fetchAPI(url.api, "html", {
       ...e.request,
@@ -98,6 +99,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
       },
     }),
   );
+  console.log("Fetch #0 took", new Date().getTime() - t, "ms");
   if (error || !response?.success) {
     debugAPI(e, `Benzer API Error: ${error?.message || "No response"}`);
     return buildBenzerAPIError(e, url.user, API_FAILED_TEXT);
@@ -260,6 +262,7 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
     .join("; ");
   //////////////////
   const url = buildBenzerUrl(word);
+  const t = new Date().getTime();
   const [error, response] = await to(
     fetchAPI(url.api, "html", {
       ...e.request,
@@ -271,6 +274,13 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
         cookie: cookieText,
       },
     }),
+  );
+  console.log(
+    "Fetch #1 took",
+    new Date().getTime() - t,
+    "ms",
+    "for word",
+    word,
   );
   // Returns error if request failed
   if (error || !response?.success) {

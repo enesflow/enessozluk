@@ -99,15 +99,15 @@ export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
   const benzer = await e.resolveValue(useBenzerLoader);
   const kubbealti = await e.resolveValue(useKubbealtiLoader);
   const rhyme = await e.resolveValue(useRhymeLoader);
-  console.log(
-    sharedMap.cacheTook,
-    tdk.perf,
-    nisanyan.perf,
-    luggat.perf,
-    benzer.perf,
-    kubbealti.perf,
-    rhyme.perf,
-  );
+  console.log({
+    "cache took": sharedMap.cacheTook,
+    tdk: tdk.perf.took,
+    nisanyan: nisanyan.perf.took,
+    luggat: luggat.perf.took,
+    benzer: benzer.perf.took,
+    kubbealti: kubbealti.perf.took,
+    rhyme,
+  });
   const recommendations = Array.from(
     new Set([
       ...(isTDKFailed(tdk) ? getTDKRecommendations(tdk) : []),
