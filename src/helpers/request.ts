@@ -121,7 +121,7 @@ export function loadCache<T extends Dicts>(
   }
 }
 
-export function getFakeHeaders() {
+export function getFakeHeaders(e: RequestEventBase): HeadersInit {
   const mostPopularUserAgents = [
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36",
@@ -150,8 +150,17 @@ export function getFakeHeaders() {
 
   const acceptEncodings = ["gzip, deflate, br", "gzip, deflate"];
 
-  return {
+  const cookieText = Object.entries(e.cookie)
+    .map(([key, value]) => `${key}=${value}`)
+    .join("; ");
+
+  const fakeHeaders = {
+    ...e.request.headers,
+    cookie: cookieText,
+    "x-real-ip": e.clientConn.ip,
     "user-agent":
+      e.headers.get("user-agent") ??
+      e.request.headers.get("user-agent") ??
       mostPopularUserAgents[
         Math.floor(Math.random() * mostPopularUserAgents.length)
       ],
@@ -168,6 +177,8 @@ export function getFakeHeaders() {
     accept:
       "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
   };
+  console.log("FAKE HEADERS", fakeHeaders);
+  return fakeHeaders;
 }
 
 export function noCache(e: RequestEventBase): void {

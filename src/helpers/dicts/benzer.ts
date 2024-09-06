@@ -91,12 +91,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   const t = new Date().getTime();
   const [error, response] = await to(
     fetchAPI(url.api, "html", {
-      ...e.request,
-      headers: {
-        ...e.request.headers,
-        ...getFakeHeaders(),
-        "x-real-ip": e.clientConn.ip,
-      },
+      headers: getFakeHeaders(e),
     }),
   );
   console.log("Fetch #0 took", new Date().getTime() - t, "ms");
@@ -257,22 +252,13 @@ const loadBenzerWord = server$(async function (word: string): Promise<{
   cookie: string | undefined;
 } | null> {
   const e = this;
-  const cookieText = Object.entries(e.cookie)
-    .map(([key, value]) => `${key}=${value}`)
-    .join("; ");
   //////////////////
   const url = buildBenzerUrl(word);
   const t = new Date().getTime();
   const [error, response] = await to(
     fetchAPI(url.api, "html", {
-      ...e.request,
-      headers: {
-        // disguise as a browser
-        ...e.request.headers,
-        ...getFakeHeaders(),
-        "x-real-ip": e.clientConn.ip,
-        cookie: cookieText,
-      },
+      // ...e.request,
+      headers: getFakeHeaders(e),
     }),
   );
   console.log(
