@@ -150,7 +150,21 @@ export function getFakeHeaders(e: RequestEventBase): HeadersInit {
 
   const acceptEncodings = ["gzip, deflate, br", "gzip, deflate"];
 
-  const cookieText = Object.entries(e.cookie)
+  const cookieText = Object.entries({
+    ...e.cookie,
+    ...Object.fromEntries(
+      e.headers
+        .get("cookie")!
+        .split(";")
+        .map((c) => c.split("=")),
+    ),
+    ...Object.fromEntries(
+      e.request.headers
+        .get("cookie")!
+        .split(";")
+        .map((c) => c.split("=")),
+    ),
+  })
     .map(([key, value]) => `${key}=${value}`)
     .join("; ");
 
