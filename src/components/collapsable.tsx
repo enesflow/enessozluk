@@ -70,7 +70,9 @@ export const Collapsable = component$<
         >
           {/* <Chevron style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }} /> */}
           <LuChevronRight
-            style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }}
+            style={{
+              rotate: collapsed[cId] || defaultClosed.value ? "0deg" : "90deg",
+            }}
             class="chevron mb-0.5 inline h-6 w-auto align-middle"
           />
         </button>
