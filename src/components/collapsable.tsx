@@ -63,7 +63,8 @@ export const Collapsable = component$<
       <div class="flex items-start gap-1">
         <button
           onClick$={() => {
-            collapsed[cId] = !collapsed[cId];
+            if (!defaultClosed.value) collapsed[cId] = true;
+            else collapsed[cId] = !collapsed[cId];
             defaultClosed.value = false;
             setCollapsable(collapsed);
           }}
