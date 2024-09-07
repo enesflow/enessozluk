@@ -4,6 +4,7 @@ import {
   createContextId,
   Slot,
   useContext,
+  useSignal,
   useStyles$,
 } from "@builder.io/qwik";
 import { routeLoader$ } from "@builder.io/qwik-city";
@@ -51,9 +52,11 @@ export const DEFAULT_COLLAPSABLE: CollapsableStore = {
 export const Collapsable = component$<
   QwikIntrinsicElements["div"] & {
     cId: keyof CollapsableStore;
+    defaultClosed?: boolean;
   }
->(({ cId, ...props }) => {
+>(({ cId, defaultClosed: _defaultClosed, ...props }) => {
   useStyles$(styles);
+  const defaultClosed = useSignal(_defaultClosed ?? false);
   const collapsed = useContext(CollapsableCTX);
   return (
     <div {...props} class="collapsable">
@@ -61,6 +64,7 @@ export const Collapsable = component$<
         <button
           onClick$={() => {
             collapsed[cId] = !collapsed[cId];
+            defaultClosed.value = false;
             setCollapsable(collapsed);
           }}
         >
@@ -72,7 +76,7 @@ export const Collapsable = component$<
         </button>
         <Slot name="header" />
       </div>
-      {!collapsed[cId] && <Slot />}
+      {!collapsed[cId] && !defaultClosed.value && <Slot />}
     </div>
   );
 });

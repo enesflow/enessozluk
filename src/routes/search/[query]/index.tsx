@@ -214,7 +214,12 @@ export default component$(() => {
           </div>
         )}
         <div class="relative">
-          <Collapsable data-version={tdk.value.version} id="tdk" cId="tdk">
+          <Collapsable
+            data-version={tdk.value.version}
+            id="tdk"
+            cId="tdk"
+            defaultClosed={isTDKFailed(tdk.value)}
+          >
             <h1 class="results-heading" q:slot="header">
               <Icon
                 show={tdk.value.perf.cached}
@@ -228,6 +233,7 @@ export default component$(() => {
             data-version={nisanyan.value.version}
             id="nisanyan"
             cId="nisanyan"
+            defaultClosed={isNisanyanFailed(nisanyan.value)}
           >
             <h1 class="results-heading" q:slot="header">
               <Icon
@@ -243,6 +249,7 @@ export default component$(() => {
             data-version={kubbealti.value.version}
             id="kubbealti"
             cId="kubbealti"
+            defaultClosed={isKubbealtiFailed(kubbealti.value)}
           >
             <h1 class="results-heading" q:slot="header">
               <Icon
@@ -258,6 +265,7 @@ export default component$(() => {
             data-version={luggat.value.version}
             id="luggat"
             cId="luggat"
+            defaultClosed={isLuggatFailed(luggat.value)}
           >
             <h1
               class="results-heading"
@@ -276,6 +284,7 @@ export default component$(() => {
             data-version={benzer.value.version}
             id="benzer"
             cId="benzer"
+            defaultClosed={isBenzerFailed(benzer.value)}
           >
             <h1 class="results-heading" q:slot="header">
               <Icon
@@ -293,6 +302,7 @@ export default component$(() => {
             data-version={rhyme.value.version}
             id="rhyme"
             cId="rhyme"
+            defaultClosed={false}
           >
             <h1 class="results-heading" q:slot="header">
               <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
