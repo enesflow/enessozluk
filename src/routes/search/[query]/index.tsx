@@ -302,7 +302,7 @@ export default component$(() => {
             data-version={rhyme.value.version}
             id="rhyme"
             cId="rhyme"
-            defaultClosed={false}
+            defaultClosed={data.value.allFailed}
           >
             <h1 class="results-heading" q:slot="header">
               <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
