@@ -11,7 +11,6 @@ import type { RhymeErrorResponse, RhymePackage } from "~/types/rhyme";
 import { RHYME_VERSION } from "~/types/rhyme";
 import { NO_RESULT } from "../constants";
 import { words } from "../data/words";
-import { large } from "../data/large";
 import { debugAPI } from "../log";
 import { perf } from "../time";
 
@@ -112,7 +111,7 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     if (cache) return setSharedMapResult(e, "rhyme", cache);
   } /////////////////////////////
 
-  const result = getWords(words, word, 20);
+  const result = getWords(words, word, 100);
 
   const data: RhymePackage = {
     word,
@@ -126,16 +125,10 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
       ...data,
       serverDefinedError: NO_RESULT,
     });
-  const more =
-    getWords(large, word, 50)?.filter(
-      // filter so that not in the result
-      (w) => !result.includes(w),
-    ) ?? undefined;
-  // find -10 and +10 words from the index
 
   return setSharedMapResult(e, "rhyme", {
     ...data,
-    items: result,
-    more,
+    items: result.slice(0, 20),
+    more: result.length > 20 ? result.slice(20) : undefined,
   });
 });
