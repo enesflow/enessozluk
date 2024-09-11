@@ -11,6 +11,7 @@ import type { RhymeErrorResponse, RhymePackage } from "~/types/rhyme";
 import { RHYME_VERSION } from "~/types/rhyme";
 import { NO_RESULT } from "../constants";
 import { words } from "../data/words";
+import { large } from "../data/large";
 import { debugAPI } from "../log";
 import { perf } from "../time";
 
@@ -44,17 +45,12 @@ function clear(word: string): string {
     .replace(/Û/g, "U")
     .replace(/Ô/g, "O");
 }
-// eslint-disable-next-line qwik/loader-location
-export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
-  const sharedMap = loadSharedMap(e);
-  const word = sharedMap.query.noNumPlusParenAccL;
-  if (DEV_DISABLED.rhyme)
-    return buildRhymeAPIError(e, word, "Rhyme is disabled");
-  // If there is data in cache, return it
-  {
-    const cache = loadCache(e, "rhyme");
-    if (cache) return setSharedMapResult(e, "rhyme", cache);
-  } /////////////////////////////
+
+function getWords(
+  array: string[],
+  word: string,
+  limit: number,
+): string[] | null {
   const clearWord = clear(word);
   const word_reversed_clear = clearWord.split("").reverse().join("");
 
@@ -63,10 +59,10 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   let index = -1;
   {
     let start = 0;
-    let end = words.length - 1;
+    let end = array.length - 1;
     while (start <= end) {
       const mid = Math.floor((start + end) / 2);
-      const wordMid = clear(words[mid]);
+      const wordMid = clear(array[mid]);
       closest = mid;
       if (wordMid === word_reversed_clear) {
         index = mid;
@@ -78,6 +74,46 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
       }
     }
   }
+  if (closest === -1) return null;
+
+  const normalCount = limit;
+  const maxCount = limit * 2;
+  const start = Math.max(0, closest - maxCount);
+  const end = Math.min(array.length, closest + maxCount);
+
+  const result: string[] = [];
+  for (let i = closest - 1; i >= start && result.length < normalCount; i--) {
+    const reversedWord = array[i].split("").reverse().join("");
+    if (!reversedWord.endsWith(" " + clearWord)) {
+      result.push(reversedWord);
+    }
+  }
+  if (index === -1) {
+    result.push(array[closest].split("").reverse().join(""));
+  }
+  for (let i = closest + 1; i < end && result.length < normalCount * 2; i++) {
+    const reversedWord = array[i].split("").reverse().join("");
+    if (!reversedWord.endsWith(" " + clearWord)) {
+      result.push(reversedWord);
+    }
+  }
+  return result;
+}
+
+// eslint-disable-next-line qwik/loader-location
+export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
+  const sharedMap = loadSharedMap(e);
+  const word = sharedMap.query.noNumPlusParenAccL;
+  if (DEV_DISABLED.rhyme)
+    return buildRhymeAPIError(e, word, "Rhyme is disabled");
+  // If there is data in cache, return it
+  {
+    const cache = loadCache(e, "rhyme");
+    if (cache) return setSharedMapResult(e, "rhyme", cache);
+  } /////////////////////////////
+
+  const result = getWords(words, word, 20);
+
   const data: RhymePackage = {
     word,
     version: RHYME_VERSION,
@@ -85,33 +121,21 @@ export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
     items: [],
   };
   // if the word is not found, return an empty array
-  if (closest === -1)
+  if (result === null)
     return setSharedMapResult(e, "rhyme", {
       ...data,
       serverDefinedError: NO_RESULT,
     });
-
+  const more =
+    getWords(large, word, 50)?.filter(
+      // filter so that not in the result
+      (w) => !result.includes(w),
+    ) ?? undefined;
   // find -10 and +10 words from the index
-  const normalCount = 20;
-  const maxCount = 40;
-  const start = Math.max(0, closest - maxCount);
-  const end = Math.min(words.length, closest + maxCount);
-  const fromStart = words
-    .slice(start, closest)
-    .map((w) => w.split("").reverse().join(""))
-    .reverse()
-    .filter((w) => !w.endsWith(" " + clearWord))
-    .slice(-normalCount);
-  const fromEnd = words
-    .slice(closest + 1, end)
-    .map((w) => w.split("").reverse().join(""))
-    .filter((w) => !w.endsWith(" " + clearWord))
-    .slice(0, normalCount);
-  if (index === -1)
-    fromEnd.unshift(words[closest].split("").reverse().join(""));
-  const rhymingWords = fromEnd.concat(fromStart);
+
   return setSharedMapResult(e, "rhyme", {
     ...data,
-    items: rhymingWords,
+    items: result,
+    more,
   });
 });

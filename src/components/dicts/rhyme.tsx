@@ -14,7 +14,8 @@ export const RhymeView = component$<{
         </>
       ) : (
         <>
-          <WordLinks words={data.value.items} />
+          <p class="result-title-took">500.000'den fazla kelime arasında</p>
+          <WordLinks words={data.value.items} more={data.value.more} />
         </>
       )}
     </>
