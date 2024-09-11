@@ -81,21 +81,32 @@ function getWords(
   const end = Math.min(array.length, closest + maxCount);
 
   const result: string[] = [];
-  for (let i = closest - 1; i >= start && result.length < normalCount; i--) {
+
+  // Collect words after the closest index
+  for (let i = closest + 1; i < end && result.length < normalCount; i++) {
     const reversedWord = array[i].split("").reverse().join("");
     if (!reversedWord.endsWith(" " + clearWord)) {
       result.push(reversedWord);
     }
   }
+
+  // If the exact word was not found, add the closest word
   if (index === -1) {
     result.push(array[closest].split("").reverse().join(""));
   }
-  for (let i = closest + 1; i < end && result.length < normalCount * 2; i++) {
+
+  // Collect words before the closest index
+  for (
+    let i = closest - 1;
+    i >= start && result.length < normalCount * 2;
+    i--
+  ) {
     const reversedWord = array[i].split("").reverse().join("");
     if (!reversedWord.endsWith(" " + clearWord)) {
       result.push(reversedWord);
     }
   }
+
   return result;
 }
 
