@@ -318,7 +318,7 @@ export default component$(() => {
 
 export const head: DocumentHead = ({ params }) => {
   return {
-    title: `${params.query} - Enes Sözlük 📕`,
+    title: `"${params.query}" ne demek?`,
     meta: [
       {
         name: "description",
