@@ -15,3 +15,9 @@ A convenient web tool for Turkish speakers that combines multiple dictionaries.
 
 [enessozluk.pages.dev](https://enessozluk.pages.dev/)
 ![Havra Kelimesi](./github/havra.png)
+
+## Static Site Generator (Node.js)
+
+```shell
+bun build.server
+```
