@@ -6,10 +6,11 @@ import {
   useContext,
   useSignal,
   useStyles$,
+  useVisibleTask$,
 } from "@builder.io/qwik";
-import { routeLoader$ } from "@builder.io/qwik-city";
-import { z } from "zod";
+import { routeLoader$, useLocation } from "@builder.io/qwik-city";
 import { LuChevronRight } from "@qwikest/icons/lucide";
+import { z } from "zod";
 import styles from "~/styles/collapsable.css?inline";
 
 function loadCollapsable(
@@ -58,6 +59,14 @@ export const Collapsable = component$<
   useStyles$(styles);
   const defaultClosed = useSignal(_defaultClosed ?? false);
   const collapsed = useContext(CollapsableCTX);
+  const loc = useLocation();
+  // eslint-disable-next-line qwik/no-use-visible-task
+  useVisibleTask$(({ track }) => {
+    track(() => loc.isNavigating);
+    // update defaultClosed when navigating
+    console.log("NAVIGATING", defaultClosed.value, _defaultClosed);
+    defaultClosed.value = _defaultClosed ?? false;
+  });
   return (
     <div {...props} class="collapsable">
       <div class="flex items-start gap-1">
