@@ -22,6 +22,7 @@ export function clearAccent(str: string): string {
     Û: "U",
     ê: "e",
     Ê: "E",
+    "'": "",
   } as Record<string, string>;
   for (const accent in accents) {
     str = str.replace(new RegExp(accent, "g"), accents[accent]);
