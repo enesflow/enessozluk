@@ -23,6 +23,10 @@ export default component$(() => {
             <strong>Yeni özellikler:</strong>
             <ul>
               <li>
+                <i class="opacity-50">14 Eylül 2024 </i>
+                🪪 <Link href="/search/Enes">Nişanyan Adlar</Link>
+              </li>
+              <li>
                 <i class="opacity-50">25 Ağu 2024 </i>
                 📖 <Link href="/search/kubbealtı">Kubbealtı</Link> Lugatı
               </li>
