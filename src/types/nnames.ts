@@ -37,7 +37,8 @@ export const NNameSchema = z.object({
         isCompound: z.boolean(),
         isCertain: z.boolean(),
       })
-      .optional(),
+      .optional()
+      .nullable(),
   }),
   definition: z.string(),
   note: z.string(),
