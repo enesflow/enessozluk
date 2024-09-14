@@ -131,26 +131,26 @@ const Results = component$<{
       {sort.map((name) => {
         const dict = dictionaries[name];
         const data = dict.loader();
+        const isFailed = dict.isFailed(data.value as any);
         return (
           <Collapsable
             data-version={data.value.version}
             id={name}
             cId={name}
-            defaultClosed={dict.isFailed(data.value as any)}
+            defaultClosed={isFailed}
             key={name}
           >
             <h1 class="results-heading" q:slot="header">
-              <HeaderIcon
-                show={data.value.perf.cached}
-                failed={dict.isFailed(data.value as any)}
-              />{" "}
+              <HeaderIcon show={data.value.perf.cached} failed={isFailed} />{" "}
               {dict.readable} Sonuçları:{" "}
               {name !== "benzer" && name !== "rhyme" && (
                 <ExternalLink href={metaData[name]} />
               )}
-              {name === "benzer" && (data.value as any).length === 1 && (
-                <ExternalLink href={(data.value as any)[0]} />
-              )}
+              {name === "benzer" &&
+                "words" in data.value &&
+                data.value.words?.length === 1 && (
+                  <ExternalLink href={metaData.benzer[0]} />
+                )}
             </h1>
             {/* @ts-expect-error */}
             <dict.view data={dict.requiresSignal ? data : data.value} />
