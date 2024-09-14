@@ -29,6 +29,7 @@ export const useCollapsableLoader = routeLoader$<
   return loadCollapsable(cookie);
 });
 
+// TODO REMOVE THIS UNNECESSARY THING AND MAKE IT DYNAMIC
 export const collapsableStoreSchema = z.object({
   tdk: z.boolean(),
   nisanyan: z.boolean(),
@@ -36,6 +37,7 @@ export const collapsableStoreSchema = z.object({
   kubbealti: z.boolean(),
   benzer: z.boolean(),
   rhyme: z.boolean(),
+  nnames: z.boolean(),
 });
 
 export type CollapsableStore = z.infer<typeof collapsableStoreSchema>;
@@ -48,6 +50,7 @@ export const DEFAULT_COLLAPSABLE: CollapsableStore = {
   kubbealti: false,
   benzer: false,
   rhyme: false,
+  nnames: false,
 };
 
 export const Collapsable = component$<

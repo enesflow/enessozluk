@@ -58,6 +58,11 @@ export const NISANYAN_ABBREVIATIONS = {
   Sogd: "Soğdca",
   Fen: "Fenike dili",
   Osm: "Osmanlıca",
+  YOsm: "Yeni Osmanlıca",
+  OYun: "Orta Yunanca",
+  Az: "Azerice",
+  Tkm: "Türkmence",
+  Çuv: "Çuvaşça",
 } as const; // TODO: Complete the list
 const NISANYAN_LINK_REGEX = /%l/g;
 const NISANYAN_NEWLINE_DET_REGEX = /(?:● |• )/g;
@@ -68,7 +73,7 @@ function convertDate(date: string): string {
   }
   return date;
 }
-function formatSpecialChars(str: string): string {
+export function formatSpecialChars(str: string): string {
   // Handle nested tags by processing them in stages
   const stages = [
     { pattern: /%i(\S+)/g, replacement: "<i>$1</i>" }, // Italic
@@ -91,9 +96,12 @@ function formatSpecialChars(str: string): string {
   return str;
 }
 
-function replaceAbbrevations(str: string, data: NisanyanResponse): string {
+export function replaceAbbrevations(
+  str: string,
+  data?: NisanyanResponse,
+): string {
   const languages: Record<string, string> = NISANYAN_ABBREVIATIONS;
-  for (const word of data.words ?? []) {
+  for (const word of data?.words ?? []) {
     if (!word.etymologies) continue;
     for (const etymology of word.etymologies) {
       for (const language of etymology.languages) {

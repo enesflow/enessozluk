@@ -18,6 +18,10 @@ export const NISANYAN_AFFIX_URL =
   "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 export const NISANYAN_AFFIX_USER_URL =
   "https://www.nisanyansozluk.com/ek/" as const;
+export const NISANYAN_NAMES_URL =
+  "https://www.nisanyanadlar.com/api/names/" as const;
+export const NISANYAN_NAMES_USER_URL =
+  "https://www.nisanyanadlar.com/isim/" as const;
 export const BENZER_URL = "https://www.benzerkelimeler.com/kelime/" as const;
 export const BENZER_USER_URL = BENZER_URL;
 export const BENZER_ADVANCED_URL = "https://www.benzerkelimeler.com/" as const;
@@ -163,5 +167,29 @@ export const buildKubbealtiUrl = (
   return {
     api: baseBuilder(KUBBEALTI_URL, query, lowercase) + append,
     user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase) + append,
+  };
+};
+export const buildNisanyanNamesUrl = (
+  e: RequestEventBase | string,
+  lowercase = true,
+) => {
+  const word = encodeURIComponent(
+    typeof e === "string"
+      ? e
+      : lowercase
+        ? loadSharedMap(e).query.noNumPlusParenAccL
+        : loadSharedMap(e).query.noNumPlusParenAcc,
+  );
+
+  let s = "";
+  if (typeof e === "string") {
+    s = word + `?session=${generateUUID()}`;
+  } else {
+    const session = e.sharedMap.get("sessionUUID") as string;
+    s = word + `?session=${session}`;
+  }
+  return {
+    api: baseBuilder(NISANYAN_NAMES_URL, s, lowercase, false),
+    user: baseBuilder(NISANYAN_NAMES_USER_URL, word, lowercase, false),
   };
 };

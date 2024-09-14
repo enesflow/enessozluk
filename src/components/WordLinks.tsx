@@ -69,7 +69,8 @@ const ShowMoreOrLess = component$<{ showMore: Signal<boolean> }>(
 export const WordLinks = component$<{
   words: Word[] | string[] | undefined;
   more?: Word[] | string[] | undefined;
-}>(({ words, more }) => {
+  joinWith?: string;
+}>(({ words, more, joinWith }) => {
   const showMore = useSignal(false);
   return (
     <>
@@ -77,7 +78,7 @@ export const WordLinks = component$<{
       words?.map((word, index) => (
         <span key={toKey(word)} class="result-description">
           <WordLink word={word} />
-          {index < words.length - 1 && ", "}
+          {index < words.length - 1 && (joinWith ?? ", ")}
         </span>
       ))}
 
@@ -90,7 +91,7 @@ export const WordLinks = component$<{
               {more.map((word, index) => (
                 <span key={toKey(word)} class="result-description">
                   <WordLink word={word} />
-                  {index < more.length - 1 && ", "}
+                  {index < more.length - 1 && (joinWith ?? ", ")}
                 </span>
               ))}
             </>

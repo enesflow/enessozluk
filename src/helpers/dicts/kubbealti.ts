@@ -8,6 +8,7 @@ import {
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
+import { isDev } from "@builder.io/qwik/build";
 import { load } from "cheerio";
 import { NISANYAN_ABBREVIATIONS } from "~/components/dicts/nisanyan";
 import type {
@@ -24,8 +25,6 @@ import { debugAPI } from "../log";
 import { perf } from "../time";
 import { to } from "../to";
 import { buildKubbealtiUrl } from "./url";
-import { isDev } from "@builder.io/qwik/build";
-import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 
 // DONT DELETE THIS YET
 // https://eski.lugatim.com/rest/word-search/merhaba
@@ -302,9 +301,10 @@ export const kubbealtiLoader = server$(async function (
 
 // eslint-disable-next-line qwik/loader-location
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
-  if (isDev && DEV_DISABLED.kubbealti)
-    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
+  // if (isDev && DEV_DISABLED.kubbealti)
   // qwik errors on build.server when I uncomment the if statement above
-  // if (isDev) return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
+  if (isDev)
+    // return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
+    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
   return kubbealtiLoader.call(e);
 });

@@ -42,6 +42,9 @@ import type { Dict, DictsArray } from "./dicts";
 import { HeaderIcon } from "./headericon";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
+import { useNNamesLoader } from "~/helpers/dicts/nnames";
+import { NNAMES_VERSION } from "~/types/nnames";
+import { isNNamesFailed, NNamesView } from "~/components/dicts/nnames";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -53,6 +56,7 @@ export {
   useRhymeLoader,
   useTDKLoader,
   useMetaDataLoader,
+  useNNamesLoader,
 };
 
 export const dictionaries = {
@@ -104,6 +108,14 @@ export const dictionaries = {
     readable: "Kâfiyeli Kelimeler",
     requiresSignal: true,
   },
+  nnames: {
+    loader: useNNamesLoader,
+    version: NNAMES_VERSION,
+    view: NNamesView,
+    isFailed: isNNamesFailed,
+    readable: "Nişanyan Adlar",
+    requiresSignal: false,
+  },
 } as const satisfies Record<Exclude<Dicts, "nisanyan-affix">, Dict>;
 
 function formatTime(ms: number) {
@@ -118,6 +130,7 @@ const Results = component$<{
   metaData: SearchPageData;
 }>(({ metaData }) => {
   const sort: DictsArray = [
+    "nnames",
     "tdk",
     "nisanyan",
     "kubbealti",
@@ -129,7 +142,12 @@ const Results = component$<{
   const datas = Object.fromEntries(
     sort.map((name) => {
       const dict = dictionaries[name];
-      return [name, dict.loader()];
+      // TODO: WTF IS THIS?
+      const loader = name === "kubbealti" ? useKubbealtiLoader : dict.loader;
+      if (!(loader as any)) {
+        throw new Error(`Loader not found for ${name}`);
+      }
+      return [name, loader()];
     }),
   );
 

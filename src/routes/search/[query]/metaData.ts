@@ -19,6 +19,8 @@ import {
   getNisanyanRecommendations,
   isNisanyanFailed,
 } from "~/components/dicts/nisanyan";
+import { useNNamesLoader } from "~/helpers/dicts/nnames";
+import { isNNamesFailed } from "~/components/dicts/nnames";
 export type SearchPageData = {
   tdk: string;
   nisanyan: string;
@@ -26,6 +28,8 @@ export type SearchPageData = {
   benzer: string[];
   kubbealti: string;
   rhyme: string;
+  nnames: string;
+  // -------------------
   took: number;
   allFailed: boolean;
   recommendations?: string[];
@@ -41,6 +45,7 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
   const benzer = await e.resolveValue(useBenzerLoader);
   const kubbealti = await e.resolveValue(useKubbealtiLoader);
   const rhyme = await e.resolveValue(useRhymeLoader);
+  const nnames = await e.resolveValue(useNNamesLoader);
   console.log({
     "cache took": sharedMap.cacheTook,
     tdk: tdk.perf,
@@ -68,6 +73,7 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
       : benzer.words.map((w) => w.url),
     kubbealti: kubbealti.url,
     rhyme: "#",
+    nnames: nnames.url,
     took:
       sharedMap.cacheTook +
       Math.max(
@@ -77,13 +83,15 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
         benzer.perf.took,
         kubbealti.perf.took,
         rhyme.perf.took,
+        nnames.perf.took,
       ),
     allFailed:
       isTDKFailed(tdk) &&
       isNisanyanFailed(nisanyan) &&
       isLuggatFailed(luggat) &&
       isBenzerFailed(benzer) &&
-      isKubbealtiFailed(kubbealti),
+      isKubbealtiFailed(kubbealti) &&
+      isNNamesFailed(nnames),
     //rhyme never fails
     recommendations: recommendations.length ? recommendations : undefined,
   };
