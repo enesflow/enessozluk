@@ -171,6 +171,24 @@ const Icon = component$<{ show: boolean; failed: boolean }>(
   },
 );
 
+const loaders = {
+  tdk: useTDKLoader,
+  nisanyan: useNisanyanLoader,
+  luggat: useLuggatLoader,
+  benzer: useBenzerLoader,
+  kubbealti: useKubbealtiLoader,
+  rhyme: useRhymeLoader,
+} as const;
+
+const readableDicts = {
+  tdk: "TDK",
+  nisanyan: "Nişanyan Sözlük",
+  luggat: "Luggat",
+  benzer: "Benzer Kelimeler",
+  kubbealti: "Kubbealtı Lugatı",
+  rhyme: "Kâfiyeli Kelimeler",
+} as const;
+
 export default component$(() => {
   useStyles$(styles);
   useStyles$(tookStyles);
@@ -181,13 +199,16 @@ export default component$(() => {
       : DEFAULT_COLLAPSABLE,
   );
   useContextProvider(CollapsableCTX, collapsed);
+  // Load all the data
+  const tdk = loaders.tdk();
+  const nisanyan = loaders.nisanyan();
+  const luggat = loaders.luggat();
+  const benzer = loaders.benzer();
+  const kubbealti = loaders.kubbealti();
+  const rhyme = loaders.rhyme();
+  // ---
+
   const loc = useLocation();
-  const tdk = useTDKLoader();
-  const nisanyan = useNisanyanLoader();
-  const luggat = useLuggatLoader();
-  const benzer = useBenzerLoader();
-  const kubbealti = useKubbealtiLoader();
-  const rhyme = useRhymeLoader();
   const data = useDataLoader();
   return (
     <>
@@ -225,7 +246,8 @@ export default component$(() => {
                 show={tdk.value.perf.cached}
                 failed={isTDKFailed(tdk.value)}
               />{" "}
-              TDK Sonuçları: <ExternalLink href={data.value.tdk} />
+              {readableDicts.tdk} Sonuçları:{" "}
+              <ExternalLink href={data.value.tdk} />
             </h1>
             <TDKView data={tdk.value} />
           </Collapsable>
@@ -240,7 +262,7 @@ export default component$(() => {
                 show={nisanyan.value.perf.cached}
                 failed={isNisanyanFailed(nisanyan.value)}
               />{" "}
-              Nişanyan Sözlük Sonuçları:{" "}
+              {readableDicts.nisanyan} Sonuçları:{" "}
               <ExternalLink href={data.value.nisanyan} />
             </h1>
             <NisanyanView data={nisanyan.value} />
@@ -256,7 +278,7 @@ export default component$(() => {
                 show={kubbealti.value.perf.cached}
                 failed={isKubbealtiFailed(kubbealti.value)}
               />{" "}
-              Kubbealtı Lugatı Sonuçları:{" "}
+              {readableDicts.kubbealti} Sonuçları:{" "}
               <ExternalLink href={data.value.kubbealti} />
             </h1>
             <KubbealtiView data={kubbealti} />
@@ -276,7 +298,8 @@ export default component$(() => {
                 show={luggat.value.perf.cached}
                 failed={isLuggatFailed(luggat.value)}
               />{" "}
-              Luggat Sonuçları: <ExternalLink href={data.value.luggat} />
+              {readableDicts.luggat} Sonuçları:{" "}
+              <ExternalLink href={data.value.luggat} />
             </h1>
             <LuggatView data={luggat.value} />
           </Collapsable>
@@ -291,7 +314,7 @@ export default component$(() => {
                 show={benzer.value.perf.cached}
                 failed={isBenzerFailed(benzer.value)}
               />{" "}
-              Benzer Kelimeler Sonuçları:{" "}
+              {readableDicts.benzer} Sonuçları:{" "}
               {data.value.benzer.length === 1 && (
                 <ExternalLink href={data.value.benzer[0]} />
               )}
@@ -305,8 +328,8 @@ export default component$(() => {
             defaultClosed={data.value.allFailed}
           >
             <h1 class="results-heading" q:slot="header">
-              <Icon show={rhyme.value.perf.cached} failed={false} /> Kâfiyeli
-              Kelimeler:{" "}
+              <Icon show={rhyme.value.perf.cached} failed={false} />{" "}
+              {readableDicts.rhyme}:{" "}
             </h1>
             <RhymeView data={rhyme} />
           </Collapsable>
@@ -318,11 +341,13 @@ export default component$(() => {
 
 export const head: DocumentHead = ({ params }) => {
   return {
-    title: `"${params.query}" ne demek?`,
+    title: `"${params.query}" ne demek? ${Object.keys(loaders).length} kaynaktan sonuçlar.`,
     meta: [
       {
         name: "description",
-        content: `Enes Sözlük'te ${params.query} araması için sonuçlar.`,
+        content: `${Object.values(readableDicts).join(
+          ", ",
+        )} sözlüklerinde ${params.query} araması için sonuçlar.`,
       },
     ],
   };
