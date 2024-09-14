@@ -125,14 +125,16 @@ export const NNamesView = component$<{
                     </>
                   )}
                 </li>
-                {result.note && (
-                  <li
-                    class="result-subitem mt-2"
-                    dangerouslySetInnerHTML={replaceAbbrevations(
-                      formatSpecialChars(result.note),
-                    )}
-                  ></li>
-                )}
+                {result.note &&
+                  replaceAbbrevations(formatSpecialChars(result.note))
+                    .split(" * ")
+                    .map((note, index) => (
+                      <li
+                        class="result-subitem mt-2"
+                        key={index}
+                        dangerouslySetInnerHTML={note}
+                      />
+                    ))}
               </section>
               {!!result.variants.length && (
                 <section class="result-section">
