@@ -4,13 +4,7 @@ import {
   useStore,
   useStyles$,
 } from "@builder.io/qwik";
-import {
-  routeLoader$,
-  useLocation,
-  type DocumentHead,
-} from "@builder.io/qwik-city";
-import { isDev } from "@builder.io/qwik/build";
-import { LuCheckCircle2, LuXCircle } from "@qwikest/icons/lucide";
+import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import type { CollapsableStore } from "~/components/collapsable";
 import {
   Collapsable,
@@ -18,14 +12,12 @@ import {
   DEFAULT_COLLAPSABLE,
   useCollapsableLoader,
 } from "~/components/collapsable";
+import { BenzerView } from "~/components/dicts/benzer";
 import { isKubbealtiFailed, KubbealtiView } from "~/components/dicts/kubbealti";
 import { isLuggatFailed, LuggatView } from "~/components/dicts/luggat";
+import { NisanyanView } from "~/components/dicts/nisanyan";
 import { RhymeView } from "~/components/dicts/rhyme";
-import {
-  getTDKRecommendations,
-  isTDKFailed,
-  TDKView,
-} from "~/components/dicts/tdk";
+import { isTDKFailed, TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
 import { SearchBar } from "~/components/search";
 import { WordLinks } from "~/components/WordLinks";
@@ -35,20 +27,21 @@ import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useRhymeLoader } from "~/helpers/dicts/rhyme";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
-import { loadSharedMap } from "~/helpers/request";
 import styles from "~/styles/search.css?inline";
 import tookStyles from "~/styles/took.css?inline";
+import { BENZER_VERSION } from "~/types/benzer";
 import type { Dicts } from "~/types/dicts";
-import {
-  BenzerView,
-  getBenzerRecommendations,
-  isBenzerFailed,
-} from "../../../components/dicts/benzer";
-import {
-  getNisanyanRecommendations,
-  isNisanyanFailed,
-  NisanyanView,
-} from "../../../components/dicts/nisanyan";
+import { KUBBEALTI_VERSION } from "~/types/kubbealti";
+import { LUGGAT_VERSION } from "~/types/luggat";
+import { NISANYAN_VERSION } from "~/types/nisanyan";
+import { RHYME_VERSION } from "~/types/rhyme";
+import { TDK_VERSION } from "~/types/tdk";
+import { isBenzerFailed } from "../../../components/dicts/benzer";
+import { isNisanyanFailed } from "../../../components/dicts/nisanyan";
+import type { Dict, DictsArray } from "./dicts";
+import { HeaderIcon } from "./headericon";
+import type { SearchPageData } from "./metaData";
+import { useMetaDataLoader } from "./metaData";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -59,93 +52,59 @@ export {
   useNisanyanLoader,
   useRhymeLoader,
   useTDKLoader,
+  useMetaDataLoader,
 };
 
-type SearchPageData = {
-  tdk: string;
-  nisanyan: string;
-  luggat: string;
-  benzer: string[];
-  kubbealti: string;
-  rhyme: true;
-  took: number;
-  allFailed: boolean;
-  recommendations?: string[];
-};
-
-export const DEV_DISABLED: Record<Dicts, boolean> = {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  tdk: true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  nisanyan: true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  luggat: true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  benzer: true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  kubbealti: true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  "nisanyan-affix": true && isDev,
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  rhyme: false && isDev,
-} as const;
-
-export const useDataLoader = routeLoader$<SearchPageData>(async (e) => {
-  // const s = new Date().getTime();
-  const sharedMap = loadSharedMap(e);
-  const tdk = await e.resolveValue(useTDKLoader);
-  const nisanyan = await e.resolveValue(useNisanyanLoader);
-  const luggat = await e.resolveValue(useLuggatLoader);
-  const benzer = await e.resolveValue(useBenzerLoader);
-  const kubbealti = await e.resolveValue(useKubbealtiLoader);
-  const rhyme = await e.resolveValue(useRhymeLoader);
-  console.log({
-    "cache took": sharedMap.cacheTook,
-    tdk: tdk.perf,
-    nisanyan: nisanyan.perf,
-    luggat: luggat.perf,
-    benzer: benzer.perf,
-    kubbealti: kubbealti.perf,
-    rhyme: rhyme.perf,
-  });
-  const recommendations = Array.from(
-    new Set([
-      ...(isTDKFailed(tdk) ? getTDKRecommendations(tdk) : []),
-      ...(isNisanyanFailed(nisanyan)
-        ? getNisanyanRecommendations(nisanyan)
-        : []),
-      ...(isBenzerFailed(benzer) ? getBenzerRecommendations(benzer) : []),
-    ]),
-  );
-  return {
-    tdk: tdk.url,
-    nisanyan: nisanyan.url,
-    luggat: luggat.url,
-    benzer: benzer.isUnsuccessful
-      ? [benzer.url]
-      : benzer.words.map((w) => w.url),
-    kubbealti: kubbealti.url,
-    rhyme: true,
-    took:
-      sharedMap.cacheTook +
-      Math.max(
-        tdk.perf.took,
-        nisanyan.perf.took,
-        luggat.perf.took,
-        benzer.perf.took,
-        kubbealti.perf.took,
-        rhyme.perf.took,
-      ),
-    allFailed:
-      isTDKFailed(tdk) &&
-      isNisanyanFailed(nisanyan) &&
-      isLuggatFailed(luggat) &&
-      isBenzerFailed(benzer) &&
-      isKubbealtiFailed(kubbealti),
-    //rhyme never fails
-    recommendations: recommendations.length ? recommendations : undefined,
-  };
-});
+export const dictionaries = {
+  tdk: {
+    loader: useTDKLoader,
+    version: TDK_VERSION,
+    view: TDKView,
+    isFailed: isTDKFailed,
+    readable: "TDK",
+    requiresSignal: false,
+  },
+  nisanyan: {
+    loader: useNisanyanLoader,
+    version: NISANYAN_VERSION,
+    view: NisanyanView,
+    isFailed: isNisanyanFailed,
+    readable: "Nişanyan Sözlük",
+    requiresSignal: false,
+  },
+  luggat: {
+    loader: useLuggatLoader,
+    version: LUGGAT_VERSION,
+    view: LuggatView,
+    isFailed: isLuggatFailed,
+    readable: "Luggat",
+    requiresSignal: false,
+  },
+  benzer: {
+    loader: useBenzerLoader,
+    version: BENZER_VERSION,
+    view: BenzerView,
+    isFailed: isBenzerFailed,
+    readable: "Benzer Kelimeler",
+    requiresSignal: true,
+  },
+  kubbealti: {
+    loader: useKubbealtiLoader,
+    version: KUBBEALTI_VERSION,
+    view: KubbealtiView,
+    isFailed: isKubbealtiFailed,
+    readable: "Kubbealtı Lugatı",
+    requiresSignal: true,
+  },
+  rhyme: {
+    loader: useRhymeLoader,
+    version: RHYME_VERSION,
+    view: RhymeView,
+    isFailed: () => false,
+    readable: "Kâfiyeli Kelimeler",
+    requiresSignal: true,
+  },
+} as const satisfies Record<Exclude<Dicts, "nisanyan-affix">, Dict>;
 
 function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
@@ -155,39 +114,52 @@ function getGoogleQuery(query: string) {
   return `${query} ne demek?`;
 }
 
-const Icon = component$<{ show: boolean; failed: boolean }>(
-  ({ show, failed }) => {
-    return (
-      <>
-        {failed ? (
-          <>
-            <LuXCircle class="mb-0.5 inline w-auto text-red-500" />
-          </>
-        ) : (
-          <>{show && <LuCheckCircle2 class="mb-0.5 inline w-auto" />}</>
-        )}
-      </>
-    );
-  },
-);
+const Results = component$<{
+  metaData: SearchPageData;
+}>(({ metaData }) => {
+  const sort: DictsArray = [
+    "tdk",
+    "nisanyan",
+    "luggat",
+    "benzer",
+    "kubbealti",
+    "rhyme",
+  ];
 
-const loaders = {
-  tdk: useTDKLoader,
-  nisanyan: useNisanyanLoader,
-  luggat: useLuggatLoader,
-  benzer: useBenzerLoader,
-  kubbealti: useKubbealtiLoader,
-  rhyme: useRhymeLoader,
-} as const;
-
-const readableDicts = {
-  tdk: "TDK",
-  nisanyan: "Nişanyan Sözlük",
-  luggat: "Luggat",
-  benzer: "Benzer Kelimeler",
-  kubbealti: "Kubbealtı Lugatı",
-  rhyme: "Kâfiyeli Kelimeler",
-} as const;
+  return (
+    <>
+      {sort.map((name) => {
+        const dict = dictionaries[name];
+        const data = dict.loader();
+        return (
+          <Collapsable
+            data-version={data.value.version}
+            id={name}
+            cId={name}
+            defaultClosed={dict.isFailed(data.value as any)}
+            key={name}
+          >
+            <h1 class="results-heading" q:slot="header">
+              <HeaderIcon
+                show={data.value.perf.cached}
+                failed={dict.isFailed(data.value as any)}
+              />{" "}
+              {dict.readable} Sonuçları:{" "}
+              {name !== "benzer" && name !== "rhyme" && (
+                <ExternalLink href={metaData[name]} />
+              )}
+              {name === "benzer" && (data.value as any).length === 1 && (
+                <ExternalLink href={(data.value as any)[0]} />
+              )}
+            </h1>
+            {/* @ts-expect-error */}
+            <dict.view data={dict.requiresSignal ? data : data.value} />
+          </Collapsable>
+        );
+      })}
+    </>
+  );
+});
 
 export default component$(() => {
   useStyles$(styles);
@@ -199,17 +171,8 @@ export default component$(() => {
       : DEFAULT_COLLAPSABLE,
   );
   useContextProvider(CollapsableCTX, collapsed);
-  // Load all the data
-  const tdk = loaders.tdk();
-  const nisanyan = loaders.nisanyan();
-  const luggat = loaders.luggat();
-  const benzer = loaders.benzer();
-  const kubbealti = loaders.kubbealti();
-  const rhyme = loaders.rhyme();
-  // ---
-
   const loc = useLocation();
-  const data = useDataLoader();
+  const data = useMetaDataLoader();
   return (
     <>
       <div class="results-container">
@@ -235,104 +198,7 @@ export default component$(() => {
           </div>
         )}
         <div class="relative">
-          <Collapsable
-            data-version={tdk.value.version}
-            id="tdk"
-            cId="tdk"
-            defaultClosed={isTDKFailed(tdk.value)}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <Icon
-                show={tdk.value.perf.cached}
-                failed={isTDKFailed(tdk.value)}
-              />{" "}
-              {readableDicts.tdk} Sonuçları:{" "}
-              <ExternalLink href={data.value.tdk} />
-            </h1>
-            <TDKView data={tdk.value} />
-          </Collapsable>
-          <Collapsable
-            data-version={nisanyan.value.version}
-            id="nisanyan"
-            cId="nisanyan"
-            defaultClosed={isNisanyanFailed(nisanyan.value)}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <Icon
-                show={nisanyan.value.perf.cached}
-                failed={isNisanyanFailed(nisanyan.value)}
-              />{" "}
-              {readableDicts.nisanyan} Sonuçları:{" "}
-              <ExternalLink href={data.value.nisanyan} />
-            </h1>
-            <NisanyanView data={nisanyan.value} />
-          </Collapsable>
-          <Collapsable
-            data-version={kubbealti.value.version}
-            id="kubbealti"
-            cId="kubbealti"
-            defaultClosed={isKubbealtiFailed(kubbealti.value)}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <Icon
-                show={kubbealti.value.perf.cached}
-                failed={isKubbealtiFailed(kubbealti.value)}
-              />{" "}
-              {readableDicts.kubbealti} Sonuçları:{" "}
-              <ExternalLink href={data.value.kubbealti} />
-            </h1>
-            <KubbealtiView data={kubbealti} />
-          </Collapsable>
-          <Collapsable
-            data-version={luggat.value.version}
-            id="luggat"
-            cId="luggat"
-            defaultClosed={isLuggatFailed(luggat.value)}
-          >
-            <h1
-              class="results-heading"
-              q:slot="header"
-              data-version={luggat.value.version}
-            >
-              <Icon
-                show={luggat.value.perf.cached}
-                failed={isLuggatFailed(luggat.value)}
-              />{" "}
-              {readableDicts.luggat} Sonuçları:{" "}
-              <ExternalLink href={data.value.luggat} />
-            </h1>
-            <LuggatView data={luggat.value} />
-          </Collapsable>
-          <Collapsable
-            data-version={benzer.value.version}
-            id="benzer"
-            cId="benzer"
-            defaultClosed={isBenzerFailed(benzer.value)}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <Icon
-                show={benzer.value.perf.cached}
-                failed={isBenzerFailed(benzer.value)}
-              />{" "}
-              {readableDicts.benzer} Sonuçları:{" "}
-              {data.value.benzer.length === 1 && (
-                <ExternalLink href={data.value.benzer[0]} />
-              )}
-            </h1>
-            <BenzerView data={benzer} />
-          </Collapsable>
-          <Collapsable
-            data-version={rhyme.value.version}
-            id="rhyme"
-            cId="rhyme"
-            defaultClosed={data.value.allFailed}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <Icon show={rhyme.value.perf.cached} failed={false} />{" "}
-              {readableDicts.rhyme}:{" "}
-            </h1>
-            <RhymeView data={rhyme} />
-          </Collapsable>
+          <Results metaData={data.value} />
         </div>
       </div>
     </>
@@ -341,13 +207,13 @@ export default component$(() => {
 
 export const head: DocumentHead = ({ params }) => {
   return {
-    title: `"${params.query}" ne demek? ${Object.keys(loaders).length} kaynaktan sonuçlar.`,
+    title: `"${params.query}" ne demek? ${Object.keys(dictionaries).length} kaynaktan sonuçlar.`,
     meta: [
       {
         name: "description",
-        content: `${Object.values(readableDicts).join(
-          ", ",
-        )} sözlüklerinde ${params.query} araması için sonuçlar.`,
+        content: `${Object.values(dictionaries)
+          .map((d) => d.readable)
+          .join(", ")} sözlüklerinde ${params.query} araması için sonuçlar.`,
       },
     ],
   };

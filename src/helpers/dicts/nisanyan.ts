@@ -29,7 +29,7 @@ import { to } from "../to";
 import { buildNisanyanAffixUrl, buildNisanyanUrl } from "./url";
 import { flattenVerb } from "../redirect";
 import { perf } from "../time";
-import { DEV_DISABLED } from "~/routes/search/[query]";
+import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 
 function isWord(query: string): boolean {
   return !(query.startsWith("+") || removeNumbersInWord(query).endsWith("+"));

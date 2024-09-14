@@ -52,7 +52,7 @@ export const DEFAULT_COLLAPSABLE: CollapsableStore = {
 export const Collapsable = component$<
   QwikIntrinsicElements["div"] & {
     cId: keyof CollapsableStore;
-    defaultClosed?: boolean;
+    defaultClosed?: boolean | never;
   }
 >(({ cId, defaultClosed: _defaultClosed, ...props }) => {
   useStyles$(styles);

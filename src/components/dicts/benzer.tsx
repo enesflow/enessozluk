@@ -114,7 +114,13 @@ function makeBold(text: string) {
 export function isBenzerFailed(
   data: BenzerPackage,
 ): data is BenzerResponseError {
-  return data.isUnsuccessful;
+  try {
+    return data.isUnsuccessful;
+  } catch (e) {
+    console.log("DATA PASSED TO isBenzerFailed", data);
+    // throw e;
+    return false;
+  }
 }
 
 export function getBenzerRecommendations(data: BenzerResponseError): string[] {

@@ -23,7 +23,7 @@ import {
 } from "~/types/luggat";
 import { unq } from "../array";
 import { perf } from "../time";
-import { DEV_DISABLED } from "~/routes/search/[query]";
+import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 
 function buildLuggatAPIError(
   e: RequestEventBase,

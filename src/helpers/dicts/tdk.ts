@@ -16,7 +16,7 @@ import {
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$ } from "@builder.io/qwik-city";
-import { DEV_DISABLED } from "~/routes/search/[query]";
+import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 import { debugAPI } from "../log";
 import { perf } from "../time";
 import { to } from "../to";

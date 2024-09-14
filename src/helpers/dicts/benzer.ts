@@ -27,7 +27,7 @@ import {
 } from "~/types/benzer";
 import { nonNullable } from "../filter";
 import { perf } from "../time";
-import { DEV_DISABLED } from "~/routes/search/[query]";
+import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 //import { unq } from "../array";
 
 export const CAPTCHA_PATH =
