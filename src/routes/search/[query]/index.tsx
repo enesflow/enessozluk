@@ -120,9 +120,9 @@ const Results = component$<{
   const sort: DictsArray = [
     "tdk",
     "nisanyan",
+    "kubbealti",
     "luggat",
     "benzer",
-    "kubbealti",
     "rhyme",
   ];
 
