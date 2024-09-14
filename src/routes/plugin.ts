@@ -17,7 +17,7 @@ export function clearAccent(str: string): string {
     â: "a",
     Â: "A",
     î: "i",
-    Î: "I",
+    Î: "İ",
     û: "u",
     Û: "U",
     ê: "e",
