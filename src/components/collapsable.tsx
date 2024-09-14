@@ -6,7 +6,7 @@ import {
   useContext,
   useSignal,
   useStyles$,
-  useVisibleTask$,
+  useTask$,
 } from "@builder.io/qwik";
 import { routeLoader$, useLocation } from "@builder.io/qwik-city";
 import { LuChevronRight } from "@qwikest/icons/lucide";
@@ -61,11 +61,12 @@ export const Collapsable = component$<
   const collapsed = useContext(CollapsableCTX);
   const loc = useLocation();
   // eslint-disable-next-line qwik/no-use-visible-task
-  useVisibleTask$(({ track }) => {
+  useTask$(({ track }) => {
     track(() => loc.isNavigating);
-    // update defaultClosed when navigating
+    /* // update defaultClosed when navigating
     console.log("NAVIGATING", defaultClosed.value, _defaultClosed);
-    defaultClosed.value = _defaultClosed ?? false;
+    defaultClosed.value = _defaultClosed ?? false; */
+    if (!loc.isNavigating) defaultClosed.value = _defaultClosed ?? false;
   });
   return (
     <div {...props} class="collapsable">
