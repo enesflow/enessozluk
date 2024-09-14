@@ -1,5 +1,9 @@
 // this type takes in a {key: string} sort of thing and for each key, it adds L to the end
 // example:
+
+import { routeLoader$ } from "@builder.io/qwik-city";
+import { loadSharedMap } from "~/helpers/request";
+
 // {nice: string, okay: string} -> {nice: string, niceL: string okay: string, okayL: string}
 export type AddL<T> = {
   [K in keyof T]: T[K];
@@ -15,6 +19,7 @@ export type QueryType = {
   noNumPlusParen: string;
   noNumPlusParenAcc: string;
 };
+export type QueryTypeL = AddL<QueryType>;
 
 export type SharedMap = {
   query: AddL<QueryType>;
@@ -43,3 +48,9 @@ export type SharedMap = {
   startTime: number;
   cacheTook: number;
 };
+
+// eslint-disable-next-line qwik/loader-location
+export const useQueryLoader = routeLoader$<QueryTypeL>((e) => {
+  const sharedMap = loadSharedMap(e);
+  return sharedMap.query;
+});

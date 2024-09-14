@@ -4,16 +4,42 @@ import { useLocation } from "@builder.io/qwik-city";
 import { getKubbealtiPage, kubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { KUBBEALTI_TTS_URL } from "~/helpers/dicts/url";
 import { convertToRoman } from "~/helpers/roman";
-import type { KubbealtiError, KubbealtiPackage } from "~/types/kubbealti";
-import { Play } from "../play";
+import { clearAccent } from "~/routes/plugin";
 import styles from "~/styles/kubbealti.css?inline";
 import tookStyles from "~/styles/took.css?inline";
+import type { KubbealtiError, KubbealtiPackage } from "~/types/kubbealti";
+import type { QueryTypeL } from "~/types/request";
+import { useQueryLoader } from "~/types/request";
+import { Play } from "../play";
+import { WordLink } from "../WordLinks";
 
 export function isKubbealtiFailed(
   data: KubbealtiPackage,
 ): data is KubbealtiError {
   return "serverDefinedReason" in data;
 }
+
+const KubbealtiTitle = component$<{
+  title: string;
+  query: Signal<QueryTypeL>;
+}>(({ title, query }) => {
+  return (
+    <span>
+      {title.split(" – ").map((part, index) => (
+        <span key={index}>
+          {index !== 0 && " - "}
+          {/* if the clearedAccent part is not equal to query, make it a wordlink */}
+          {clearAccent(part.toLocaleLowerCase("tr")) ===
+          query.value.noNumPlusParenAccL ? (
+            part
+          ) : (
+            <WordLink word={part} />
+          )}
+        </span>
+      ))}
+    </span>
+  );
+});
 
 export const KubbealtiView = component$<{
   data: Signal<KubbealtiPackage>;
@@ -22,6 +48,7 @@ export const KubbealtiView = component$<{
   useStyles$(tookStyles);
   const loc = useLocation();
   const kubbealtiPage = useSignal(getKubbealtiPage(loc.url));
+  const query = useQueryLoader();
   return (
     <>
       {isKubbealtiFailed(data.value) ? (
@@ -40,7 +67,7 @@ export const KubbealtiView = component$<{
                   {data.value.content[kubbealtiPage.value]?.length === 1
                     ? "•"
                     : `(${convertToRoman(index + 1)})`}{" "}
-                  {result.kelime}{" "}
+                  <KubbealtiTitle title={result.kelime} query={query} />{" "}
                   <Play id={result.id.toString()} base={KUBBEALTI_TTS_URL} />
                 </h2>
                 <ul class="results-list">

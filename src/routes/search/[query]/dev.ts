@@ -6,7 +6,7 @@ function withDev(bool: boolean): boolean {
 }
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
-  nnames: withDev(false),
+  nnames: withDev(true),
   tdk: withDev(true),
   nisanyan: withDev(true),
   luggat: withDev(true),

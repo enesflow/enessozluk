@@ -45,6 +45,7 @@ import { useMetaDataLoader } from "./metaData";
 import { useNNamesLoader } from "~/helpers/dicts/nnames";
 import { NNAMES_VERSION } from "~/types/nnames";
 import { isNNamesFailed, NNamesView } from "~/components/dicts/nnames";
+import { useQueryLoader } from "~/types/request";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -57,6 +58,7 @@ export {
   useTDKLoader,
   useMetaDataLoader,
   useNNamesLoader,
+  useQueryLoader,
 };
 
 export const dictionaries = {
