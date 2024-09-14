@@ -218,7 +218,7 @@ function cleanseNisanyanAffixResponse(
     const keys = Object.keys(data);
     let result = [] as any;
     for (const key of keys) {
-      if (key.toLocaleLowerCase().endsWith("words")) {
+      if (key.toLocaleLowerCase("tr").endsWith("words")) {
         result = result.concat(data[key]);
       }
     }

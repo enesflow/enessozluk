@@ -198,7 +198,7 @@ const cleanseKubbealtiResponse = (
           !next.children().is("a")
         ) {
           next.replaceWith(
-            `<a href="/search/${next.text().toLocaleLowerCase()}">${next.html()}</a>`,
+            `<a href="/search/${next.text().toLocaleLowerCase("tr")}">${next.html()}</a>`,
           );
         }
         elem.text("Bakınız: ");
