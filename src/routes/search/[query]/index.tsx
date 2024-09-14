@@ -131,7 +131,7 @@ const Results = component$<{
       {sort.map((name) => {
         const dict = dictionaries[name];
         const data = dict.loader();
-        const isFailed = dict.isFailed(data.value as any);
+        const isFailed = dict.isFailed(data.value as any) || metaData.allFailed;
         return (
           <Collapsable
             data-version={data.value.version}
