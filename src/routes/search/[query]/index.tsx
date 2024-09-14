@@ -100,7 +100,7 @@ export const dictionaries = {
     loader: useRhymeLoader,
     version: RHYME_VERSION,
     view: RhymeView,
-    isFailed: () => false,
+    isFailed: () => false, // metaData.allFailed can be used
     readable: "Kâfiyeli Kelimeler",
     requiresSignal: true,
   },
@@ -126,37 +126,53 @@ const Results = component$<{
     "rhyme",
   ];
 
+  const datas = Object.fromEntries(
+    sort.map((name) => {
+      const dict = dictionaries[name];
+      return [name, dict.loader()];
+    }),
+  );
+
   return (
     <>
-      {sort.map((name) => {
-        const dict = dictionaries[name];
-        const data = dict.loader();
-        const isFailed = dict.isFailed(data.value as any) || metaData.allFailed;
-        return (
-          <Collapsable
-            data-version={data.value.version}
-            id={name}
-            cId={name}
-            defaultClosed={isFailed}
-            key={name}
-          >
-            <h1 class="results-heading" q:slot="header">
-              <HeaderIcon show={data.value.perf.cached} failed={isFailed} />{" "}
-              {dict.readable} Sonuçları:{" "}
-              {name !== "benzer" && name !== "rhyme" && (
-                <ExternalLink href={metaData[name]} />
-              )}
-              {name === "benzer" &&
-                "words" in data.value &&
-                data.value.words?.length === 1 && (
-                  <ExternalLink href={metaData.benzer[0]} />
+      {sort
+        // sort by isFailed is false
+        .sort((a, b) => {
+          const aFailed = dictionaries[a].isFailed(datas[a].value as any);
+          const bFailed = dictionaries[b].isFailed(datas[b].value as any);
+          if (aFailed && !bFailed) return 1;
+          if (!aFailed && bFailed) return -1;
+          return 0;
+        })
+        .map((name) => {
+          const dict = dictionaries[name];
+          const data = datas[name];
+          const isFailed = dict.isFailed(data.value as any);
+          return (
+            <Collapsable
+              data-version={data.value.version}
+              id={name}
+              cId={name}
+              defaultClosed={isFailed}
+              key={name}
+            >
+              <h1 class="results-heading" q:slot="header">
+                <HeaderIcon show={data.value.perf.cached} failed={isFailed} />{" "}
+                {dict.readable} Sonuçları:{" "}
+                {name !== "benzer" && name !== "rhyme" && (
+                  <ExternalLink href={metaData[name]} />
                 )}
-            </h1>
-            {/* @ts-expect-error */}
-            <dict.view data={dict.requiresSignal ? data : data.value} />
-          </Collapsable>
-        );
-      })}
+                {name === "benzer" &&
+                  "words" in data.value &&
+                  data.value.words?.length === 1 && (
+                    <ExternalLink href={metaData.benzer[0]} />
+                  )}
+              </h1>
+              {/* @ts-expect-error */}
+              <dict.view data={dict.requiresSignal ? data : data.value} />
+            </Collapsable>
+          );
+        })}
     </>
   );
 });
