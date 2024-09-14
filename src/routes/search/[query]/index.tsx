@@ -130,11 +130,11 @@ const Results = component$<{
   metaData: SearchPageData;
 }>(({ metaData }) => {
   const sort: DictsArray = [
-    "nnames",
     "tdk",
     "nisanyan",
     "kubbealti",
     "luggat",
+    "nnames",
     "benzer",
     "rhyme",
   ];
