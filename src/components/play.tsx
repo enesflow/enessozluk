@@ -8,14 +8,13 @@ export const Play = component$<{ base: string; id: string | null | undefined }>(
       <button
         onClick$={() => {
           if (playing.value) return;
-          const audioElement = audio.value;
-          if (audioElement) {
+          if (audio.value) {
             playing.value = true;
-            audioElement.currentTime = 0;
-            audioElement.play();
+            audio.value.currentTime = 0;
+            audio.value.play();
             setTimeout(
               () => (playing.value = false),
-              (audioElement.duration + SPEAKER_DELAY) * 1000,
+              (audio.value.duration + SPEAKER_DELAY) * 1000,
             );
           }
         }}
