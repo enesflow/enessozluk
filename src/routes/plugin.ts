@@ -94,7 +94,7 @@ export function getQuery(query: string): SharedMap["query"] {
   }
   const rawDecoded = decodeURIComponent(query).trim(); // Decode the url encoded string
   const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
-  const noNumEtc = noNum.replace(/[-+]/g, ""); // Remove - and +
+  const noNumEtc = noNum.replace(/[+]/g, "").replace(/-$/, "");
   const noNumEtcParen = noNumEtc.includes(" ")
     ? noNumEtc
     : noNumEtc.replace(/[()]/g, ""); // Remove ()

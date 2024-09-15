@@ -1,4 +1,4 @@
-import { removeNumbersAtEnd } from "#helpers/string";
+import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
 import type { Signal } from "@builder.io/qwik";
 import { component$, useSignal } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
@@ -33,9 +33,13 @@ export const WordLink = component$<{ word: Word | string }>(({ word }) => {
   return (
     <>
       <LinkR
-        href={`/search/${cleanWordFromRom(removeNumbersAtEnd(toKey(word)))}`}
+        href={`/search/${cleanWordFromRom(removeNumbersInWord(toKey(word)))}`}
       >
-        {flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(toKey(word)))}
+        {flattenVerb(
+          removeNumbersInWord(
+            putTheNumbersAtTheEndAsRomanToTheBeginning(toKey(word)),
+          ),
+        )}
       </LinkR>
       {typeof word !== "string" && word.recursive && (
         <>
