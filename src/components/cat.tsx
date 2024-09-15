@@ -3,10 +3,10 @@ import ImgCatup from "~/../public/images/catup.png?jsx";
 export const CatLookingUp = component$(() => {
   return (
     <div>
-      <div class="pb-96" />
+      <div class="pb-72 sm:pb-96"></div>
       <ImgCatup
         alt="catup"
-        class="absolute -bottom-4 left-0 h-96 w-auto shadow-lg dark:brightness-75"
+        class="absolute -bottom-4 left-0 h-72 w-auto shadow-lg dark:brightness-75 sm:h-96"
       />
     </div>
   );
