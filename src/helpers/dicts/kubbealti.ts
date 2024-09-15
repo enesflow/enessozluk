@@ -8,7 +8,6 @@ import {
 } from "#helpers/request";
 import type { RequestEventBase } from "@builder.io/qwik-city";
 import { routeLoader$, server$ } from "@builder.io/qwik-city";
-import { isDev } from "@builder.io/qwik/build";
 import { load } from "cheerio";
 import { NISANYAN_ABBREVIATIONS } from "~/components/dicts/nisanyan";
 import type {
