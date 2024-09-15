@@ -1,3 +1,4 @@
+import ImgCatup from "/public/images/catup.png?jsx";
 import {
   component$,
   useContextProvider,
@@ -210,7 +211,9 @@ export default component$(() => {
   const loc = useLocation();
   const data = useMetaDataLoader();
   return (
-    <>
+    <div class="relative min-h-[calc(100vh-3rem)]">
+      {" "}
+      {/* 1rem is for mt-4 for .results-container, 1rem is for p-4 for body */}
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
         <div class="result-title-took text-center">
@@ -236,8 +239,12 @@ export default component$(() => {
         <div class="relative">
           <Results metaData={data.value} />
         </div>
+        <div>
+          <div class="pb-96" />
+          <ImgCatup alt="catup" class="absolute -bottom-4 left-0 h-96 w-auto" />
+        </div>
       </div>
-    </>
+    </div>
   );
 });
 

@@ -11,11 +11,12 @@
   font-family: "Atkinson Hyperlegible";
   font-style: normal;
   font-weight: 400;
-  src: url("../public/fonts/AtkinsonHyperlegible-Regular.ttf") format("truetype");
+  src: url("../public/fonts/AtkinsonHyperlegible-Regular.ttf")
+    format("truetype");
 }
 
 body {
-  @apply selection:bg-red-500 selection:text-white;
+  @apply p-4 selection:bg-red-500 selection:text-white;
 }
 
 html {
@@ -82,10 +83,6 @@ html {
 
 li {
   @apply list-none;
-}
-
-body {
-  @apply p-4;
 }
 
 select {
