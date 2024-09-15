@@ -30,7 +30,10 @@ export function clearAccent(str: string): string {
     Ê: "E",
     // ē: "e",
     // Ē: "E",
+    // 1st type of quote
     "'": "",
+    // 2nd type of quote
+    "’": "",
   } as Record<string, string>;
   for (const accent in accents) {
     str = str.replace(new RegExp(accent, "g"), accents[accent]);
