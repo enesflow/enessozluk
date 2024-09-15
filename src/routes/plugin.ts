@@ -74,7 +74,7 @@ function filterForJson(obj: any): any {
 
 export function fullyCleanWord(word: string): string {
   // remove numbers, +, (, ), and accent characters and flatten verb
-  return flattenVerbclearAccent(
+  return flattenVerb(clearAccent(
     word
       .trim()
       .toLocaleLowerCase("tr")
