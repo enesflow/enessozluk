@@ -16,12 +16,20 @@ export function clearAccent(str: string): string {
   const accents = {
     â: "a",
     Â: "A",
+    ā: "a",
+    Ā: "A",
     î: "i",
     Î: "İ",
+    ī: "ı",
+    Ī: "I",
     û: "u",
     Û: "U",
+    ū: "u",
+    Ū: "U",
     ê: "e",
     Ê: "E",
+    // ē: "e",
+    // Ē: "E",
     "'": "",
   } as Record<string, string>;
   for (const accent in accents) {
