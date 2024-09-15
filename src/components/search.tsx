@@ -42,7 +42,7 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
   );
   return (
     <div class="relative">
-      <div ref={placeholderRef} class=" my-4 h-10 w-full"></div>
+      <div ref={placeholderRef} class="my-4 h-10 w-full"></div>
       <form
         preventdefault:submit
         onSubmit$={() => {

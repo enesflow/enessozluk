@@ -6,12 +6,12 @@ function withDev(bool: boolean): boolean {
 }
 
 export const DEV_DISABLED: Record<Dicts, boolean> = {
-  nnames: withDev(false),
-  tdk: withDev(false),
-  nisanyan: withDev(false),
-  luggat: withDev(false),
-  benzer: withDev(false),
-  kubbealti: withDev(false),
-  "nisanyan-affix": withDev(false),
-  rhyme: withDev(false),
+  nnames: withDev(true),
+  tdk: withDev(true),
+  nisanyan: withDev(true),
+  luggat: withDev(true),
+  benzer: withDev(true),
+  kubbealti: withDev(true),
+  "nisanyan-affix": withDev(true),
+  rhyme: withDev(true),
 } as const;

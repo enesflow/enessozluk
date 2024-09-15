@@ -57,8 +57,9 @@ export const Collapsable = component$<
   QwikIntrinsicElements["div"] & {
     cId: keyof CollapsableStore;
     defaultClosed?: boolean | never;
+    lessOpacity?: boolean;
   }
->(({ cId, defaultClosed: _defaultClosed, ...props }) => {
+>(({ cId, defaultClosed: _defaultClosed, lessOpacity, ...props }) => {
   useStyles$(styles);
   const defaultClosed = useSignal(_defaultClosed ?? false);
   const collapsed = useContext(CollapsableCTX);
@@ -72,7 +73,10 @@ export const Collapsable = component$<
     if (!loc.isNavigating) defaultClosed.value = _defaultClosed ?? false;
   });
   return (
-    <div {...props} class="collapsable">
+    <div
+      {...props}
+      class={`collapsable ${lessOpacity && !(!collapsed[cId] && !defaultClosed.value) ? "opacity-50" : ""}`}
+    >
       <div class="flex items-start gap-1">
         <button
           onClick$={() => {

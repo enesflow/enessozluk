@@ -30,6 +30,7 @@ import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
 import { useNNamesLoader } from "~/helpers/dicts/nnames";
 import { useRhymeLoader } from "~/helpers/dicts/rhyme";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
+import { flattenVerb } from "~/helpers/redirect";
 import styles from "~/styles/search.css?inline";
 import tookStyles from "~/styles/took.css?inline";
 import { BENZER_VERSION } from "~/types/benzer";
@@ -44,10 +45,8 @@ import { TDK_VERSION } from "~/types/tdk";
 import { isBenzerFailed } from "../../../components/dicts/benzer";
 import { isNisanyanFailed } from "../../../components/dicts/nisanyan";
 import type { Dict, DictsArray } from "./dicts";
-import { HeaderIcon } from "./headericon";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
-import { flattenVerb } from "~/helpers/redirect";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -173,22 +172,24 @@ const Results = component$<{
           return (
             <Collapsable
               data-version={data.value.version}
+              data-cached={data.value.perf.cached}
               id={name}
               cId={name}
               defaultClosed={isFailed}
               key={name}
+              lessOpacity={isFailed}
             >
               <h1 class="results-heading" q:slot="header">
-                <HeaderIcon show={data.value.perf.cached} failed={isFailed} />{" "}
-                {dict.readable} Sonuçları:{" "}
+                {/* <HeaderIcon show={data.value.perf.cached} failed={isFailed} />{" "} */}
                 {name !== "benzer" && name !== "rhyme" && (
                   <ExternalLink href={metaData[name]} />
                 )}
                 {name === "benzer" &&
-                  "words" in data.value /*  &&
-                  data.value.words?.length === 1 */ && (
+                  (("words" in data.value && data.value.words?.length === 1) ||
+                    isFailed) && (
                     <ExternalLink href={metaData.benzer[0]} />
-                  )}
+                  )}{" "}
+                {dict.readable} Sonuçları:
               </h1>
               {/* @ts-expect-error */}
               <dict.view data={dict.requiresSignal ? data : data.value} />
