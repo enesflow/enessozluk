@@ -13,7 +13,7 @@ export const Footer = component$(() => {
         <LuMail class="icon" />
         İletişim
       </Link>
-      <Link href="https://github.com/enesflow/enessozluk" class="shadow-2xl">
+      <Link href="https://github.com/enesflow/" class="shadow-2xl">
         <SiGithub class="icon" />
         Github
       </Link>
