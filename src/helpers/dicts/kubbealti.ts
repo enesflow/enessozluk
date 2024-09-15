@@ -303,8 +303,8 @@ export const kubbealtiLoader = server$(async function (
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
   // if (isDev && DEV_DISABLED.kubbealti)
   // qwik errors on build.server when I uncomment the if statement above
-  if (isDev)
+  /* if (isDev)
     // return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
-    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
+    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled"); */
   return kubbealtiLoader.call(e);
 });
