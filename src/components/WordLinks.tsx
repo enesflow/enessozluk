@@ -1,4 +1,4 @@
-import { removeNumbersAtEnd, removeNumbersInWord } from "#helpers/string";
+import { removeNumbersInWord } from "#helpers/string";
 import type { Signal } from "@builder.io/qwik";
 import { component$, useSignal } from "@builder.io/qwik";
 import { Link } from "@builder.io/qwik-city";
