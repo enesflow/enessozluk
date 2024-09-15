@@ -8,7 +8,6 @@ import { sha256 } from "~/helpers/sha256";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isDev } from "@builder.io/qwik/build";
 import { getKubbealtiPage } from "~/helpers/dicts/kubbealti";
-import { flattenVerb } from "#helpers/redirect";
 
 const CACHE_DISABLED = /* false */ isDev as boolean;
 
@@ -74,7 +73,7 @@ function filterForJson(obj: any): any {
 
 export function fullyCleanWord(word: string): string {
   // remove numbers, +, (, ), and accent characters and flatten verb
-  return flattenVerb(clearAccent(
+  return (clearAccent(
     word
       .trim()
       .toLocaleLowerCase("tr")
@@ -93,7 +92,7 @@ export function getQuery(query: string): SharedMap["query"] {
     }
     return newObj;
   }
-  const rawDecoded = flattenVerb(decodeURIComponent(query).trim()); // Decode the url encoded string
+  const rawDecoded = (decodeURIComponent(query).trim()); // Decode the url encoded string
   const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
   const noNumPlus = noNum.replace(/[+]/g, ""); // Remove +
   const noNumPlusParen = noNumPlus.includes(" ")
