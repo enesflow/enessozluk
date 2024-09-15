@@ -1,7 +1,7 @@
 .footer {
   @apply absolute left-0 z-10 h-72 w-full;
   /* align content to the bottom right */
-  @apply flex items-end justify-end gap-2 p-4 align-bottom text-xl md:text-2xl;
+  @apply flex items-end justify-end gap-2 p-4 align-bottom text-sm md:text-xl xl:text-2xl;
 }
 
 .obsidian {
