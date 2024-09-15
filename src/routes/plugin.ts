@@ -73,12 +73,12 @@ function filterForJson(obj: any): any {
 
 export function fullyCleanWord(word: string): string {
   // remove numbers, +, (, ), and accent characters and flatten verb
-  return clearAccent(
+  return (clearAccent(
     word
       .trim()
       .toLocaleLowerCase("tr")
       .replace(/[0-9+()]/g, ""),
-  );
+  ));
 }
 
 export function getQuery(query: string): SharedMap["query"] {
@@ -92,7 +92,7 @@ export function getQuery(query: string): SharedMap["query"] {
     }
     return newObj;
   }
-  const rawDecoded = decodeURIComponent(query).trim(); // Decode the url encoded string
+  const rawDecoded = (decodeURIComponent(query).trim()); // Decode the url encoded string
   const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
   const noNumPlus = noNum.replace(/[+]/g, ""); // Remove +
   const noNumPlusParen = noNumPlus.includes(" ")
