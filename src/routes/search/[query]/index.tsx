@@ -4,8 +4,7 @@ import {
   useStore,
   useStyles$,
 } from "@builder.io/qwik";
-import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
-import { CatLookingUp } from "~/components/cat";
+import { Link, useLocation, type DocumentHead } from "@builder.io/qwik-city";
 import type { CollapsableStore } from "~/components/collapsable";
 import {
   Collapsable,
@@ -47,6 +46,7 @@ import { isNisanyanFailed } from "../../../components/dicts/nisanyan";
 import type { Dict, DictsArray } from "./dicts";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
+import { LuArrowLeft } from "@qwikest/icons/lucide";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -213,33 +213,37 @@ export default component$(() => {
   const loc = useLocation();
   const data = useMetaDataLoader();
   return (
-    <div class="cat-parent">
-      <div class="results-container">
-        <h1 class="header">{flattenVerb(loc.params.query)}</h1>
+    <div class="results-container">
+      <div class="flex h-24 flex-col justify-end">
+        <h1 class="header">
+          <Link href="/" class="!bg-transparent !text-white">
+            <LuArrowLeft class="icon" />
+          </Link>
+          {flattenVerb(loc.params.query)}
+        </h1>
         <div class="result-title-took text-center">
           ({formatTime(data.value.took)})
         </div>
-        <SearchBar value={loc.params.query} />
-        {data.value.allFailed && (
-          <p class="result-item">
-            Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
-            <ExternalLink
-              href={`https://www.google.com/search?q=${encodeURIComponent(
-                getGoogleQuery(loc.params.query),
-              )}`}
-            />
-          </p>
-        )}
+      </div>
+      <SearchBar value={loc.params.query} />
+      {data.value.allFailed && (
+        <p class="result-item">
+          Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
+          <ExternalLink
+            href={`https://www.google.com/search?q=${encodeURIComponent(
+              getGoogleQuery(loc.params.query),
+            )}`}
+          />
+        </p>
+      )}
 
-        {data.value.recommendations && (
-          <div class="result-item result-subitem">
-            Öneriler: <WordLinks words={data.value.recommendations} />
-          </div>
-        )}
-        <div class="relative">
-          <Results metaData={data.value} />
+      {data.value.recommendations && (
+        <div class="result-item result-subitem">
+          Öneriler: <WordLinks words={data.value.recommendations} />
         </div>
-        <CatLookingUp />
+      )}
+      <div class="relative">
+        <Results metaData={data.value} />
       </div>
     </div>
   );

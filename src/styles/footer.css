@@ -1,0 +1,18 @@
+.footer {
+  @apply absolute left-0 z-10 h-72 w-full;
+  /* align content to the bottom right */
+  @apply flex items-end justify-end gap-2 p-4 align-bottom text-xl md:text-2xl;
+}
+
+.obsidian {
+  border-radius: 5px;
+  padding: 0 0.1rem;
+  line-height: 1.4rem;
+  text-decoration: none;
+  color: var(--secondary);
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+  color: #2ebd88;
+  background-color: rgba(143, 159, 169, 0.15);
+}

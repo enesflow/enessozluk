@@ -45,7 +45,7 @@ html {
 }
 
 .header {
-  @apply mb-2 text-center text-4xl font-bold;
+  @apply text-center text-4xl font-bold;
 }
 
 .results-list {
@@ -69,7 +69,7 @@ html {
 }
 
 .result-title-description {
-  @apply italic text-gray-700 dark:text-gray-400;
+  @apply italic brightness-75;
 }
 
 .result-subtitle {
@@ -130,4 +130,14 @@ a {
 
 .cat-parent {
   @apply relative min-h-[calc(100vh-3rem)];
+}
+
+.bottom-fix {
+  @apply -bottom-4;
+}
+
+.icon {
+  @apply mr-1 inline-block h-5 w-5;
+  /* center it in line of text */
+  @apply align-middle;
 }

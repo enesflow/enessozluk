@@ -1,24 +1,6 @@
 .new-features-wrapper {
   @apply mb-4 rounded-md border-2 border-red-500 bg-[#fee2e222] px-4 py-2;
 }
-
-.obsidian-wrapper {
-  @apply rounded-md border-2 border-[#6ee7b7] px-4 py-2 dark:border-[#059669];
-  @apply bg-[#6ee7b722] dark:bg-[#05966922];
-}
-
-.obsidian {
-  border-radius: 5px;
-  padding: 0 0.1rem;
-  line-height: 1.4rem;
-  text-decoration: none;
-  color: var(--secondary);
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s;
-  color: #2ebd88;
-  background-color: rgba(143, 159, 169, 0.15);
-}
 /* different color for dark mode */
 @media (prefers-color-scheme: dark) {
   .obsidian {
