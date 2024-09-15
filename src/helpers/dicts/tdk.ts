@@ -114,7 +114,7 @@ export const useTDKLoader = routeLoader$<TDKPackage>(async (e) => {
   /* const [error, response] = await to(fetchAPI(url.api)); */
   const [[error, response], ttsId, recommendations] = await Promise.all([
     to(fetchAPI(url.api)),
-    loadTTSId(sharedMap.query.noNumPlusL),
+    loadTTSId(sharedMap.query.noNumEtcL),
     loadTDKRecommendations(e),
   ]);
   // Returns error if request failed

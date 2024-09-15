@@ -47,6 +47,7 @@ import type { Dict, DictsArray } from "./dicts";
 import { HeaderIcon } from "./headericon";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
+import { flattenVerb } from "~/helpers/redirect";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -184,8 +185,8 @@ const Results = component$<{
                   <ExternalLink href={metaData[name]} />
                 )}
                 {name === "benzer" &&
-                  "words" in data.value &&
-                  data.value.words?.length === 1 && (
+                  "words" in data.value /*  &&
+                  data.value.words?.length === 1 */ && (
                     <ExternalLink href={metaData.benzer[0]} />
                   )}
               </h1>
@@ -213,7 +214,7 @@ export default component$(() => {
   return (
     <div class="cat-parent">
       <div class="results-container">
-        <h1 class="header">{loc.params.query}</h1>
+        <h1 class="header">{flattenVerb(loc.params.query)}</h1>
         <div class="result-title-took text-center">
           ({formatTime(data.value.took)})
         </div>

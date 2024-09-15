@@ -13,6 +13,7 @@ import { joinTurkish } from "~/helpers/parser";
 import { LinkR } from "../linkWithRedirect";
 import { TextWithLinks } from "../textwithlinks";
 import { WordLinks } from "../WordLinks";
+import { flattenVerb } from "~/helpers/redirect";
 
 //const NISANYAN_AFFIX_URL = "https://www.nisanyansozluk.com/api/affixes-1/" as const;
 export const NISANYAN_ABBREVIATIONS = {
@@ -239,9 +240,9 @@ function formatRelation(
 
 function getWordTitle(index: number, length: number, name: string) {
   if (/\d$/.test(name)) {
-    return `${putTheNumbersAtTheEndAsRomanToTheBeginning(name)}`;
+    return `${flattenVerb(putTheNumbersAtTheEndAsRomanToTheBeginning(name))}`;
   } else {
-    return `${romanOptional(index, length)}${removeNumbersInWord(name)}`;
+    return `${romanOptional(index, length)}${flattenVerb(removeNumbersInWord(name))}`;
   }
 }
 function getWordTitleTwoParts(

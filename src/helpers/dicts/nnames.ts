@@ -49,7 +49,7 @@ const cleanseNNamesResponse = (e: RequestEventBase, data: NNamesResponse) => {
 
     if (
       clearAccent(name.name.toLocaleLowerCase("tr")) !==
-      sharedMap.query.noNumPlusParenAccL
+      sharedMap.query.noNumEtcParenAccL
     )
       name.serverDefinedIsMisspellings = true;
   });

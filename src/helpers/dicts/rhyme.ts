@@ -113,7 +113,7 @@ function getWords(
 // eslint-disable-next-line qwik/loader-location
 export const useRhymeLoader = routeLoader$<RhymePackage>(async (e) => {
   const sharedMap = loadSharedMap(e);
-  const word = sharedMap.query.noNumPlusParenAccL;
+  const word = sharedMap.query.noNumEtcParenAccL;
   if (DEV_DISABLED.rhyme)
     return buildRhymeAPIError(e, word, "Rhyme is disabled");
   // If there is data in cache, return it

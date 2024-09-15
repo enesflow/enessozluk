@@ -73,12 +73,12 @@ function filterForJson(obj: any): any {
 
 export function fullyCleanWord(word: string): string {
   // remove numbers, +, (, ), and accent characters and flatten verb
-  return (clearAccent(
+  return clearAccent(
     word
       .trim()
       .toLocaleLowerCase("tr")
       .replace(/[0-9+()]/g, ""),
-  ));
+  );
 }
 
 export function getQuery(query: string): SharedMap["query"] {
@@ -92,20 +92,20 @@ export function getQuery(query: string): SharedMap["query"] {
     }
     return newObj;
   }
-  const rawDecoded = (decodeURIComponent(query).trim()); // Decode the url encoded string
+  const rawDecoded = decodeURIComponent(query).trim(); // Decode the url encoded string
   const noNum = rawDecoded.replace(/[0-9]/g, ""); // Remove numbers
-  const noNumPlus = noNum.replace(/[+]/g, ""); // Remove +
-  const noNumPlusParen = noNumPlus.includes(" ")
-    ? noNumPlus
-    : noNumPlus.replace(/[()]/g, ""); // Remove ()
-  const noNumPlusParenAcc = clearAccent(noNumPlusParen); // Remove accents (â, î, û, ê)
+  const noNumEtc = noNum.replace(/[-+]/g, ""); // Remove - and +
+  const noNumEtcParen = noNumEtc.includes(" ")
+    ? noNumEtc
+    : noNumEtc.replace(/[()]/g, ""); // Remove ()
+  const noNumEtcParenAcc = clearAccent(noNumEtcParen); // Remove accents (â, î, û, ê)
   return addLowercaseKeys({
     raw: query,
     rawDecoded,
     noNum,
-    noNumPlus,
-    noNumPlusParen,
-    noNumPlusParenAcc,
+    noNumEtc,
+    noNumEtcParen,
+    noNumEtcParenAcc,
   });
 }
 

@@ -30,7 +30,7 @@ const KubbealtiTitle = component$<{
           {index !== 0 && " - "}
           {/* if the clearedAccent part is not equal to query, make it a wordlink */}
           {clearAccent(part.toLocaleLowerCase("tr")) ===
-          query.value.noNumPlusParenAccL ? (
+          query.value.noNumEtcParenAccL ? (
             part
           ) : (
             <WordLink word={part} />

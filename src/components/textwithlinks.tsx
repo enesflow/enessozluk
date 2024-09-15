@@ -1,12 +1,14 @@
 import { component$ } from "@builder.io/qwik";
-import { LinkR } from "./linkWithRedirect";
 import { removeNumbersInWord } from "~/helpers/string";
-import { flattenVerb } from "~/helpers/redirect";
+import { WordLink } from "./WordLinks";
 
-function isALetter(word: string | undefined, char: string | undefined): boolean {
+function isALetter(
+  word: string | undefined,
+  char: string | undefined,
+): boolean {
   return !(
+    // a comma
     (
-      // a comma
       char === "," ||
       // a dot
       char === "." ||
@@ -16,8 +18,8 @@ function isALetter(word: string | undefined, char: string | undefined): boolean 
       char === ";" ||
       // a question mark
       char === "?" ||
-      // a closing paren 
-      (char === ")" && !word?.includes("(")) 
+      // a closing paren
+      (char === ")" && !word?.includes("("))
     )
   );
 }
@@ -48,13 +50,14 @@ export const TextWithLinks = component$<{
         return (
           <span key={index}>
             <>
-              <LinkR
+              {/*  <LinkR
                 href={`/search/${!isALetter(word, word[word.length - 1]) ? word.slice(0, -1) : word}`}
               >
                 {flattenVerb(removeNumbersInWord(
                   !isALetter(word, word[word.length - 1]) ? word.slice(0, -1) : word,
                 ))}
-              </LinkR>
+              </LinkR> */}
+              <WordLink word={word} />
               {!isALetter(word, word[word.length - 1]) ? (
                 <>{removeNumbersInWord(word[word.length - 1])}</>
               ) : (

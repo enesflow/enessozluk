@@ -45,8 +45,8 @@ const baseBuilder = (
       base +
       encoder(
         lowercase
-          ? sharedMap.query.noNumPlusParenAccL
-          : sharedMap.query.noNumPlusParenAcc,
+          ? sharedMap.query.noNumEtcParenAccL
+          : sharedMap.query.noNumEtcParenAcc,
       );
   }
   return s;
@@ -87,8 +87,8 @@ export const buildNisanyanUrl = (
     typeof e === "string"
       ? e
       : lowercase
-        ? loadSharedMap(e).query.noNumPlusParenAccL
-        : loadSharedMap(e).query.noNumPlusParenAcc,
+        ? loadSharedMap(e).query.noNumEtcParenAccL
+        : loadSharedMap(e).query.noNumEtcParenAcc,
   );
 
   let s = "";
@@ -139,7 +139,7 @@ export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
   const s =
     typeof e === "string"
       ? clearAccent(e).toLocaleLowerCase("tr")
-      : loadSharedMap(e).query.noNumPlusParenAccL;
+      : loadSharedMap(e).query.noNumEtcParenAccL;
   // replace a, e, i, ı, o, ö, u, ü with _
   const replaced = encodeURIComponent(s.replace(/[aeıioöuü]/g, "_"));
   const url = `${BENZER_ADVANCED_URL}${replaced}-ile-baslayan-${replaced}-ile-biten-kelimeler`;
@@ -161,7 +161,7 @@ export const buildKubbealtiUrl = (
     };
   }
   const sharedMap = loadSharedMap(e);
-  let query = sharedMap.query.noNumPlusParenAccL;
+  let query = sharedMap.query.noNumEtcParenAccL;
   if (query[0] === "–") query = query.slice(1);
   const append = page ? `/${page}` : "";
   return {
@@ -177,8 +177,8 @@ export const buildNisanyanNamesUrl = (
     typeof e === "string"
       ? e
       : lowercase
-        ? loadSharedMap(e).query.noNumPlusParenAccL
-        : loadSharedMap(e).query.noNumPlusParenAcc,
+        ? loadSharedMap(e).query.noNumEtcParenAccL
+        : loadSharedMap(e).query.noNumEtcParenAcc,
   );
 
   let s = "";

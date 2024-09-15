@@ -80,7 +80,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
     }
 > {
   const sharedMap = loadSharedMap(e);
-  const query = sharedMap.query.noNumPlusParenAcc;
+  const query = sharedMap.query.noNumEtcParenAcc;
   if (query.length === 1) {
     return {
       isUnsuccessful: false,
@@ -102,7 +102,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   const $ = load(response.data);
   const captcha = checkCaptcha(
     $,
-    buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
+    buildBenzerUrl(sharedMap.query.noNumEtcParen).user,
     e,
   );
   if (captcha) return captcha;
@@ -114,7 +114,7 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
   if (results.length === 0) {
     return {
       isUnsuccessful: false,
-      words: [sharedMap.query.noNumPlusParenL],
+      words: [sharedMap.query.noNumEtcParenL],
     };
   }
   // find all the li a inside all the ul elements and get their text
@@ -130,12 +130,12 @@ async function getBenzerWordForms(e: RequestEventBase): Promise<
       (word) =>
         word.length === query.length &&
         clearAccent(word.toLocaleLowerCase("tr")) ===
-          sharedMap.query.noNumPlusParenAccL,
+          sharedMap.query.noNumEtcParenAccL,
     )
     .sort((a, b) => a.localeCompare(b, "tr"));
   return {
     isUnsuccessful: false,
-    words: words.length ? words : [sharedMap.query.noNumPlusParenAcc],
+    words: words.length ? words : [sharedMap.query.noNumEtcParenAcc],
   };
 }
 
@@ -335,7 +335,7 @@ const cleanseBenzerResponse = (
     if (isCaptcha) {
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
+        url: buildBenzerUrl(sharedMap.query.noNumEtcParen).user,
         serverDefinedCaptchaError: isCaptcha,
 
         serverDefinedErrorText:
@@ -355,7 +355,7 @@ const cleanseBenzerResponse = (
       const words = Array.from(new Set(w)) as string[];
       return {
         isUnsuccessful: true,
-        url: buildBenzerUrl(sharedMap.query.noNumPlusParen).user,
+        url: buildBenzerUrl(sharedMap.query.noNumEtcParen).user,
         serverDefinedErrorText: NO_RESULT,
         words,
         version: BENZER_VERSION,

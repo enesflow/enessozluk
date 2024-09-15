@@ -134,7 +134,7 @@ async function cleanseNisanyanResponse(
 
   data.words?.forEach((word) => {
     word.name = flattenVerb(word.name);
-    if (fullyCleanWord(word.name) !== sharedMap.query.noNumPlusParenAccL) {
+    if (fullyCleanWord(word.name) !== sharedMap.query.noNumEtcParenAccL) {
       word.serverDefinedTitleDescription = sharedMap.query.rawDecodedL;
       word.serverDefinedIsMisspelling = true;
     }

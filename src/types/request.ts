@@ -15,9 +15,9 @@ export type QueryType = {
   raw: string;
   rawDecoded: string;
   noNum: string;
-  noNumPlus: string;
-  noNumPlusParen: string;
-  noNumPlusParenAcc: string;
+  noNumEtc: string;
+  noNumEtcParen: string;
+  noNumEtcParenAcc: string;
 };
 export type QueryTypeL = AddL<QueryType>;
 
