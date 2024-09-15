@@ -6,7 +6,7 @@ export const CatLookingUp = component$(() => {
       <div class="pb-72 md:pb-96"></div>
       <ImgCatup
         alt="catup"
-        class="absolute -bottom-4 left-0 h-72 w-auto shadow-lg dark:brightness-75 md:h-96"
+        class="absolute -bottom-8 left-0 h-72 w-auto shadow-lg dark:brightness-75 md:h-96"
       />
     </div>
   );
