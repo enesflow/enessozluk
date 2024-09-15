@@ -1,4 +1,3 @@
-import ImgCatup from "/public/images/catup.png?jsx";
 import {
   component$,
   useContextProvider,
@@ -6,6 +5,7 @@ import {
   useStyles$,
 } from "@builder.io/qwik";
 import { useLocation, type DocumentHead } from "@builder.io/qwik-city";
+import { CatLookingUp } from "~/components/cat";
 import type { CollapsableStore } from "~/components/collapsable";
 import {
   Collapsable,
@@ -17,6 +17,7 @@ import { BenzerView } from "~/components/dicts/benzer";
 import { isKubbealtiFailed, KubbealtiView } from "~/components/dicts/kubbealti";
 import { isLuggatFailed, LuggatView } from "~/components/dicts/luggat";
 import { NisanyanView } from "~/components/dicts/nisanyan";
+import { isNNamesFailed, NNamesView } from "~/components/dicts/nnames";
 import { RhymeView } from "~/components/dicts/rhyme";
 import { isTDKFailed, TDKView } from "~/components/dicts/tdk";
 import { ExternalLink } from "~/components/externalLink";
@@ -26,6 +27,7 @@ import { useBenzerLoader } from "~/helpers/dicts/benzer";
 import { useKubbealtiLoader } from "~/helpers/dicts/kubbealti";
 import { useLuggatLoader } from "~/helpers/dicts/luggat";
 import { useNisanyanLoader } from "~/helpers/dicts/nisanyan";
+import { useNNamesLoader } from "~/helpers/dicts/nnames";
 import { useRhymeLoader } from "~/helpers/dicts/rhyme";
 import { useTDKLoader } from "~/helpers/dicts/tdk";
 import styles from "~/styles/search.css?inline";
@@ -35,6 +37,8 @@ import type { Dicts } from "~/types/dicts";
 import { KUBBEALTI_VERSION } from "~/types/kubbealti";
 import { LUGGAT_VERSION } from "~/types/luggat";
 import { NISANYAN_VERSION } from "~/types/nisanyan";
+import { NNAMES_VERSION } from "~/types/nnames";
+import { useQueryLoader } from "~/types/request";
 import { RHYME_VERSION } from "~/types/rhyme";
 import { TDK_VERSION } from "~/types/tdk";
 import { isBenzerFailed } from "../../../components/dicts/benzer";
@@ -43,10 +47,6 @@ import type { Dict, DictsArray } from "./dicts";
 import { HeaderIcon } from "./headericon";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
-import { useNNamesLoader } from "~/helpers/dicts/nnames";
-import { NNAMES_VERSION } from "~/types/nnames";
-import { isNNamesFailed, NNamesView } from "~/components/dicts/nnames";
-import { useQueryLoader } from "~/types/request";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -54,12 +54,12 @@ export {
   useCollapsableLoader,
   useKubbealtiLoader,
   useLuggatLoader,
-  useNisanyanLoader,
-  useRhymeLoader,
-  useTDKLoader,
   useMetaDataLoader,
+  useNisanyanLoader,
   useNNamesLoader,
   useQueryLoader,
+  useRhymeLoader,
+  useTDKLoader,
 };
 
 export const dictionaries = {
@@ -211,9 +211,7 @@ export default component$(() => {
   const loc = useLocation();
   const data = useMetaDataLoader();
   return (
-    <div class="relative min-h-[calc(100vh-3rem)]">
-      {" "}
-      {/* 1rem is for mt-4 for .results-container, 1rem is for p-4 for body */}
+    <div class="cat-parent">
       <div class="results-container">
         <h1 class="header">{loc.params.query}</h1>
         <div class="result-title-took text-center">
@@ -239,10 +237,7 @@ export default component$(() => {
         <div class="relative">
           <Results metaData={data.value} />
         </div>
-        <div>
-          <div class="pb-96" />
-          <ImgCatup alt="catup" class="absolute -bottom-4 left-0 h-96 w-auto" />
-        </div>
+        <CatLookingUp />
       </div>
     </div>
   );

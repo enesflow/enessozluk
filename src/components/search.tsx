@@ -62,7 +62,7 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
           placeholder="Enes Sözlük'te ara..."
           bind:value={query}
           value={value}
-          class="search-input"
+          class="search-input nice-w"
           ref={input}
         />
         <button

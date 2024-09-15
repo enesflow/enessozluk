@@ -21,6 +21,21 @@ body {
 
 html {
   @apply bg-white text-black dark:bg-black dark:text-white;
+  opacity: 1;
+  background-image: radial-gradient(var(--secondary) 0.5px, #fff0 0.5px);
+  background-size: 20px 20px;
+}
+
+@media (prefers-color-scheme: light) {
+  html {
+    --secondary: #fee2e2;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  html {
+    --secondary: #7f1d1d;
+  }
 }
 
 * {
@@ -103,4 +118,16 @@ a {
   transition: color 0.2s;
   @apply text-red-600 dark:text-red-400;
   @apply bg-red-100 dark:bg-red-950;
+}
+
+.nice-w {
+  @apply w-full max-w-md sm:w-11/12 md:w-5/6 lg:w-3/4 xl:w-2/3;
+}
+
+.redish-tinted-background {
+  @apply dark:border-red-400 dark:bg-[#7f1d1d22];
+}
+
+.cat-parent {
+  @apply relative min-h-[calc(100vh-3rem)];
 }
