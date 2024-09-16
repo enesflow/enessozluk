@@ -35,6 +35,7 @@ export type SharedMap = {
     kubbealti?: unknown;
     rhyme?: unknown;
   };
+  cacheLastUpdated?: number;
   result: {
     tdk?: unknown; // at the end of the request, if this is different than the cache, it will be updated
     nisanyan?: unknown;

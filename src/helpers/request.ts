@@ -10,6 +10,7 @@ import { NNamesPackageSchema } from "~/types/nnames";
 import { RhymePackageSchema } from "~/types/rhyme";
 import { TDKPackageSchema } from "~/types/tdk";
 import { debugAPI, debugLog } from "./log";
+import { MAX_CACHE_AGE } from "./db_config";
 
 export const Packages = {
   tdk: TDKPackageSchema,
@@ -103,6 +104,13 @@ export function loadCache<T extends Dicts>(
   dict: T,
 ): z.infer<(typeof Packages)[T]> | null {
   const sharedMap = loadSharedMap(e);
+  if (
+    sharedMap.cacheLastUpdated &&
+    sharedMap.cacheLastUpdated < Date.now() - MAX_CACHE_AGE
+  ) {
+    debugLog("Cache is too old for", dict);
+    return null;
+  }
   const cache = (sharedMap.cache as any)[dict];
   if (cache) {
     const parsed = Packages[dict].safeParse(cache);
