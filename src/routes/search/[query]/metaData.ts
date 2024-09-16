@@ -64,7 +64,7 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
       ...(isBenzerFailed(benzer) ? getBenzerRecommendations(benzer) : []),
     ]),
   );
-  return {
+  const metaData = {
     tdk: tdk.url,
     nisanyan: nisanyan.url,
     luggat: luggat.url,
@@ -95,4 +95,6 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
     //rhyme never fails
     recommendations: recommendations.length ? recommendations : undefined,
   };
+  e.sharedMap.set("metaData", metaData);
+  return metaData;
 });

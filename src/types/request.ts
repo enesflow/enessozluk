@@ -3,6 +3,7 @@
 
 import { routeLoader$ } from "@builder.io/qwik-city";
 import { loadSharedMap } from "~/helpers/request";
+import type { SearchPageData } from "~/routes/search/[query]/metaData";
 
 // {nice: string, okay: string} -> {nice: string, niceL: string okay: string, okayL: string}
 export type AddL<T> = {
@@ -47,6 +48,7 @@ export type SharedMap = {
   };
   startTime: number;
   cacheTook: number;
+  metaData?: SearchPageData;
 };
 
 // eslint-disable-next-line qwik/loader-location

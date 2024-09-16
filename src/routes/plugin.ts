@@ -3,11 +3,18 @@ import { generateUUID } from "#helpers/generateUUID";
 import { getRedirect } from "#helpers/redirect";
 import type { RequestHandler } from "@builder.io/qwik-city";
 import * as compressJSON from "compress-json";
-import { getCacheByKey, setCache, updateCache } from "~/helpers/db";
+import {
+  deleteCache,
+  getCacheByKey,
+  setCache,
+  updateCache,
+} from "~/helpers/db";
 import { sha256 } from "~/helpers/sha256";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isDev } from "@builder.io/qwik/build";
 import { getKubbealtiPage } from "~/helpers/dicts/kubbealti";
+import { CACHE_TOTAL_FAILED } from "~/helpers/db_config";
+import { loadSharedMap } from "~/helpers/request";
 
 const CACHE_DISABLED = /* false */ isDev as boolean;
 
@@ -139,26 +146,36 @@ export const onRequest: RequestHandler = async (e) => {
     throw e.redirect(red.code, red.to);
   }
   await e.next();
-  const result = e.sharedMap.get("data").result;
-  const compressed = JSON.stringify(
-    compressJSON.compress(filterForJson(result)),
-  );
-  // set the caches
-  if (!cache) {
-    console.log("Setting caches for the first time");
-    await setCache(e, {
-      key,
-      data: compressed,
-    });
+
+  // if every dict failed, no bother to cache and fill up the db
+  const sharedMap = loadSharedMap(e);
+
+  if (!CACHE_TOTAL_FAILED && sharedMap.metaData?.allFailed) {
+    // and delete the cache if it exists (to clean up older failed caches)
+    console.log("Not caching because all failed, and deleting cache if exists");
+    await deleteCache(e, key);
   } else {
-    if (cache.hash !== (await sha256(compressed))) {
-      console.log("Updating caches");
-      await updateCache(e, {
+    const result = sharedMap.result;
+    const compressed = JSON.stringify(
+      compressJSON.compress(filterForJson(result)),
+    );
+    // set the caches
+    if (!cache) {
+      console.log("Setting caches for the first time");
+      await setCache(e, {
         key,
         data: compressed,
       });
     } else {
-      console.log("Caches are up-to-date");
+      if (cache.hash !== (await sha256(compressed))) {
+        console.log("Updating caches");
+        await updateCache(e, {
+          key,
+          data: compressed,
+        });
+      } else {
+        console.log("Caches are up-to-date");
+      }
     }
   }
 };
