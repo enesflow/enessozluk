@@ -79,24 +79,41 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
 > {
   process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
   debugLog("Fetching", decodeURI(url));
-  const response = await fetch(url, init);
-  const error = buildError(response);
-  if (error) {
-    // throw error
+  
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+
+  const fetchInit = { ...init, signal: controller.signal };
+
+  try {
+    const response = await fetch(url, fetchInit);
+    clearTimeout(timeoutId);
+
+    const error = buildError(response);
+    if (error) {
+      return {
+        success: false,
+        code: response.status,
+        error,
+        raw: response,
+      };
+    }
+
     return {
-      success: false,
+      success: true,
       code: response.status,
-      error,
+      data: returnType === "json" ? await response.json() : await response.text(),
       raw: response,
     };
+  } catch (error) {
+    clearTimeout(timeoutId);
+    return {
+      success: false,
+      code: 0, // You may want to set a specific code for timeouts
+      error: error instanceof Error ? error : new Error("Unknown error"),
+      raw: null as any, // Adjust this based on your actual Response type handling
+    };
   }
-  /* return returnType === "json" ? res.json() : res.text(); */
-  return {
-    success: true,
-    code: response.status,
-    data: returnType === "json" ? await response.json() : await response.text(),
-    raw: response,
-  };
 }
 
 export function loadCache<T extends Dicts>(

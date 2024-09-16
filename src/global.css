@@ -89,7 +89,7 @@ html {
 }
 
 .results-container {
-  @apply mx-4 mt-4 max-w-7xl sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48;
+  @apply mx-auto mt-4 max-w-7xl sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48;
 }
 
 .error-message {
