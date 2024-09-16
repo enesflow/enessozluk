@@ -30,6 +30,8 @@ import { perf } from "../time";
 import { DEV_DISABLED } from "~/routes/search/[query]/dev";
 //import { unq } from "../array";
 
+const BENZER_DISABLED = true as boolean;
+
 export const CAPTCHA_PATH =
   "body > main > div.page > div > div.page-main > div > div.page-content > div > form > div > span:nth-child(2) > span > button";
 
@@ -380,7 +382,18 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   {
     const cache = loadCache(e, "benzer");
     if (cache) return setSharedMapResult(e, "benzer", cache);
+    // eslint-disable-next-line no-constant-condition
   } /////////////////////////////
+  if (BENZER_DISABLED) {
+    // TEMPORARILY DISABLE BENZER
+    return buildBenzerAPIError(
+      e,
+      buildBenzerUrl(loadSharedMap(e).query.noNumEtcParen).user,
+      "Benzer Kelimeler şu anda kullanılamıyor.",
+    );
+    // --------------------------
+  }
+
   const rec = await getBenzerWordForms(e);
   /* if (!rec.words?.length || !rec.isUnsuccessful) return rec; */
   if (rec.isUnsuccessful) {
