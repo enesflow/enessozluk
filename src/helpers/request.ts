@@ -81,7 +81,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
   debugLog("Fetching", decodeURI(url));
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
+  const timeoutId = setTimeout(() => controller.abort(), 1250); // 1.25 seconds
 
   const fetchInit = { ...init, signal: controller.signal };
 
