@@ -12,7 +12,7 @@
 }
 
 .search-input {
-  @apply h-full rounded-md bg-gray-100 p-2 text-gray-700 outline outline-gray-300 focus:outline-none focus:ring focus:ring-red-500 dark:bg-black dark:text-gray-300 dark:outline-gray-700;
+  @apply h-full w-full rounded-md bg-gray-100 p-2 text-gray-700 outline outline-gray-300 focus:outline-none focus:ring focus:ring-red-500 dark:bg-black dark:text-gray-300 dark:outline-gray-700;
 }
 
 .search-button {
