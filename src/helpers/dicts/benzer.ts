@@ -380,7 +380,7 @@ export const benzerLoader = server$(async function (): Promise<BenzerPackage> {
   const e = this;
   // If there is data in cache, return it
   {
-    const cache = loadCache(e, "benzer");
+    const cache = loadCache(e, "benzer", BENZER_DISABLED);
     if (cache) return setSharedMapResult(e, "benzer", cache);
     // eslint-disable-next-line no-constant-condition
   } /////////////////////////////
