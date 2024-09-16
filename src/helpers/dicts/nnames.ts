@@ -31,13 +31,17 @@ function buildNNamesAPIError(
   title: string,
 ): NNamesError {
   debugAPI(e, `NNames API Error: ${title}`);
-  return withoutCache(e, {
-    url,
-    version: NNAMES_VERSION,
-    perf: perf(e),
-    isSuccessful: false,
-    serverDefinedError: title,
-  });
+  return withoutCache(
+    e,
+    {
+      url,
+      version: NNAMES_VERSION,
+      perf: perf(e),
+      isSuccessful: false,
+      serverDefinedError: title,
+    },
+    "nnames",
+  );
 }
 
 const cleanseNNamesResponse = (e: RequestEventBase, data: NNamesResponse) => {

@@ -31,13 +31,17 @@ function buildLuggatAPIError(
   title: string,
 ): LuggatResponseError {
   debugAPI(e, `Luggat API Error: ${title}`);
-  return withoutCache(e, {
-    url,
-    serverDefinedErrorText: title,
-    isUnsuccessful: true,
-    version: LUGGAT_VERSION,
-    perf: perf(e),
-  });
+  return withoutCache(
+    e,
+    {
+      url,
+      serverDefinedErrorText: title,
+      isUnsuccessful: true,
+      version: LUGGAT_VERSION,
+      perf: perf(e),
+    },
+    "luggat",
+  );
 }
 
 function parseLuggat(

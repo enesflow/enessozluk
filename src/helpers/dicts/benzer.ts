@@ -39,13 +39,17 @@ function buildBenzerAPIError(
   title: string,
 ): BenzerResponseError {
   debugAPI(e, `Benzer API Error: ${title}`);
-  return withoutCache(e, {
-    url,
-    serverDefinedErrorText: title,
-    isUnsuccessful: true,
-    version: BENZER_VERSION,
-    perf: perf(e),
-  });
+  return withoutCache(
+    e,
+    {
+      url,
+      serverDefinedErrorText: title,
+      isUnsuccessful: true,
+      version: BENZER_VERSION,
+      perf: perf(e),
+    },
+    "benzer",
+  );
 }
 
 function checkCaptcha(
@@ -56,14 +60,19 @@ function checkCaptcha(
   const path = CAPTCHA_PATH;
   const isCaptcha = $(path).length;
   if (isCaptcha) {
-    return withoutCache(e, {
-      url,
-      serverDefinedCaptchaError: true,
-      serverDefinedErrorText: "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
-      isUnsuccessful: true,
-      version: BENZER_VERSION,
-      perf: perf(e),
-    });
+    return withoutCache(
+      e,
+      {
+        url,
+        serverDefinedCaptchaError: true,
+        serverDefinedErrorText:
+          "Lütfen yukarıdan robot olmadığınızı doğrulayın.",
+        isUnsuccessful: true,
+        version: BENZER_VERSION,
+        perf: perf(e),
+      },
+      "benzer",
+    );
   }
   return null;
 }

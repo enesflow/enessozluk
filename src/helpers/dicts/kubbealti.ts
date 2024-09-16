@@ -55,15 +55,19 @@ function buildKubbealtiAPIError(
   title: string,
 ): KubbealtiError {
   debugAPI(e, `Kubbealti API Error: ${title}`);
-  return withoutCache(e, {
-    serverDefinedReason: title,
-    // items: [],
-    url,
-    version: KUBBEALTI_VERSION,
-    perf: perf(e),
-    totalPages: 0,
-    content: {},
-  });
+  return withoutCache(
+    e,
+    {
+      serverDefinedReason: title,
+      // items: [],
+      url,
+      version: KUBBEALTI_VERSION,
+      perf: perf(e),
+      totalPages: 0,
+      content: {},
+    },
+    "kubbealti",
+  );
 }
 
 const TAGS = {

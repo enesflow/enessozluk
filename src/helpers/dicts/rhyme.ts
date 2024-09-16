@@ -20,12 +20,16 @@ function buildRhymeAPIError(
   title: string,
 ): RhymeErrorResponse {
   debugAPI(e, `Rhyme API Error: ${title}`);
-  return withoutCache(e, {
-    word,
-    serverDefinedError: title,
-    version: RHYME_VERSION,
-    perf: perf(e),
-  });
+  return withoutCache(
+    e,
+    {
+      word,
+      serverDefinedError: title,
+      version: RHYME_VERSION,
+      perf: perf(e),
+    },
+    "rhyme",
+  );
 }
 
 function clear(word: string): string {

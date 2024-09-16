@@ -42,13 +42,17 @@ function buildTDKAPIError(
   title: string,
 ): TDKResponseError {
   debugAPI(e, `TDK API Error: ${title}`);
-  return withoutCache(e, {
-    url,
-    error: title,
-    recommendations: [],
-    version: TDK_VERSION,
-    perf: perf(e),
-  });
+  return withoutCache(
+    e,
+    {
+      url,
+      error: title,
+      recommendations: [],
+      version: TDK_VERSION,
+      perf: perf(e),
+    },
+    "tdk",
+  );
 }
 
 const cleanseTDKResponse = (data: TDKResponse) => {

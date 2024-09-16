@@ -9,8 +9,8 @@ import { NisanyanWordPackageSchema } from "~/types/nisanyan";
 import { NNamesPackageSchema } from "~/types/nnames";
 import { RhymePackageSchema } from "~/types/rhyme";
 import { TDKPackageSchema } from "~/types/tdk";
-import { debugAPI, debugLog } from "./log";
 import { MAX_CACHE_AGE } from "./db_config";
+import { debugAPI, debugLog } from "./log";
 
 export const Packages = {
   tdk: TDKPackageSchema,
@@ -79,7 +79,7 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
 > {
   process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
   debugLog("Fetching", decodeURI(url));
-  
+
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 seconds timeout
 
@@ -102,7 +102,8 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
     return {
       success: true,
       code: response.status,
-      data: returnType === "json" ? await response.json() : await response.text(),
+      data:
+        returnType === "json" ? await response.json() : await response.text(),
       raw: response,
     };
   } catch (error) {
@@ -119,11 +120,13 @@ export async function fetchAPI<T extends "json" | "html" = "json">(
 export function loadCache<T extends Dicts>(
   e: RequestEventBase,
   dict: T,
+  dismissBeingOld?: boolean,
 ): z.infer<(typeof Packages)[T]> | null {
   const sharedMap = loadSharedMap(e);
   if (
     sharedMap.cacheLastUpdated &&
-    sharedMap.cacheLastUpdated < Date.now() - MAX_CACHE_AGE
+    sharedMap.cacheLastUpdated < Date.now() - MAX_CACHE_AGE &&
+    !dismissBeingOld
   ) {
     debugLog("Cache is too old for", dict);
     return null;
@@ -234,7 +237,12 @@ export function noCache(e: RequestEventBase): void {
   });
 }
 
-export function withoutCache<D>(e: RequestEventBase, d: D): D {
+export function withoutCache<D>(e: RequestEventBase, d: D, cacheKey: Dicts): D {
+  const oldCache = loadCache(e, cacheKey, true);
+  if (oldCache) {
+    debugLog("Using an old cache for", cacheKey);
+    return oldCache as D;
+  }
   noCache(e);
   const isObject = typeof d === "object" && d !== null;
   console.log(
