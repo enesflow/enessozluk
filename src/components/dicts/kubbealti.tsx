@@ -23,7 +23,7 @@ const KubbealtiTitle = component$<{
 }>(({ title, query }) => {
   return (
     <span>
-      {title.split(" – ").map((part, index) => (
+      {title.split(/ – | - | — /).map((part, index) => (
         <span key={index}>
           {index !== 0 && " - "}
           {/* if the clearedAccent part is not equal to query, make it a wordlink */}
