@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { PerformanceSchema } from "./shared";
 
-export const KUBBEALTI_VERSION = "1.0.4" as const;
+export const KUBBEALTI_VERSION = "1.0.5" as const;
 
 export const KubbealtiContentSchema = z.array(
   z.object({
@@ -69,7 +69,7 @@ export const KubbealtiResponseSchema = z.object({
   perf: PerformanceSchema,
   items: z.array(z.object({ number: z.number(), current: z.boolean() })),
   url: z.string(),
-  totalPages: z.number(),
+  // totalPages: z.number(),
   totalElements: z.number(),
   lastPage: z.boolean(),
   // hasPreviousPage: z.boolean(),
@@ -89,7 +89,7 @@ export const KubbealtiErrorSchema = z.object({
   perf: PerformanceSchema,
   // items: z.array(z.unknown()).length(0),
   url: z.string(),
-  totalPages: z.number().optional().default(0),
+  // totalPages: z.number().optional().default(0),
   totalElements: z.number().optional(),
   // lastPage: z.boolean().optional(),
   // hasPreviousPage: z.boolean().optional(),

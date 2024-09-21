@@ -151,7 +151,6 @@ export const buildBenzerAdvancedUrl = (e: RequestEventBase | string) => {
 
 export const buildKubbealtiUrl = (
   e: RequestEventBase | string,
-  page: number | null = null,
   lowercase = false,
 ) => {
   if (typeof e === "string") {
@@ -163,10 +162,9 @@ export const buildKubbealtiUrl = (
   const sharedMap = loadSharedMap(e);
   let query = sharedMap.query.noNumEtcParenAccL;
   if (query[0] === "–") query = query.slice(1);
-  const append = page ? `/${page}` : "";
   return {
-    api: baseBuilder(KUBBEALTI_URL, query, lowercase) + append,
-    user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase) + append,
+    api: baseBuilder(KUBBEALTI_URL, query, lowercase),
+    user: baseBuilder(KUBBEALTI_USER_URL, query, lowercase),
   };
 };
 export const buildNisanyanNamesUrl = (

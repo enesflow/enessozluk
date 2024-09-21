@@ -44,3 +44,6 @@ lerna-debug.log*
 functions/**/*.js
 
 .wrangler
+decompressed.json
+src/playground/data.json
+src/playground/playground.ts

@@ -2,7 +2,6 @@ import { API_FAILED_TEXT, NO_RESULT } from "#helpers/constants";
 import {
   fetchAPI,
   loadCache,
-  loadSharedMap,
   setSharedMapResult,
   withoutCache,
 } from "#helpers/request";
@@ -41,14 +40,6 @@ import { buildKubbealtiUrl } from "./url";
   return data;
 }; */
 
-export function getKubbealtiPage(url: URL): number {
-  const query = url.searchParams;
-  return query.has("kubbealtiPage") &&
-    !Number.isNaN(Number(query.get("kubbealtiPage")))
-    ? parseInt(query.get("kubbealtiPage") as string)
-    : 1;
-}
-
 function buildKubbealtiAPIError(
   e: RequestEventBase,
   url: string,
@@ -63,7 +54,6 @@ function buildKubbealtiAPIError(
       url,
       version: KUBBEALTI_VERSION,
       perf: perf(e),
-      totalPages: 0,
       content: {},
     },
     "kubbealti",
@@ -91,14 +81,18 @@ function cleanAuthor(author: string) {
 
 const cleanseKubbealtiResponse = (
   data: KubbealtiResponse,
-  page: number,
 ): KubbealtiResponse => {
-  if (!(page in data.content)) {
+  if (!(1 in data.content)) {
     throw new Error(
       "SERIOUS ERROR: Kubbealti API response is not in the correct format",
     );
   }
-  for (const item of data.content[page]!) {
+
+  // and make the content array max 5 elements
+  data.content[1] = data.content[1]?.slice(0, 5);
+  data.totalElements = data.content[1]?.length || 0;
+
+  for (const item of data.content[1]!) {
     /* item.anlam = item.anlam
       .replaceAll('href="/s/–', 'href="/s/')
       .replaceAll("href='/s/–", "href='/s/")
@@ -212,95 +206,88 @@ const cleanseKubbealtiResponse = (
   return data;
 };
 
-export const kubbealtiLoader = server$(async function (
-  overridePage?: number,
-): Promise<KubbealtiPackage> {
-  const e = this;
-  // If there is data in cache, return it
-  const sharedMap = loadSharedMap(e);
-  const cache = loadCache(e, "kubbealti");
-  const kubbealtiPage = overridePage || sharedMap.url.kubbealtiPage;
-  if (
-    cache &&
-    ("serverDefinedReason" in cache || kubbealtiPage in cache.content)
-  )
-    return setSharedMapResult(e, "kubbealti", cache);
-  /////////////////////////////
+export const kubbealtiLoader = server$(
+  async function (): Promise<KubbealtiPackage> {
+    const e = this;
+    // If there is data in cache, return it
+    const cache = loadCache(e, "kubbealti");
+    if (cache && "serverDefinedReason" in cache)
+      return setSharedMapResult(e, "kubbealti", cache);
+    /////////////////////////////
 
-  const url = buildKubbealtiUrl(e, kubbealtiPage);
-  const [error, response] = await to(fetchAPI(url.api));
-  // Returns error if request failed
-  if (error || !response?.success) {
-    debugAPI(e, `Kubbealti API Error: ${error?.message || response?.code}`);
-    return buildKubbealtiAPIError(
-      e,
-      url.user,
-      `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
-    );
-  }
-  response.data = {
-    ...(response.data as any),
-    content:
-      "content" in response.data
-        ? {
-            [kubbealtiPage]: response.data.content,
-          }
-        : undefined,
-    url: url.user,
-    version: KUBBEALTI_VERSION,
-    perf: perf(e),
-  } satisfies KubbealtiResponse;
-  const parsed = KubbealtiResponseSchema.safeParse(response.data);
-  // Error handling
-  {
-    // Returns recommendations if the response is an error or has no results
-    const error = KubbealtiErrorSchema.safeParse(response.data);
-    if (error.success) {
-      const data: KubbealtiError = {
-        serverDefinedReason: NO_RESULT,
-        // items: error.data.items,
-        url: url.user,
-        version: KUBBEALTI_VERSION,
-        perf: perf(e),
-        totalPages: 0,
-        content: {},
-      };
-      return setSharedMapResult(e, "kubbealti", data);
-    }
-    // Returns error if parsing failed
-    if (!parsed.success) {
-      console.log(response.data);
+    const url = buildKubbealtiUrl(e);
+    const [error, response] = await to(fetchAPI(url.api));
+    // Returns error if request failed
+    if (error || !response?.success) {
+      debugAPI(e, `Kubbealti API Error: ${error?.message || response?.code}`);
       return buildKubbealtiAPIError(
         e,
         url.user,
-        `${API_FAILED_TEXT}: ${parsed.error.message}`,
+        `${API_FAILED_TEXT}: ${error?.message || response?.code}`,
       );
     }
-  } /////////////////////////////
-  if (parsed.data.totalElements === 0) {
-    return setSharedMapResult(e, "kubbealti", {
-      serverDefinedReason: NO_RESULT,
+    response.data = {
+      ...(response.data as any),
+      content:
+        "content" in response.data
+          ? {
+              [1]: response.data.content,
+            }
+          : undefined,
       url: url.user,
       version: KUBBEALTI_VERSION,
       perf: perf(e),
-      totalPages: 0,
-      content: {},
-    });
-  }
-  const data = cleanseKubbealtiResponse(parsed.data, kubbealtiPage);
-  // return setSharedMapResult(e, "kubbealti", data);
-  if (cache) {
-    cache.content[kubbealtiPage] = data.content[kubbealtiPage];
-    return setSharedMapResult(e, "kubbealti", cache);
-  } else {
-    return setSharedMapResult(e, "kubbealti", {
-      ...data,
-      content: {
-        [kubbealtiPage]: data.content[kubbealtiPage],
-      },
-    });
-  }
-});
+    } satisfies KubbealtiResponse;
+    const parsed = KubbealtiResponseSchema.safeParse(response.data);
+    // Error handling
+    {
+      // Returns recommendations if the response is an error or has no results
+      const error = KubbealtiErrorSchema.safeParse(response.data);
+      if (error.success) {
+        const data: KubbealtiError = {
+          serverDefinedReason: NO_RESULT,
+          // items: error.data.items,
+          url: url.user,
+          version: KUBBEALTI_VERSION,
+          perf: perf(e),
+          content: {},
+        };
+        return setSharedMapResult(e, "kubbealti", data);
+      }
+      // Returns error if parsing failed
+      if (!parsed.success) {
+        console.log(response.data);
+        return buildKubbealtiAPIError(
+          e,
+          url.user,
+          `${API_FAILED_TEXT}: ${parsed.error.message}`,
+        );
+      }
+    } /////////////////////////////
+    if (parsed.data.totalElements === 0) {
+      return setSharedMapResult(e, "kubbealti", {
+        serverDefinedReason: NO_RESULT,
+        url: url.user,
+        version: KUBBEALTI_VERSION,
+        perf: perf(e),
+        content: {},
+      });
+    }
+    const data = cleanseKubbealtiResponse(parsed.data);
+    // return setSharedMapResult(e, "kubbealti", data);
+    if (cache) {
+      cache.content[1] = data.content[1];
+      return setSharedMapResult(e, "kubbealti", cache);
+    } else {
+      return setSharedMapResult(e, "kubbealti", {
+        ...data,
+        content: {
+          [1]: data.content[1],
+        },
+      });
+    }
+  },
+);
 
 // eslint-disable-next-line qwik/loader-location
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {

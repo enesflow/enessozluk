@@ -12,7 +12,6 @@ import {
 import { sha256 } from "~/helpers/sha256";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { isDev } from "@builder.io/qwik/build";
-import { getKubbealtiPage } from "~/helpers/dicts/kubbealti";
 import { CACHE_TOTAL_FAILED } from "~/helpers/db_config";
 import { loadSharedMap } from "~/helpers/request";
 
@@ -122,14 +121,11 @@ export const onRequest: RequestHandler = async (e) => {
   const query = getQuery(e.params.query);
   ///////////////////////////////
   const s = new Date().getTime();
-  const kubbealtiPage = getKubbealtiPage(e.url);
   const key = query.rawDecodedL;
   const cache = CACHE_DISABLED ? null : await getCacheByKey(e, key);
   const data: SharedMap = {
     query: getQuery(e.params.query),
-    url: {
-      kubbealtiPage,
-    },
+    url: {},
     cache: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
     cacheLastUpdated: cache ? cache.time : undefined,
     result: cache ? compressJSON.decompress(JSON.parse(cache.data)) : {},
