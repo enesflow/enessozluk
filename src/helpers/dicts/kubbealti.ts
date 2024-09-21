@@ -24,6 +24,8 @@ import { perf } from "../time";
 import { to } from "../to";
 import { buildKubbealtiUrl } from "./url";
 
+const MAX_KUBBEALTI_RESULTS = 3;
+
 // DONT DELETE THIS YET
 // https://eski.lugatim.com/rest/word-search/merhaba
 /* const loadTDKRecommendations = async (e: RequestEventBase) => {
@@ -88,8 +90,7 @@ const cleanseKubbealtiResponse = (
     );
   }
 
-  // and make the content array max 5 elements
-  data.content[1] = data.content[1]?.slice(0, 5);
+  data.content[1] = data.content[1]?.slice(0, MAX_KUBBEALTI_RESULTS);
   data.totalElements = data.content[1]?.length || 0;
 
   for (const item of data.content[1]!) {
