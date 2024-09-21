@@ -95,6 +95,9 @@ export const useMetaDataLoader = routeLoader$<SearchPageData>(async (e) => {
     //rhyme never fails
     recommendations: recommendations.length ? recommendations : undefined,
   };
-  e.sharedMap.set("metaData", metaData);
+  e.sharedMap.set("data", {
+    ...loadSharedMap(e),
+    metaData,
+  });
   return metaData;
 });
