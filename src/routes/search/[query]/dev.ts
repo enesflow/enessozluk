@@ -13,5 +13,5 @@ export const DEV_DISABLED: Record<Dicts, boolean> = {
   benzer: withDev(true),
   kubbealti: withDev(true),
   "nisanyan-affix": withDev(true),
-  rhyme: withDev(true),
+  rhyme: withDev(false),
 } as const;

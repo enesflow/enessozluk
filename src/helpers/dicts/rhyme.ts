@@ -14,6 +14,30 @@ import { words } from "../data/words";
 import { debugAPI } from "../log";
 import { perf } from "../time";
 
+const CUSTOM_ALPHABET = "hğaeıiylroöuübpdtçgkfvszşcjmn";
+
+function smaller_char(a: string, b: string): boolean {
+  const aIndex = CUSTOM_ALPHABET.indexOf(a);
+  const bIndex = CUSTOM_ALPHABET.indexOf(b);
+  return aIndex < bIndex;
+}
+
+function smaller(a: string, b: string): boolean {
+  /* const aIndex = CUSTOM_ALPHABET.indexOf(a);
+  const bIndex = CUSTOM_ALPHABET.indexOf(b);
+  console.log("is smaller", a, b, aIndex, bIndex);
+  return aIndex < bIndex; */
+  // we are not comparing only characters but words
+  // so we need to compare the whole word
+  const len = Math.min(a.length, b.length);
+  for (let i = 0; i < len; i++) {
+    if (a[i] !== b[i]) {
+      return smaller_char(a[i], b[i]);
+    }
+  }
+  return a.length < b.length;
+}
+
 function buildRhymeAPIError(
   e: RequestEventBase,
   word: string,
@@ -49,6 +73,57 @@ function clear(word: string): string {
     .replace(/Ô/g, "O");
 }
 
+function sortWordsByRhyme(det: string, words: string[]): string[] {
+  function getPoints(reversed: string): number {
+    let sum = 0;
+    for (let i = 0; i < Math.min(reversed.length, det.length); i++) {
+      const detChar = det[i];
+      const char = reversed[i];
+      const detIndex = CUSTOM_ALPHABET.indexOf(detChar);
+      const index = CUSTOM_ALPHABET.indexOf(char);
+      sum += Math.abs(detIndex - index);
+    }
+    return sum;
+  }
+  const reversedWord = clear(det).split("").reverse().join("");
+  // sort by the "points" of the words
+  // asc
+  // for every word, reverse it, and for from the start up to the length of det
+  // and add the points like abs(alphabetIndex - detAlphabetIndex)
+  const points = words.map((word) => {
+    const reversed = clear(word).split("").reverse().join("");
+    // compare how many characters are same from the start
+    let same = 0;
+    for (let i = 0; i < Math.min(reversed.length, reversedWord.length); i++) {
+      if (reversed[i] === reversedWord[i]) {
+        same++;
+      } else {
+        break;
+      }
+    }
+    return same;
+  });
+  const sorted = words.slice().sort((a, b) => {
+    const indexA = words.indexOf(a);
+    const indexB = words.indexOf(b);
+    // if the points are the same, sort by getPoints
+    if (points[indexA] === points[indexB]) {
+      return (
+        getPoints(clear(b).split("").reverse().join("")) -
+        getPoints(clear(a).split("").reverse().join(""))
+      );
+    }
+    return points[indexB] - points[indexA]; // desc
+  });
+  // print the best 5 words and their points
+  /* console.log("Best 5 words:");
+  for (let i = 0; i < Math.min(5, words.length); i++) {
+    console.log(sorted[i], points[words.indexOf(sorted[i])]);
+  }
+  console.log("point of", "kontes"); */
+  return sorted;
+}
+
 function getWords(
   array: string[],
   word: string,
@@ -70,7 +145,8 @@ function getWords(
       if (wordMid === word_reversed_clear) {
         index = mid;
         break;
-      } else if (wordMid < word_reversed_clear) {
+      } //else if (wordMid < word_reversed_clear) {
+      else if (smaller(wordMid, word_reversed_clear)) {
         start = mid + 1;
       } else {
         end = mid - 1;
@@ -111,7 +187,7 @@ function getWords(
     }
   }
 
-  return result;
+  return sortWordsByRhyme(word, result);
 }
 
 // eslint-disable-next-line qwik/loader-location

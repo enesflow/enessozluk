@@ -23,6 +23,7 @@ import { debugAPI } from "../log";
 import { perf } from "../time";
 import { to } from "../to";
 import { buildKubbealtiUrl } from "./url";
+import { isDev } from "@builder.io/qwik/build";
 
 const MAX_KUBBEALTI_RESULTS = 3;
 
@@ -294,8 +295,8 @@ export const kubbealtiLoader = server$(
 export const useKubbealtiLoader = routeLoader$<KubbealtiPackage>(async (e) => {
   // if (isDev && DEV_DISABLED.kubbealti)
   // qwik errors on build.server when I uncomment the if statement above
-  /* if (isDev)
+  if (isDev)
     // return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
-    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled"); */
+    return buildKubbealtiAPIError(e, "", "Kubbealti is disabled");
   return kubbealtiLoader.call(e);
 });
