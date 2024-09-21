@@ -53,9 +53,6 @@ export const KubbealtiView = component$<{
         </>
       ) : (
         <>
-          <p class="result-title-took">
-            {data.value.totalElements} sonuç bulundu.
-          </p>{" "}
           <ul class="results-list">
             {data.value.content[1]?.map((result, index) => (
               <li key={result.id} class="result-item">
