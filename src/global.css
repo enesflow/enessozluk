@@ -89,7 +89,8 @@ html {
 }
 
 .results-container {
-  @apply mx-auto mt-4 max-w-7xl sm:mx-8 md:mx-16 lg:mx-32 xl:mx-48;
+  @apply mx-auto mt-4 max-w-7xl;
+  @apply sm:px-8 md:px-16 lg:px-32 xl:px-48;
 }
 
 .error-message {

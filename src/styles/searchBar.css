@@ -3,8 +3,7 @@
 }
 
 .search-form-fixed {
-  width: calc(100% - 4rem);
-  @apply fixed left-1/2 top-4 z-50 -translate-x-1/2 transform opacity-80 focus-within:opacity-100;
+  @apply fixed left-1/2 top-4 z-50 w-[calc(100%-2rem)] -translate-x-1/2 transform opacity-80 focus-within:opacity-100 sm:w-[calc(100%-4rem)];
 }
 
 .search-form-fixed > * {
