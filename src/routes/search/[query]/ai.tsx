@@ -6,6 +6,7 @@ import { PerplexityCompletionChunk } from "~/helpers/perplexity/perplexity";
 import button_styles from "~/styles/button.css?inline";
 import styles from "~/styles/ai.css?inline";
 import Spinner from "~/components/spinner";
+import { loadSharedMap } from "~/helpers/request";
 
 function preprocess_text_server(text: string) {
   // remove any number that is enclosed in square brackets [123] and also remove the brackets
@@ -36,6 +37,7 @@ function process_text_client(text: string) {
 }
 
 const getAIResponse = server$(async function* (word: string) {
+  const sharedMap = loadSharedMap(this);
   const client = new OpenAI({
     apiKey: process.env.PERPLEXITY_API_KEY,
     baseURL: "https://api.perplexity.ai",
@@ -54,7 +56,7 @@ const getAIResponse = server$(async function* (word: string) {
         },
         {
           role: "user",
-          content: `Türkçe'de "${word}" kelimesinin anlamını ver. Başka bir şey istemiyorum.`,
+          content: `Türkçe'de "${sharedMap.query.rawDecoded}" kelimesinin anlamını ver. Başka bir şey istemiyorum.`,
         },
       ],
       stream: true,
