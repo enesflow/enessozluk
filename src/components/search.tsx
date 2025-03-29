@@ -11,9 +11,11 @@ import { useLocation, useNavigate } from "@builder.io/qwik-city";
 import { isBrowser } from "@builder.io/qwik/build";
 import Spinner from "./spinner";
 import styles from "~/styles/searchBar.css?inline";
+import button_styles from "~/styles/button.css?inline";
 
 export const SearchBar = component$<{ value?: string }>(({ value }) => {
   useStyles$(styles);
+  useStyles$(button_styles);
   const placeholderRef = useSignal<HTMLFormElement>();
   const fixToTop = useSignal(false);
   const nav = useNavigate();
@@ -67,7 +69,7 @@ export const SearchBar = component$<{ value?: string }>(({ value }) => {
         />
         <button
           type="submit"
-          class={`search-button ${isLoading.value ? "search-button-loading" : ""}`}
+          class={`generic-button search-button ${isLoading.value ? "search-button-loading" : ""}`}
         >
           {isLoading.value ? (
             <span>

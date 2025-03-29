@@ -47,6 +47,7 @@ import type { Dict, DictsArray } from "./dicts";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
 import { LuArrowLeft } from "@qwikest/icons/lucide";
+import { AIResult } from "./ai";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -135,7 +136,7 @@ const Results = component$<{
   const sort: DictsArray = [
     "tdk",
     "nisanyan",
-    "nnames", 
+    "nnames",
     "kubbealti",
     "luggat",
     "benzer",
@@ -227,14 +228,17 @@ export default component$(() => {
       </div>
       <SearchBar value={loc.params.query} />
       {data.value.allFailed && (
-        <p class="result-item">
-          Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
-          <ExternalLink
-            href={`https://www.google.com/search?q=${encodeURIComponent(
-              getGoogleQuery(loc.params.query),
-            )}`}
-          />
-        </p>
+        <>
+          <AIResult word={loc.params.query} />
+          <p class="result-item">
+            Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
+            <ExternalLink
+              href={`https://www.google.com/search?q=${encodeURIComponent(
+                getGoogleQuery(loc.params.query),
+              )}`}
+            />
+          </p>
+        </>
       )}
 
       {data.value.recommendations && (

@@ -1,0 +1,4 @@
+strong {
+  @apply text-red-600 dark:text-red-400;
+  /*@apply bg-red-100 dark:bg-red-950;*/
+}

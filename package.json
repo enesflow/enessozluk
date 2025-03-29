@@ -53,6 +53,8 @@
   "trustedDependencies-annotation": "Needed for bun to allow running install scripts",
   "type": "module",
   "dependencies": {
+    "caniuse-lite": "^1.0.30001707",
+    "openai": "^4.90.0",
     "zod": "^3.23.8"
   }
 }
