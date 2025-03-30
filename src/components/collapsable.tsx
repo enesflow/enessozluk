@@ -38,6 +38,7 @@ export const collapsableStoreSchema = z.object({
   benzer: z.boolean(),
   rhyme: z.boolean(),
   nnames: z.boolean(),
+  default: z.boolean(),
 });
 
 export type CollapsableStore = z.infer<typeof collapsableStoreSchema>;
@@ -51,18 +52,30 @@ export const DEFAULT_COLLAPSABLE: CollapsableStore = {
   benzer: false,
   rhyme: false,
   nnames: false,
+  default: true,
 };
 
 export const Collapsable = component$<
   QwikIntrinsicElements["div"] & {
-    cId: keyof CollapsableStore;
+    cId?: keyof CollapsableStore;
     defaultClosed?: boolean | never;
     lessOpacity?: boolean;
   }
 >(({ cId, defaultClosed: _defaultClosed, lessOpacity, ...props }) => {
   useStyles$(styles);
   const defaultClosed = useSignal(_defaultClosed ?? false);
-  const collapsed = useContext(CollapsableCTX);
+  const collapsed = cId
+    ? useContext(CollapsableCTX)
+    : {
+        default: true,
+        tdk: true,
+        nisanyan: true,
+        luggat: true,
+        kubbealti: true,
+        benzer: true,
+        rhyme: true,
+        nnames: true,
+      };
   const loc = useLocation();
   // eslint-disable-next-line qwik/no-use-visible-task
   useTask$(({ track }) => {
@@ -75,13 +88,13 @@ export const Collapsable = component$<
   return (
     <div
       {...props}
-      class={`collapsable ${lessOpacity && !(!collapsed[cId] && !defaultClosed.value) ? "opacity-50" : ""}`}
+      class={`collapsable ${lessOpacity && !(!collapsed[cId || "default"] && !defaultClosed.value) ? "opacity-50" : ""}`}
     >
       <div class="flex items-start gap-1">
         <button
           onClick$={() => {
-            if (defaultClosed.value) collapsed[cId] = false;
-            else collapsed[cId] = !collapsed[cId];
+            if (defaultClosed.value) collapsed[cId || "default"] = false;
+            else collapsed[cId || "default"] = !collapsed[cId || "default"];
             defaultClosed.value = false;
             setCollapsable(collapsed);
           }}
@@ -89,14 +102,17 @@ export const Collapsable = component$<
           {/* <Chevron style={{ rotate: collapsed[cId] ? "0deg" : "90deg" }} /> */}
           <LuChevronRight
             style={{
-              rotate: collapsed[cId] || defaultClosed.value ? "0deg" : "90deg",
+              rotate:
+                collapsed[cId || "default"] || defaultClosed.value
+                  ? "0deg"
+                  : "90deg",
             }}
             class="chevron mb-0.5 inline h-6 w-auto align-middle"
           />
         </button>
         <Slot name="header" />
       </div>
-      {!collapsed[cId] && !defaultClosed.value && <Slot />}
+      {!collapsed[cId || "default"] && !defaultClosed.value && <Slot />}
     </div>
   );
 });

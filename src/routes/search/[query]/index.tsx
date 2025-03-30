@@ -46,8 +46,9 @@ import { isNisanyanFailed } from "../../../components/dicts/nisanyan";
 import type { Dict, DictsArray } from "./dicts";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
-import { LuArrowLeft } from "@qwikest/icons/lucide";
+import { LuArrowLeft, LuSparkles } from "@qwikest/icons/lucide";
 import { AIResult } from "./ai";
+import Spark from "~/components/spark";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
@@ -126,9 +127,9 @@ function formatTime(ms: number) {
   return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(2)}s`;
 }
 
-function getGoogleQuery(query: string) {
+/* function getGoogleQuery(query: string) {
   return `${query} ne demek?`;
-}
+} */
 
 const Results = component$<{
   metaData: SearchPageData;
@@ -227,19 +228,6 @@ export default component$(() => {
         </div>
       </div>
       <SearchBar value={loc.params.query} />
-      {data.value.allFailed && (
-        <>
-          <AIResult word={loc.params.query} />
-          <p class="result-item">
-            Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
-            <ExternalLink
-              href={`https://www.google.com/search?q=${encodeURIComponent(
-                getGoogleQuery(loc.params.query),
-              )}`}
-            />
-          </p>
-        </>
-      )}
 
       {data.value.recommendations && (
         <div class="result-item result-subitem">
@@ -247,6 +235,34 @@ export default component$(() => {
         </div>
       )}
       <div class="relative">
+        {data.value.allFailed && (
+          <>
+            <Collapsable
+              id="ai"
+              cId="default"
+              defaultClosed={true}
+              key="ai"
+              lessOpacity={false}
+              class="ai-result"
+            >
+              <h1 class="results-heading" q:slot="header">
+                <a>
+                  <LuSparkles class="mb-0.5 inline w-auto" />
+                </a>{" "}
+                Yapay Zekaya Sor:
+              </h1>
+              <AIResult word={loc.params.query} />
+            </Collapsable>
+            {/* <p class="result-item">
+            Google'da ara "{getGoogleQuery(loc.params.query)}"{" "}
+            <ExternalLink
+              href={`https://www.google.com/search?q=${encodeURIComponent(
+                getGoogleQuery(loc.params.query),
+              )}`}
+            />
+          </p> */}
+          </>
+        )}
         <Results metaData={data.value} />
       </div>
     </div>

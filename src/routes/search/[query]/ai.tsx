@@ -1,4 +1,10 @@
-import { component$, useSignal, useStyles$, useTask$ } from "@builder.io/qwik";
+import {
+  component$,
+  useSignal,
+  useStyles$,
+  useTask$,
+  useVisibleTask$,
+} from "@builder.io/qwik";
 import { server$, useLocation } from "@builder.io/qwik-city";
 import OpenAI from "openai";
 import Spark from "~/components/spark";
@@ -7,6 +13,10 @@ import button_styles from "~/styles/button.css?inline";
 import styles from "~/styles/ai.css?inline";
 import Spinner from "~/components/spinner";
 import { loadSharedMap } from "~/helpers/request";
+
+function clean_url(url: string) {
+  return new URL(url).hostname.replace("www.", "");
+}
 
 function preprocess_text_server(text: string) {
   // remove any number that is enclosed in square brackets [123] and also remove the brackets
@@ -45,13 +55,9 @@ const getAIResponse = server$(async function* (word: string) {
   });
 
   const sources = new Set<string>(); // Using Set for unique sources
-  console.log(
-    "Running AI response for word:",
-    word,
-    "(",
-    sharedMap.query.rawDecoded,
-    ")",
-  );
+  if (word !== sharedMap.query.rawDecoded) {
+    throw new Error("Invalid word");
+  }
 
   try {
     const stream = (await client.chat.completions.create({
@@ -93,53 +99,60 @@ const getAIResponse = server$(async function* (word: string) {
 export const AIResult = component$<{
   word: string;
 }>(({ word }) => {
-  useStyles$(styles);
-  useStyles$(button_styles);
   const loc = useLocation();
   const message = useSignal("");
   const sourceList = useSignal<string[]>([]);
+  const isLoading = useSignal(true);
+  useStyles$(styles);
+  useStyles$(button_styles);
   useTask$(({ track }) => {
     track(() => loc.isNavigating);
     message.value = "";
     sourceList.value = [];
   });
-  const isLoading = useSignal(false);
+  useVisibleTask$(async () => {
+    isLoading.value = true;
+    message.value = "";
+    sourceList.value = [];
+    const response = await getAIResponse(word);
+    for await (const chunk of response) {
+      message.value += chunk.text;
+      if (chunk.sources) {
+        sourceList.value = [...sourceList.value, ...chunk.sources];
+      }
+    }
+    isLoading.value = false;
+  });
 
   return (
-    <div>
-      <button
-        type="submit"
-        class={`generic-button w-48 gap-2 ${isLoading.value ? "cursor-not-allowed bg-red-600" : ""}`}
-        onClick$={async () => {
-          isLoading.value = true;
-          message.value = "";
-          sourceList.value = [];
-          const response = await getAIResponse(word);
-          for await (const chunk of response) {
-            message.value += chunk.text;
-            if (chunk.sources) {
-              sourceList.value = [...sourceList.value, ...chunk.sources];
-            }
-          }
-          isLoading.value = false;
-        }}
-      >
+    <>
+      <section class="result-section">
         {isLoading.value ? (
-          <span>
-            <Spinner />{" "}
-          </span>
+          <p class="result-subitem">Bir saniye bekleyin...</p>
         ) : (
-          <>
-            <Spark />
-            {message.value.length === 0 ? "Yapay zekaya sor" : "Yeniden sor"}
-          </>
+          <p
+            dangerouslySetInnerHTML={process_text_client(message.value)}
+            class="result-subitem"
+          />
         )}
-      </button>
-
-      <p
-        dangerouslySetInnerHTML={process_text_client(message.value)}
-        class="result-item"
-      />
-    </div>
+      </section>
+      {sourceList.value.length > 0 && (
+        <section class="result-section">
+          <h2 class="result-subtitle">Kaynaklar</h2>
+          <div class="result-subitem">
+            {sourceList.value.map((source) => (
+              <a
+                href={source}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="mr-1"
+              >
+                {clean_url(source)}
+              </a>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
   );
 });
