@@ -125,7 +125,7 @@ export const AIResult = component$<{
   return (
     <>
       <section class="result-section">
-        {isLoading.value ? (
+        {isLoading.value && message.value.length === 0 ? (
           <p class="result-subitem">Bir saniye bekleyin...</p>
         ) : (
           <p
