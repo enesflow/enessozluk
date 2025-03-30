@@ -137,7 +137,7 @@ export const AIResult = component$<{
       {sourceList.value.length > 0 && (
         <section class="result-section">
           <h2 class="result-subtitle">Kaynaklar</h2>
-          <div class="result-subitem">
+          <div class="result-subitem overflow-x-auto">
             {sourceList.value.map((source) => (
               <a
                 href={source}
