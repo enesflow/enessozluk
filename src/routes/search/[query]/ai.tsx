@@ -39,11 +39,19 @@ function process_text_client(text: string) {
 const getAIResponse = server$(async function* (word: string) {
   const sharedMap = loadSharedMap(this);
   const client = new OpenAI({
-    apiKey: process.env.PERPLEXITY_API_KEY,
+    apiKey:
+      process.env.PERPLEXITY_API_KEY || this.env.get("PERPLEXITY_API_KEY"),
     baseURL: "https://api.perplexity.ai",
   });
 
   const sources = new Set<string>(); // Using Set for unique sources
+  console.log(
+    "Running AI response for word:",
+    word,
+    "(",
+    sharedMap.query.rawDecoded,
+    ")",
+  );
 
   try {
     const stream = (await client.chat.completions.create({
@@ -74,9 +82,11 @@ const getAIResponse = server$(async function* (word: string) {
     }
 
     yield { text: "", sources: Array.from(sources) };
+    return "Finished";
   } catch (error) {
     console.error("Streaming error:", error);
     yield { text: "⚠️ Service unavailable.", sources: [] };
+    throw error;
   }
 });
 
