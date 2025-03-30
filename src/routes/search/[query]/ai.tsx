@@ -7,12 +7,10 @@ import {
 } from "@builder.io/qwik";
 import { server$, useLocation } from "@builder.io/qwik-city";
 import OpenAI from "openai";
-import Spark from "~/components/spark";
 import type { PerplexityCompletionChunk } from "~/helpers/perplexity/perplexity";
-import button_styles from "~/styles/button.css?inline";
-import styles from "~/styles/ai.css?inline";
-import Spinner from "~/components/spinner";
 import { loadSharedMap } from "~/helpers/request";
+import styles from "~/styles/ai.css?inline";
+import button_styles from "~/styles/button.css?inline";
 
 function clean_url(url: string) {
   return new URL(url).hostname.replace("www.", "");

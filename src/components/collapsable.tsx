@@ -64,18 +64,18 @@ export const Collapsable = component$<
 >(({ cId, defaultClosed: _defaultClosed, lessOpacity, ...props }) => {
   useStyles$(styles);
   const defaultClosed = useSignal(_defaultClosed ?? false);
-  const collapsed = cId
-    ? useContext(CollapsableCTX)
-    : {
-        default: true,
-        tdk: true,
-        nisanyan: true,
-        luggat: true,
-        kubbealti: true,
-        benzer: true,
-        rhyme: true,
-        nnames: true,
-      };
+  let collapsed = useContext(CollapsableCTX);
+  if (!cId)
+    collapsed = {
+      default: true,
+      tdk: true,
+      nisanyan: true,
+      luggat: true,
+      kubbealti: true,
+      benzer: true,
+      rhyme: true,
+      nnames: true,
+    };
   const loc = useLocation();
   // eslint-disable-next-line qwik/no-use-visible-task
   useTask$(({ track }) => {

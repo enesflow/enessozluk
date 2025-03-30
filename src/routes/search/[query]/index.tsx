@@ -5,6 +5,7 @@ import {
   useStyles$,
 } from "@builder.io/qwik";
 import { Link, useLocation, type DocumentHead } from "@builder.io/qwik-city";
+import { LuArrowLeft, LuSparkles } from "@qwikest/icons/lucide";
 import type { CollapsableStore } from "~/components/collapsable";
 import {
   Collapsable,
@@ -43,12 +44,10 @@ import { RHYME_VERSION } from "~/types/rhyme";
 import { TDK_VERSION } from "~/types/tdk";
 import { isBenzerFailed } from "../../../components/dicts/benzer";
 import { isNisanyanFailed } from "../../../components/dicts/nisanyan";
+import { AIResult } from "./ai";
 import type { Dict, DictsArray } from "./dicts";
 import type { SearchPageData } from "./metaData";
 import { useMetaDataLoader } from "./metaData";
-import { LuArrowLeft, LuSparkles } from "@qwikest/icons/lucide";
-import { AIResult } from "./ai";
-import Spark from "~/components/spark";
 
 // IMPORTANT, DON'T FORGET TO RE-EXPORT THE LOADER FUNCTIONS
 export {
